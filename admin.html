@@ -2,35 +2,89 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Catalogue</title>
+    <title>Admin Pro - M.A.M Technologie</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        .section { background: white; padding: 20px; border-radius: 8px; display: none; }
+        .active { display: block; }
+        input, textarea { width: 100%; margin: 10px 0; padding: 10px; }
+        button { padding: 10px; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h1>Nos Produits</h1>
-    <div id="catalog">Chargement en cours...</div>
 
-    <script>
-        const supabase = supabase.createClient(
-            'https://myxxcaaveqbwsujckxhj.supabase.co', 
-            'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy'
-        );
+<div class="nav">
+    <button onclick="show('produits')">Produits</button>
+    <button onclick="show('messages')">Messages</button>
+    <button onclick="show('settings')">Réglages</button>
+</div>
 
-        async function chargerProduits() {
-            try {
-                const { data, error } = await supabase.from('products').select('*');
-                if (error) throw error;
-                
-                const div = document.getElementById('catalog');
-                if (data.length === 0) {
-                    div.innerHTML = "Aucun produit trouvé dans la base.";
-                } else {
-                    div.innerHTML = data.map(p => `<div><h3>${p.name}</h3><p>${p.price} FCFA</p></div>`).join('');
-                }
-            } catch (err) {
-                document.getElementById('catalog').innerHTML = "Erreur : " + err.message;
-            }
+<div id="produits" class="section active">
+    <h2>Ajouter un produit</h2>
+    <input type="text" id="name" placeholder="Nom">
+    <input type="number" id="price" placeholder="Prix">
+    <input type="text" id="category" placeholder="Catégorie">
+    <input type="text" id="promo" placeholder="Promotion">
+    <textarea id="desc" placeholder="Description"></textarea>
+    <input type="file" id="fileInput">
+    <button onclick="saveProduct()">Enregistrer</button>
+</div>
+
+<div id="messages" class="section">
+    <h2>Messages reçus</h2>
+    <div id="msgList"></div>
+</div>
+
+<div id="settings" class="section">
+    <h2>Réglages (Look)</h2>
+    <input type="text" id="color" placeholder="Code couleur (ex: #ff0000)">
+    <button onclick="saveSettings()">Enregistrer couleur</button>
+</div>
+
+<script>
+    const supabase = supabase.createClient('https://myxxcaaveqbwsujckxhj.supabase.co', 'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy');
+
+    function show(id) {
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
+
+    async function saveProduct() {
+        const file = document.getElementById('fileInput').files[0];
+        let imageUrl = '';
+        if(file) {
+            const { data } = await supabase.storage.from('mam-media').upload(Date.now() + file.name, file);
+            imageUrl = supabase.storage.from('mam-media').getPublicUrl(data.path).data.publicUrl;
         }
-        chargerProduits();
-    </script>
+        await supabase.from('products').insert([{ 
+            name: document.getElementById('name').value, 
+            price: document.getElementById('price').value,
+            image_url: imageUrl,
+            description: document.getElementById('desc').value 
+        }]);
+        alert("Produit ajouté !");
+    }
+
+    async function loadMessages() {
+        const { data } = await supabase.from('messages').select('*');
+        document.getElementById('msgList').innerHTML = data.map(m => `
+            <div><p>${m.message}</p><button onclick="delMsg(${m.id})">Supprimer</button></div>
+        `).join('');
+    }
+
+    async function delMsg(id) {
+        await supabase.from('messages').delete().eq('id', id);
+        loadMessages();
+    }
+
+    async function saveSettings() {
+        await supabase.from('settings').update({ theme_color: document.getElementById('color').value }).eq('id', 1);
+        alert("Couleur mise à jour !");
+    }
+    
+    loadMessages();
+</script>
 </body>
 </html>
