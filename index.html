@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Catalogue M.A.M Technologie</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style id="dynamicStyle">
+        body { font-family: sans-serif; padding: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Nos Produits</h1>
+    <div id="catalog">Chargement...</div>
+
+    <script>
+        const supabase = supabase.createClient('https://myxxcaaveqbwsujckxhj.supabase.co', 'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy');
+
+        async function init() {
+            // Appliquer la couleur depuis la table settings
+            const { data: set } = await supabase.from('settings').select('theme_color').eq('id', 1).single();
+            if(set) document.getElementById('dynamicStyle').innerHTML = `h1 { color: ${set.theme_color}; }`;
+
+            // Charger les produits
+            const { data: prod } = await supabase.from('products').select('*');
+            document.getElementById('catalog').innerHTML = prod.map(p => `
+                <div><h3>${p.name}</h3><p>${p.price} FCFA</p></div>
+            `).join('');
+        }
+        init();
+    </script>
+</body>
+</html>
