@@ -7,30 +7,28 @@
 </head>
 <body>
     <h1>Nos Produits</h1>
-    <div id="catalog">Chargement en cours...</div>
+    <div id="catalog">Chargement...</div>
 
     <script>
-        const supabase = supabase.createClient(
-            'https://myxxcaaveqbwsujckxhj.supabase.co', 
-            'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy'
-        );
+        const supabase = supabase.createClient('https://myxxcaaveqbwsujckxhj.supabase.co', 'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy');
 
-        async function chargerProduits() {
+        async function init() {
             try {
                 const { data, error } = await supabase.from('products').select('*');
                 if (error) throw error;
                 
-                const div = document.getElementById('catalog');
-                if (data.length === 0) {
-                    div.innerHTML = "Aucun produit trouvé dans la base.";
+                if (!data || data.length === 0) {
+                    document.getElementById('catalog').innerHTML = "Aucun produit trouvé.";
                 } else {
-                    div.innerHTML = data.map(p => `<div><h3>${p.name}</h3><p>${p.price} FCFA</p></div>`).join('');
+                    document.getElementById('catalog').innerHTML = data.map(p => `
+                        <div><h3>${p.name}</h3><p>${p.price} FCFA</p></div>
+                    `).join('');
                 }
             } catch (err) {
                 document.getElementById('catalog').innerHTML = "Erreur : " + err.message;
             }
         }
-        chargerProduits();
+        init();
     </script>
 </body>
 </html>
