@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact M.A.M Technologie</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+        .form-card { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2>Nous contacter</h2>
+    <input type="text" id="name" placeholder="Votre nom">
+    <input type="email" id="email" placeholder="Votre email">
+    <textarea id="msg" placeholder="Votre message" rows="4"></textarea>
+    <button onclick="envoyerMessage()">Envoyer</button>
+</div>
+
+<script>
+    const supabase = supabase.createClient(
+        'https://myxxcaaveqbwsujckxhj.supabase.co', 
+        'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy'
+    );
+
+    async function envoyerMessage() {
+        const { error } = await supabase.from('messages').insert([
+            { 
+                client_name: document.getElementById('name').value, 
+                email: document.getElementById('email').value,
+                message: document.getElementById('msg').value 
+            }
+        ]);
+        
+        if (error) {
+            alert("Erreur : " + error.message);
+        } else {
+            alert("Message envoyé !");
+            location.reload();
+        }
+    }
+</script>
+</body>
+</html>
