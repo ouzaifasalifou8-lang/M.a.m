@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogue M.A.M Technologie</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style id="dynamicStyle">
@@ -13,18 +14,44 @@
     <div id="catalog">Chargement...</div>
 
     <script>
-        const supabase = supabase.createClient('https://myxxcaaveqbwsujckxhj.supabase.co', 'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy');
+        // Initialisation de Supabase
+        const supabase = supabase.createClient(
+            'https://myxxcaaveqbwsujckxhj.supabase.co', 
+            'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy'
+        );
 
         async function init() {
-            // Appliquer la couleur depuis la table settings
-            const { data: set } = await supabase.from('settings').select('theme_color').eq('id', 1).single();
-            if(set) document.getElementById('dynamicStyle').innerHTML = `h1 { color: ${set.theme_color}; }`;
+            const catalogDiv = document.getElementById('catalog');
+            
+            try {
+                // 1. Récupérer la couleur
+                const { data: set, error: setErr } = await supabase.from('settings').select('theme_color').eq('id', 1).single();
+                if (set) {
+                    document.getElementById('dynamicStyle').innerHTML = `h1 { color: ${set.theme_color}; }`;
+                }
 
-            // Charger les produits
-            const { data: prod } = await supabase.from('products').select('*');
-            document.getElementById('catalog').innerHTML = prod.map(p => `
-                <div><h3>${p.name}</h3><p>${p.price} FCFA</p></div>
-            `).join('');
+                // 2. Récupérer les produits
+                const { data: prod, error: prodErr } = await supabase.from('products').select('*');
+                
+                if (prodErr) throw prodErr;
+
+                if (!prod || prod.length === 0) {
+                    catalogDiv.innerHTML = "<p>Aucun produit n'a encore été ajouté.</p>";
+                    return;
+                }
+
+                // 3. Afficher les produits
+                catalogDiv.innerHTML = prod.map(p => `
+                    <div style="border:1px solid #ccc; margin:10px 0; padding:10px; border-radius:8px;">
+                        <h3>${p.name || 'Sans nom'}</h3>
+                        <p>Prix : ${p.price || 0} FCFA</p>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.error("Erreur :", err);
+                catalogDiv.innerHTML = `<p style="color:red;">Erreur : ${err.message}</p>`;
+            }
         }
         init();
     </script>
