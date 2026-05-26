@@ -2,58 +2,35 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogue M.A.M Technologie</title>
+    <title>Catalogue</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style id="dynamicStyle">
-        body { font-family: sans-serif; padding: 20px; }
-    </style>
 </head>
 <body>
     <h1>Nos Produits</h1>
-    <div id="catalog">Chargement...</div>
+    <div id="catalog">Chargement en cours...</div>
 
     <script>
-        // Initialisation de Supabase
         const supabase = supabase.createClient(
             'https://myxxcaaveqbwsujckxhj.supabase.co', 
             'sb_publishable_A-8fk-zlmgdcTc3WAcx7fA_A0Z0SSJy'
         );
 
-        async function init() {
-            const catalogDiv = document.getElementById('catalog');
-            
+        async function chargerProduits() {
             try {
-                // 1. Récupérer la couleur
-                const { data: set, error: setErr } = await supabase.from('settings').select('theme_color').eq('id', 1).single();
-                if (set) {
-                    document.getElementById('dynamicStyle').innerHTML = `h1 { color: ${set.theme_color}; }`;
-                }
-
-                // 2. Récupérer les produits
-                const { data: prod, error: prodErr } = await supabase.from('products').select('*');
+                const { data, error } = await supabase.from('products').select('*');
+                if (error) throw error;
                 
-                if (prodErr) throw prodErr;
-
-                if (!prod || prod.length === 0) {
-                    catalogDiv.innerHTML = "<p>Aucun produit n'a encore été ajouté.</p>";
-                    return;
+                const div = document.getElementById('catalog');
+                if (data.length === 0) {
+                    div.innerHTML = "Aucun produit trouvé dans la base.";
+                } else {
+                    div.innerHTML = data.map(p => `<div><h3>${p.name}</h3><p>${p.price} FCFA</p></div>`).join('');
                 }
-
-                // 3. Afficher les produits
-                catalogDiv.innerHTML = prod.map(p => `
-                    <div style="border:1px solid #ccc; margin:10px 0; padding:10px; border-radius:8px;">
-                        <h3>${p.name || 'Sans nom'}</h3>
-                        <p>Prix : ${p.price || 0} FCFA</p>
-                    </div>
-                `).join('');
-
             } catch (err) {
-                console.error("Erreur :", err);
-                catalogDiv.innerHTML = `<p style="color:red;">Erreur : ${err.message}</p>`;
+                document.getElementById('catalog').innerHTML = "Erreur : " + err.message;
             }
         }
-        init();
+        chargerProduits();
     </script>
 </body>
 </html>
