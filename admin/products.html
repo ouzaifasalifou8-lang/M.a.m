@@ -1,43 +1,88 @@
-document.getElementById('productForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    btn.innerText = 'Enregistrement en cours...';
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter Produit - M.A.Mshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
 
-    try {
-        const name = document.getElementById('name').value;
-        const price = document.getElementById('price').value;
-        const file = document.getElementById('mediaFile').files[0];
+    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">Ajouter un produit</h2>
         
-        console.log("Début de l'enregistrement...");
+        <form id="productForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium">Nom du produit</label>
+                <input type="text" id="name" required class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Prix (FCFA)</label>
+                <input type="number" id="price" required class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Image ou Vidéo</label>
+                <input type="file" id="mediaFile" accept="image/*,video/*" class="w-full border p-2 rounded">
+            </div>
+            <button type="submit" id="submitBtn" class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">
+                Enregistrer le produit
+            </button>
+        </form>
+    </div>
 
-        let mediaUrl = '';
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
 
-        if (file) {
-            console.log("Upload du fichier en cours...");
-            const fileName = `${Date.now()}_${file.name}`;
-            const { data, error } = await supabase.storage
-                .from('media') // Vérifiez bien que le nom du bucket est 'media'
-                .upload(fileName, file);
-            
-            if (error) throw new Error("Erreur Upload: " + error.message);
-            
-            const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(fileName);
-            mediaUrl = publicUrlData.publicUrl;
-        }
+    <script>
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = 'Enregistrement en cours...';
+            btn.disabled = true;
 
-        console.log("Insertion dans la base de données...");
-        const { error: dbError } = await supabase
-            .from('products')
-            .insert([{ name, price, attributes: { mediaUrl } }]);
+            try {
+                const name = document.getElementById('name').value;
+                const price = document.getElementById('price').value;
+                const file = document.getElementById('mediaFile').files[0];
+                let mediaUrl = '';
 
-        if (dbError) throw new Error("Erreur Base: " + dbError.message);
+                // 1. Upload du média
+                if (file) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}.${fileExt}`;
+                    
+                    const { data, error } = await supabase.storage
+                        .from('media')
+                        .upload(fileName, file);
+                    
+                    if (error) throw new Error("Erreur upload: " + error.message);
+                    
+                    const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(fileName);
+                    mediaUrl = publicUrlData.publicUrl;
+                }
 
-        alert('Succès !');
-        location.reload();
+                // 2. Insertion dans la table
+                const { error: dbError } = await supabase
+                    .from('products')
+                    .insert([{ 
+                        name: name, 
+                        price: parseFloat(price), 
+                        attributes: { mediaUrl: mediaUrl } 
+                    }]);
 
-    } catch (err) {
-        console.error(err);
-        alert(err.message); // Ceci affichera l'erreur réelle sur votre téléphone
-        btn.innerText = 'Enregistrer le produit';
-    }
-});
+                if (dbError) throw new Error("Erreur base: " + dbError.message);
+
+                alert('Produit enregistré avec succès !');
+                location.reload();
+
+            } catch (err) {
+                console.error(err);
+                alert('Erreur: ' + err.message);
+            } finally {
+                btn.innerText = 'Enregistrer le produit';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
