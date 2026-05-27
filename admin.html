@@ -1,14 +1,50 @@
-<input type="text" id="nom" placeholder="Nom du produit">
-<button onclick="publier()">Publier</button>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration MAMshop</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        input { padding: 10px; width: 80%; margin-bottom: 10px; }
+        button { padding: 10px 20px; cursor: pointer; background: #0070f3; color: white; border: none; }
+    </style>
+</head>
+<body>
 
-<script>
-  async function publier() {
-    const nom = document.getElementById('nom').value;
-    const res = await fetch('/api/produits', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nom })
-    });
-    if (res.ok) alert("Succès !");
-  }
-</script>
+    <h1>Ajouter un produit</h1>
+    <input type="text" id="nomProduit" placeholder="Entrez le nom du produit">
+    <br>
+    <button onclick="publierProduit()">Publier le produit</button>
+
+    <script>
+        async function publierProduit() {
+            const nom = document.getElementById('nomProduit').value;
+            
+            if (!nom) {
+                alert("Veuillez entrer un nom de produit.");
+                return;
+            }
+
+            try {
+                // Envoi vers votre API Vercel
+                const response = await fetch('/api/produits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nom: nom })
+                });
+
+                if (response.ok) {
+                    alert("Produit ajouté avec succès à la base Turso !");
+                    document.getElementById('nomProduit').value = ""; // Vider le champ
+                } else {
+                    alert("Erreur lors de l'ajout.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erreur technique : " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
