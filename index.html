@@ -1,44 +1,33 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>M.A.Mshop - Boutique</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-gray-100 p-6">
-    <h1 class="text-3xl font-bold text-center mb-8">Nos Produits</h1>
-    
-    <div id="productList" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        </div>
+<div id="boutique" style="display: flex; gap: 20px;"></div>
 
-    <script>
-        // Initialisation
-        const supabase = window.supabase.createClient(
-            'https://dzbomxdmnznzykppbguh.supabase.co', 
-            'votre-clé-anon-ici' // REMPLACEZ PAR VOTRE VRAIE CLÉ
-        );
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
 
-        async function fetchProducts() {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*');
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbLsac6o8g7hFhnUvhn41-57DwDKSzzUg",
+    authDomain: "mamanan-8f3d9.firebaseapp.com",
+    projectId: "mamanan-8f3d9",
+    storageBucket: "mamanan-8f3d9.firebasestorage.app",
+    messagingSenderId: "766980373370",
+    appId: "1:766980373370:web:64bd2bf510d71dd148b4c3",
+    measurementId: "G-9SBJ7G5PYQ"
+  };
 
-            if (error) {
-                console.error("Erreur:", error.message);
-                return;
-            }
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-            const container = document.getElementById('productList');
-            container.innerHTML = data.map(product => `
-                <div class="bg-white p-4 rounded shadow">
-                    <h2 class="font-bold text-xl">${product.name}</h2>
-                    <p class="text-gray-600">${product.price || 0} FCFA</p>
-                </div>
-            `).join('');
-        }
-
-        fetchProducts();
-    </script>
-</body>
-</html>
+  onSnapshot(collection(db, "Produits"), (snapshot) => {
+    const conteneur = document.getElementById('boutique');
+    conteneur.innerHTML = "";
+    snapshot.forEach((doc) => {
+      const p = doc.data();
+      conteneur.innerHTML += `
+        <div style="border: 1px solid #ccc; padding: 10px;">
+          <img src="${p.image}" width="150">
+          <h3>${p.nom}</h3>
+          <p>${p.prix} FCFA</p>
+        </div>`;
+    });
+  });
+</script>
