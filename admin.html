@@ -1,39 +1,37 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Test Supabase Final</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-    <button id="btnSupabase" style="padding: 20px; font-size: 20px;">TESTER SUPABASE</button>
-    <p id="resultat"></p>
+<input type="file" id="imageInput">
+<input id="nom" placeholder="Nom du produit">
+<input id="prix" placeholder="Prix">
+<button id="btnUpload">Publier le produit</button>
 
-    <script>
-        // Initialisation
-        const supabaseUrl = 'https://dzbomxdmnznzykppbguh.supabase.co';
-        const supabaseKey = 'Sb_publishable_09bNEz6hpAH_QeD91-dhZw_ufVBhDlS';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
 
-        document.getElementById('btnSupabase').addEventListener('click', async () => {
-            document.getElementById('resultat').innerText = "Test en cours...";
-            
-            try {
-                // On tente juste de lire la table 'products'
-                const { data, error } = await supabase
-                    .from('products')
-                    .select('id')
-                    .limit(1);
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbLsac6o8g7hFhnUvhn41-57DwDKSzzUg",
+    authDomain: "mamanan-8f3d9.firebaseapp.com",
+    projectId: "mamanan-8f3d9",
+    storageBucket: "mamanan-8f3d9.firebasestorage.app",
+    messagingSenderId: "766980373370",
+    appId: "1:766980373370:web:64bd2bf510d71dd148b4c3",
+    measurementId: "G-9SBJ7G5PYQ"
+  };
 
-                if (error) throw error;
-                
-                alert("Connexion Supabase réussie !");
-                document.getElementById('resultat').innerText = "Connexion OK.";
-            } catch (err) {
-                alert("Erreur Supabase : " + err.message);
-                document.getElementById('resultat').innerText = "Erreur : " + err.message;
-            }
-        });
-    </script>
-</body>
-</html>
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  document.getElementById('btnUpload').onclick = async () => {
+    const file = document.getElementById('imageInput').files[0];
+    const nom = document.getElementById('nom').value;
+    const prix = document.getElementById('prix').value;
+
+    const storageRef = ref(storage, 'produits/' + file.name);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+
+    await addDoc(collection(db, "Produits"), { nom, prix, image: url });
+    alert("Produit publié avec succès !");
+  };
+</script>
