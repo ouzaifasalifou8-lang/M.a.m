@@ -1,35 +1,41 @@
-<div id="boutique">Chargement des produits...</div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Boutique MAMshop</title>
+</head>
+<body>
+    <h1>Nos Produits</h1>
+    <div id="liste-produits">Chargement en cours...</div>
 
-<script src="https://unpkg.com/mongodb-stitch-browser-sdk@4.8.0/dist/browser/mongodb-stitch-browser-sdk.min.js"></script>
+    <script>
+        async function chargerProduits() {
+            try {
+                // On appelle votre API Vercel qui communique avec Turso
+                const response = await fetch('/api/produits');
+                const produits = await response.json();
+                
+                const conteneur = document.getElementById('liste-produits');
+                
+                if (produits.length === 0) {
+                    conteneur.innerHTML = "Aucun produit pour le moment.";
+                    return;
+                }
 
-<script>
-  // REMPLACEZ 'votre-app-id-ici' par l'ID que vous avez trouvé dans MongoDB Atlas > App Services
-  const client = stitch.Stitch.initializeDefaultAppClient('mongodb+srv://Ouzaif:<WwmcCM6p5XaLYVx0>@cluster0.4amt8zx.mongodb.net/?appName=Cluster0');
-  const mongodb = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas');
-  const db = mongodb.db('MAMshopDB'); // Nom de votre base
+                // On affiche la liste des produits
+                conteneur.innerHTML = produits.map(p => 
+                    `<div style="border: 1px solid #ddd; padding: 10px; margin: 10px; border-radius: 5px;">
+                        <h3>${p.nom}</h3>
+                     </div>`
+                ).join('');
+                
+            } catch (err) {
+                document.getElementById('liste-produits').innerHTML = "Erreur de chargement : " + err.message;
+            }
+        }
 
-  async function afficherProduits() {
-    try {
-      // Connexion anonyme
-      await client.auth.loginWithCredential(new stitch.AnonymousCredential());
-      
-      // Récupérer les produits
-      const produits = await db.collection('Produits').find({}).toArray();
-      
-      const conteneur = document.getElementById('boutique');
-      conteneur.innerHTML = ""; // Vider le chargement
-      
-      produits.forEach(p => {
-        conteneur.innerHTML += `
-          <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
-            <h3>${p.nom}</h3>
-            <p>${p.prix || 'Prix non défini'} FCFA</p>
-          </div>`;
-      });
-    } catch (err) {
-      document.getElementById('boutique').innerHTML = "Erreur de chargement : " + err.message;
-    }
-  }
-
-  afficherProduits();
-</script>
+        // Lancer le chargement au démarrage
+        chargerProduits();
+    </script>
+</body>
+</html>
