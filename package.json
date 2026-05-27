@@ -1,0 +1,35 @@
+{
+  "name": "mamshop",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/ssr": "^0.1.0",
+    "zod": "^3.22.4",
+    "react-hook-form": "^7.51.0",
+    "lucide-react": "^0.363.0",
+    "recharts": "^2.12.0",
+    "react-hot-toast": "^2.4.1",
+    "date-fns": "^3.6.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8",
+    "autoprefixer": "^10",
+    "shadcn-ui": "^0.8.0"
+  }
+}
