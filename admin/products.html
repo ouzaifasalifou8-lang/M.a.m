@@ -36,8 +36,15 @@
     <script>
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Vérification de sécurité
+            if (typeof supabase === 'undefined') {
+                alert("Erreur: Supabase n'est pas chargé ! Vérifiez le fichier js/supabase.js");
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
-            btn.innerText = 'Enregistrement en cours...';
+            btn.innerText = 'Enregistrement...';
             btn.disabled = true;
 
             try {
@@ -46,7 +53,6 @@
                 const file = document.getElementById('mediaFile').files[0];
                 let mediaUrl = '';
 
-                // 1. Upload du média
                 if (file) {
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${Date.now()}.${fileExt}`;
@@ -55,13 +61,12 @@
                         .from('media')
                         .upload(fileName, file);
                     
-                    if (error) throw new Error("Erreur upload: " + error.message);
+                    if (error) throw new Error("Erreur Upload: " + error.message);
                     
                     const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(fileName);
                     mediaUrl = publicUrlData.publicUrl;
                 }
 
-                // 2. Insertion dans la table
                 const { error: dbError } = await supabase
                     .from('products')
                     .insert([{ 
@@ -70,7 +75,7 @@
                         attributes: { mediaUrl: mediaUrl } 
                     }]);
 
-                if (dbError) throw new Error("Erreur base: " + dbError.message);
+                if (dbError) throw new Error("Erreur Base: " + dbError.message);
 
                 alert('Produit enregistré avec succès !');
                 location.reload();
