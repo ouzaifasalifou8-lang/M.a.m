@@ -1,30 +1,26 @@
-<script src="https://cdn.jsdelivr.net/npm/mongodb-stitch-browser-sdk@4.8.0/dist/browser/mongodb-stitch-browser-sdk.min.js"></script>
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Test Admin - MAMshop</h2>
+  <input type="text" id="nom" placeholder="Nom du produit">
+  <button onclick="testerEnvoi()">Publier dans MongoDB</button>
 
-<script>
-  // Remplacez 'VOTRE_APP_ID' par l'ID que vous trouvez dans votre console MongoDB Atlas > App Services
-  const client = stitch.Stitch.initializeDefaultAppClient('mongodb+srv://Ouzaif:<WwmcCM6p5XaLYVx0>@cluster0.4amt8zx.mongodb.net/?appName=Cluster0');
-  const mongodb = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas');
-  const db = mongodb.db('MAMshopDB'); // Nom de votre base de données
+  <script src="https://cdn.jsdelivr.net/npm/mongodb@4.17.0/lib/mongodb.min.js"></script>
+  <script>
+    // CHAÎNE DE CONNEXION (Test uniquement)
+    const uri = "mongodb+srv://Ouzaif:WwmcCM6p5XaLYVx0@cluster0.4amt8zx.mongodb.net/?appName=Cluster0";
 
-  async function testerConnexion() {
-    try {
-      // Connexion anonyme pour le test
-      await client.auth.loginWithCredential(new stitch.AnonymousCredential());
-      console.log("Connecté à MongoDB !");
-
-      // Insertion d'un produit de test
-      await db.collection('Produits').insertOne({ 
-        nom: "Produit de Test", 
-        date: new Date() 
-      });
-
-      alert("Succès ! La donnée est bien envoyée dans MongoDB.");
-    } catch (err) {
-      console.error(err);
-      alert("Erreur de connexion : " + err.message);
+    async function testerEnvoi() {
+      const nom = document.getElementById('nom').value;
+      try {
+        // Note: Dans un vrai site, ceci doit être fait dans une API (Backend)
+        // Voici une simulation simple
+        console.log("Tentative de connexion à : " + uri);
+        alert("Pour des raisons de sécurité, le driver MongoDB direct ne fonctionne pas dans le navigateur.\n\nVous devez utiliser une API Vercel pour cela.");
+      } catch (err) {
+        alert("Erreur : " + err.message);
+      }
     }
-  }
-</script>
-
-<button onclick="testerConnexion()">Tester la connexion MongoDB</button>
-
+  </script>
+</body>
+</html>
