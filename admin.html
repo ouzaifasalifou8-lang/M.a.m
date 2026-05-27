@@ -2,38 +2,46 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Test Admin</title>
+    <title>Test Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="p-10">
     <div class="max-w-md mx-auto bg-white p-6 rounded shadow">
-        <h2 class="text-xl font-bold mb-4">Test Connexion Supabase</h2>
+        <h2 class="text-xl font-bold mb-4">Test de Connexion</h2>
         <input type="text" id="pName" placeholder="Nom produit" class="w-full border p-2 mb-2">
-        <button id="btnTest" class="bg-blue-600 text-white w-full py-2">Envoyer</button>
-        <p id="status" class="mt-4 text-sm"></p>
+        <button id="btnTest" class="bg-blue-600 text-white w-full py-2">Envoyer vers Supabase</button>
+        <p id="status" class="mt-4 text-sm text-gray-700"></p>
     </div>
 
     <script>
-        // Initialisation directe
-        const supabase = window.supabase.createClient(
-            'https://dzbomxdmnznzykppbguh.supabase.co', 
-            'sb_publishable_09bNEz6hpAH_QeD91-dhZw_ufVBhDlS' // REMPLACEZ PAR VOTRE VRAIE CLÉ
-        );
+        // Initialisation avec VOTRE clé
+        const supabaseUrl = 'https://dzbomxdmnznzykppbguh.supabase.co';
+        const supabaseKey = 'Sb_publishable_09bNEz6hpAH_QeD91-dhZw_ufVBhDlS';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        document.getElementById('btnTest').addEventListener('click', async () => {
+        const btn = document.getElementById('btnTest');
+        const status = document.getElementById('status');
+
+        btn.addEventListener('click', async () => {
             const name = document.getElementById('pName').value;
-            document.getElementById('status').innerText = "Envoi en cours...";
+            status.innerText = "En cours d'envoi...";
+            console.log("Tentative d'insertion pour :", name);
 
-            const { data, error } = await supabase
-                .from('products')
-                .insert([{ name: name }]);
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .insert([{ name: name }]);
 
-            if (error) {
-                document.getElementById('status').innerText = "Erreur : " + error.message;
-                console.error(error);
-            } else {
-                document.getElementById('status').innerText = "Succès ! Vérifiez votre table.";
+                if (error) {
+                    console.error("Erreur détaillée:", error);
+                    status.innerText = "Erreur : " + error.message;
+                } else {
+                    status.innerText = "Succès ! Le produit a été ajouté.";
+                    alert("Bravo ! Ça fonctionne.");
+                }
+            } catch (err) {
+                status.innerText = "Erreur critique : " + err.message;
             }
         });
     </script>
