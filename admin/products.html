@@ -1,56 +1,43 @@
-<form id="productForm" class="space-y-4">
-    <div>
-        <label class="block text-sm font-medium">Nom du produit</label>
-        <input type="text" id="name" required class="w-full border p-2 rounded">
-    </div>
-    <div>
-        <label class="block text-sm font-medium">Prix (FCFA)</label>
-        <input type="number" id="price" required class="w-full border p-2 rounded">
-    </div>
-    <div>
-        <label class="block text-sm font-medium">Image ou Vidéo</label>
-        <input type="file" id="mediaFile" accept="image/*,video/*" class="w-full border p-2 rounded">
-    </div>
-    <button type="submit" id="submitBtn" class="bg-blue-600 text-white w-full py-2 rounded">
-        Enregistrer le produit
-    </button>
-</form>
+document.getElementById('productForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = 'Enregistrement en cours...';
 
-<script>
-    document.getElementById('productForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        btn.innerText = 'Enregistrement...';
-
+    try {
         const name = document.getElementById('name').value;
         const price = document.getElementById('price').value;
         const file = document.getElementById('mediaFile').files[0];
+        
+        console.log("Début de l'enregistrement...");
+
         let mediaUrl = '';
 
-        // 1. Upload du média dans le bucket 'media'
         if (file) {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random()}.${fileExt}`;
+            console.log("Upload du fichier en cours...");
+            const fileName = `${Date.now()}_${file.name}`;
             const { data, error } = await supabase.storage
-                .from('media')
+                .from('media') // Vérifiez bien que le nom du bucket est 'media'
                 .upload(fileName, file);
             
-            if (error) { alert('Erreur upload image'); return; }
-            const { data: publicUrl } = supabase.storage.from('media').getPublicUrl(fileName);
-            mediaUrl = publicUrl.publicUrl;
+            if (error) throw new Error("Erreur Upload: " + error.message);
+            
+            const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(fileName);
+            mediaUrl = publicUrlData.publicUrl;
         }
 
-        // 2. Insertion dans la table products
-        const { error } = await supabase
+        console.log("Insertion dans la base de données...");
+        const { error: dbError } = await supabase
             .from('products')
             .insert([{ name, price, attributes: { mediaUrl } }]);
 
-        if (error) {
-            alert('Erreur base de données : ' + error.message);
-        } else {
-            alert('Succès ! Le produit est dans Supabase.');
-            location.reload();
-        }
+        if (dbError) throw new Error("Erreur Base: " + dbError.message);
+
+        alert('Succès !');
+        location.reload();
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message); // Ceci affichera l'erreur réelle sur votre téléphone
         btn.innerText = 'Enregistrer le produit';
-    });
-</script>
+    }
+});
