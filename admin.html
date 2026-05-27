@@ -2,14 +2,37 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Test Ultime</title>
+    <title>Test Supabase Final</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <button id="monBouton" style="padding: 20px; font-size: 20px;">CLIQUE ICI</button>
+    <button id="btnSupabase" style="padding: 20px; font-size: 20px;">TESTER SUPABASE</button>
+    <p id="resultat"></p>
 
     <script>
-        document.getElementById('monBouton').addEventListener('click', function() {
-            alert('Le bouton fonctionne !');
+        // Initialisation
+        const supabaseUrl = 'https://dzbomxdmnznzykppbguh.supabase.co';
+        const supabaseKey = 'Sb_publishable_09bNEz6hpAH_QeD91-dhZw_ufVBhDlS';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.getElementById('btnSupabase').addEventListener('click', async () => {
+            document.getElementById('resultat').innerText = "Test en cours...";
+            
+            try {
+                // On tente juste de lire la table 'products'
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('id')
+                    .limit(1);
+
+                if (error) throw error;
+                
+                alert("Connexion Supabase réussie !");
+                document.getElementById('resultat').innerText = "Connexion OK.";
+            } catch (err) {
+                alert("Erreur Supabase : " + err.message);
+                document.getElementById('resultat').innerText = "Erreur : " + err.message;
+            }
         });
     </script>
 </body>
