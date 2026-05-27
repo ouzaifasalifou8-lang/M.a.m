@@ -1,33 +1,35 @@
-<div id="boutique" style="display: flex; gap: 20px;"></div>
+<div id="boutique">Chargement des produits...</div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+<script src="https://unpkg.com/mongodb-stitch-browser-sdk@4.8.0/dist/browser/mongodb-stitch-browser-sdk.min.js"></script>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAbLsac6o8g7hFhnUvhn41-57DwDKSzzUg",
-    authDomain: "mamanan-8f3d9.firebaseapp.com",
-    projectId: "mamanan-8f3d9",
-    storageBucket: "mamanan-8f3d9.firebasestorage.app",
-    messagingSenderId: "766980373370",
-    appId: "1:766980373370:web:64bd2bf510d71dd148b4c3",
-    measurementId: "G-9SBJ7G5PYQ"
-  };
+<script>
+  // REMPLACEZ 'votre-app-id-ici' par l'ID que vous avez trouvé dans MongoDB Atlas > App Services
+  const client = stitch.Stitch.initializeDefaultAppClient('mongodb+srv://Ouzaif:<WwmcCM6p5XaLYVx0>@cluster0.4amt8zx.mongodb.net/?appName=Cluster0');
+  const mongodb = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas');
+  const db = mongodb.db('MAMshopDB'); // Nom de votre base
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  async function afficherProduits() {
+    try {
+      // Connexion anonyme
+      await client.auth.loginWithCredential(new stitch.AnonymousCredential());
+      
+      // Récupérer les produits
+      const produits = await db.collection('Produits').find({}).toArray();
+      
+      const conteneur = document.getElementById('boutique');
+      conteneur.innerHTML = ""; // Vider le chargement
+      
+      produits.forEach(p => {
+        conteneur.innerHTML += `
+          <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+            <h3>${p.nom}</h3>
+            <p>${p.prix || 'Prix non défini'} FCFA</p>
+          </div>`;
+      });
+    } catch (err) {
+      document.getElementById('boutique').innerHTML = "Erreur de chargement : " + err.message;
+    }
+  }
 
-  onSnapshot(collection(db, "Produits"), (snapshot) => {
-    const conteneur = document.getElementById('boutique');
-    conteneur.innerHTML = "";
-    snapshot.forEach((doc) => {
-      const p = doc.data();
-      conteneur.innerHTML += `
-        <div style="border: 1px solid #ccc; padding: 10px;">
-          <img src="${p.image}" width="150">
-          <h3>${p.nom}</h3>
-          <p>${p.prix} FCFA</p>
-        </div>`;
-    });
-  });
+  afficherProduits();
 </script>
