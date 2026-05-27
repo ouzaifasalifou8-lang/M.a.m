@@ -1,26 +1,14 @@
-<!DOCTYPE html>
-<html>
-<body>
-  <h2>Test Admin - MAMshop</h2>
-  <input type="text" id="nom" placeholder="Nom du produit">
-  <button onclick="testerEnvoi()">Publier dans MongoDB</button>
+<input type="text" id="nom" placeholder="Nom du produit">
+<button onclick="publier()">Publier</button>
 
-  <script src="https://cdn.jsdelivr.net/npm/mongodb@4.17.0/lib/mongodb.min.js"></script>
-  <script>
-    // CHAÎNE DE CONNEXION (Test uniquement)
-    const uri = "mongodb+srv://Ouzaif:WwmcCM6p5XaLYVx0@cluster0.4amt8zx.mongodb.net/?appName=Cluster0";
-
-    async function testerEnvoi() {
-      const nom = document.getElementById('nom').value;
-      try {
-        // Note: Dans un vrai site, ceci doit être fait dans une API (Backend)
-        // Voici une simulation simple
-        console.log("Tentative de connexion à : " + uri);
-        alert("Pour des raisons de sécurité, le driver MongoDB direct ne fonctionne pas dans le navigateur.\n\nVous devez utiliser une API Vercel pour cela.");
-      } catch (err) {
-        alert("Erreur : " + err.message);
-      }
-    }
-  </script>
-</body>
-</html>
+<script>
+  async function publier() {
+    const nom = document.getElementById('nom').value;
+    const res = await fetch('/api/produits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom })
+    });
+    if (res.ok) alert("Succès !");
+  }
+</script>
