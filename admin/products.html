@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produits - M.A.Mshop Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="flex">
+        <!-- Sidebar identique -->
+        <div class="sidebar w-64 min-h-screen text-white fixed" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+            <div class="p-6">
+                <div class="flex items-center space-x-2 mb-8">
+                    <i class="fas fa-store text-2xl"></i>
+                    <span class="text-xl font-bold">M.A.Mshop Admin</span>
+                </div>
+                <nav class="space-y-2">
+                    <a href="index.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="products.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-white/20">
+                        <i class="fas fa-box"></i>
+                        <span>Produits</span>
+                    </a>
+                    <a href="orders.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Commandes</span>
+                    </a>
+                    <a href="sellers.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-users"></i>
+                        <span>Vendeurs</span>
+                    </a>
+                    <a href="installations.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-tools"></i>
+                        <span>Installations</span>
+                    </a>
+                    <a href="deliveries.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-truck"></i>
+                        <span>Livraisons</span>
+                    </a>
+                    <a href="settings.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-cog"></i>
+                        <span>Paramètres</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-64">
+            <div class="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Gestion des produits</h1>
+                <button onclick="openProductModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                    <i class="fas fa-plus mr-2"></i>Ajouter un produit
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Filtres -->
+                <div class="bg-white rounded-lg p-4 mb-6">
+                    <div class="flex flex-wrap gap-4">
+                        <input type="text" id="searchProduct" placeholder="Rechercher un produit..." class="flex-1 px-4 py-2 border rounded-lg">
+                        <select id="categoryFilter" class="px-4 py-2 border rounded-lg">
+                            <option value="all">Toutes catégories</option>
+                            <option value="electronics">Électronique</option>
+                            <option value="antennas">Antennes</option>
+                            <option value="installation">Installation</option>
+                        </select>
+                        <button onclick="filterProducts()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                            <i class="fas fa-search mr-2"></i>Filtrer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Liste des produits -->
+                <div id="productsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Chargement dynamique -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajout/Modification Produit -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-2xl mx-4">
+            <div class="p-6">
+                <h2 id="modalTitle" class="text-2xl font-bold mb-4">Ajouter un produit</h2>
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Nom du produit *</label>
+                            <input type="text" id="productName" required class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Description</label>
+                            <textarea id="productDescription" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Prix (FCFA) *</
