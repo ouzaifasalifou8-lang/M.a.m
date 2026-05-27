@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.A.Mshop - La première marketplace du Niger</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-white shadow-md fixed w-full top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="assets/logo.png" alt="M.A.Mshop" class="h-10">
+                <span class="text-2xl font-bold text-blue-600">M.A.Mshop</span>
+            </div>
+            
+            <div class="hidden md:flex space-x-6">
+                <a href="index.html" class="text-gray-700 hover:text-blue-600">Accueil</a>
+                <a href="products.html" class="text-gray-700 hover:text-blue-600">Produits</a>
+                <a href="installation.html" class="text-gray-700 hover:text-blue-600">Installation</a>
+                <a href="about.html" class="text-gray-700 hover:text-blue-600">À propos</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <a href="cart.html" class="relative">
+                    <i class="fas fa-shopping-cart text-2xl text-gray-700"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">0</span>
+                </a>
+                <div id="authButtons">
+                    <a href="login.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Connexion</a>
+                    <a href="register.html" class="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50">Inscription</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white pt-24">
+        <div class="container mx-auto px-4 py-16">
+            <div class="max-w-3xl">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                    M.A.Mshop - Le Niger Achete et Vends
+                </h1>
+                <p class="text-xl mb-8 opacity-90">
+                    Découvrez la première marketplace générale du Niger. 
+                    Achetez, vendez et faites installer vos équipements partout au pays.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="products.html" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
+                        Commander maintenant
+                    </a>
+                    <a href="installation.html" class="border border-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20">
+                        Service installation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Nos services exclusifs</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-satellite text-5xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Starlink & Antennes</h3>
+                    <p class="text-gray-600">Vente d'antennes paraboliques et kits Starlink haut débit</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-wrench text-5xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Installation pro</h3>
+                    <p class="text-gray-600">Installation à domicile par nos techniciens qualifiés</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-truck text-5xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Livraison Niger</h3>
+                    <p class="text-gray-600">Livraison rapide partout au Niger</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produits populaires -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Produits populaires</h2>
+                <a href="products.html" class="text-blue-600 hover:underline">Voir tout →</a>
+            </div>
+            <div id="popularProducts" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Les produits seront chargés dynamiquement -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Localisation -->
+    <section class="py-16 bg-gradient-to-r from-green-600 to-blue-600 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-2xl font-bold mb-4">Nous trouver à Niamey</h3>
+            <p class="mb-2">Quartier Banizounbou 2, Niamey - Niger</p>
+            <p>Ouvert du lundi au samedi de 8h à 19h</p>
+            <p class="mt-4">📞 +227 XX XX XX XX</p>
+            <button onclick="openWhatsApp()" class="mt-6 bg-green-500 px-6 py-3 rounded-lg font-semibold hover:bg-green-600">
+                <i class="fab fa-whatsapp mr-2"></i>Nous contacter sur WhatsApp
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 M.A.Mshop - Tous droits réservés</p>
+            <p class="mt-2 text-sm opacity-75">La première marketplace générale du Niger</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        // Charger les produits populaires
+        async function loadPopularProducts() {
+            const { data: products } = await supabase
+                .from('products')
+                .select('*')
+                .eq('is_active', true)
+                .limit(4)
+                .order('created_at', { ascending: false });
+
+            const container = document.getElementById('popularProducts');
+            if (products && container) {
+                container.innerHTML = products.map(product => `
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-lg mb-2">${product.name}</h3>
+                            <p class="text-gray-600 text-sm mb-2">${product.description?.substring(0, 80)}...</p>
+                            <p class="text-2xl font-bold text-blue-600 mb-4">${product.price.toLocaleString()} FCFA</p>
+                            <button onclick="addToCart('${product.id}', '${product.name}', ${product.price})" 
+                                    class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                                Ajouter au panier
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openWhatsApp() {
+            window.open('https://wa.me/227XXXXXXXXX?text=Bonjour%20M.A.Mshop', '_blank');
+        }
+
+        loadPopularProducts();
+        updateCartCount();
+    </script>
+</body>
+  </html>
