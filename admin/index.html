@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - M.A.Mshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 min-h-screen text-white fixed">
+            <div class="p-6">
+                <div class="flex items-center space-x-2 mb-8">
+                    <i class="fas fa-store text-2xl"></i>
+                    <span class="text-xl font-bold">M.A.Mshop Admin</span>
+                </div>
+                <nav class="space-y-2">
+                    <a href="index.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-white/20">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="products.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-box"></i>
+                        <span>Produits</span>
+                    </a>
+                    <a href="orders.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Commandes</span>
+                    </a>
+                    <a href="sellers.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-users"></i>
+                        <span>Vendeurs</span>
+                    </a>
+                    <a href="installations.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-tools"></i>
+                        <span>Installations</span>
+                    </a>
+                    <a href="deliveries.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-truck"></i>
+                        <span>Livraisons</span>
+                    </a>
+                    <a href="settings.html" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10">
+                        <i class="fas fa-cog"></i>
+                        <span>Paramètres</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-64">
+            <!-- Header -->
+            <div class="bg-white shadow-sm px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                    <div class="flex items-center space-x-4">
+                        <span id="adminEmail" class="text-gray-600">admin@mamshop.com</span>
+                        <button onclick="logout()" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card bg-white rounded-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Chiffre d'affaires</p>
+                                <p id="totalRevenue" class="text-2xl font-bold text-gray-800">0 FCFA</p>
+                                <p class="text-green-500 text-sm mt-2">
+                                    <i class="fas fa-arrow-up"></i> +12% ce mois
+                                </p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-lg">
+                                <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Commandes</p>
+                                <p id="totalOrders" class="text-2xl font-bold text-gray-800">0</p>
+                                <p class="text-gray-500 text-sm mt-2">Ce mois: <span id="monthlyOrders">0</span></p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-lg">
+                                <i class="fas fa-shopping-cart text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Vendeurs</p>
+                                <p id="totalSellers" class="text-2xl font-bold text-gray-800">0</p>
+                                <p class="text-yellow-500 text-sm mt-2">
+                                    En attente: <span id="pendingSellers">0</span>
+                                </p>
+                            </div>
+                            <div class="bg-purple-100 p-3 rounded-lg">
+                                <i class="fas fa-users text-purple-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Utilisateurs</p>
+                                <p id="totalUsers" class="text-2xl font-bold text-gray-800">0</p>
+                                <p class="text-blue-500 text-sm mt-2">
+                                    <i class="fas fa-user-plus"></i> Nouveaux: <span id="newUsers">0</span>
+                                </p>
+                            </div>
+                            <div class="bg-pink-100 p-3 rounded-lg">
+                                <i class="fas fa-user text-pink-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4">Évolution des ventes</h3>
+                        <canvas id="salesChart" height="250"></canvas>
+                    </div>
+                    <div class="bg-white rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4">Commandes par statut</h3>
+                        <canvas id="statusChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="bg-white rounded-lg p-6 mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Dernières commandes</h3>
+                        <a href="orders.html" class="text-blue-600 hover:underline">Voir tout</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-sm">ID</th>
+                                    <th class="px-4 py-2 text-left text-sm">Client</th>
+                                    <th class="px-4 py-2 text-left text-sm">Montant</th>
+                                    <th class="px-4 py-2 text-left text-sm">Statut</th>
+                                    <th class="px-4 py-2 text-left text-sm">Date</th>
+                                    <th class="px-4 py-2 text-left text-sm">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersTable">
+                                <tr><td colspan="6" class="text-center py-4">Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Installations -->
+                <div class="bg-white rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Demandes d'installation récentes</h3>
+                        <a href="installations.html" class="text-blue-600 hover:underline">Voir tout</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-sm">Client</th>
+                                    <th class="px-4 py-2 text-left text-sm">Service</th>
+                                    <th class="px-4 py-2 text-left text-sm">Ville</th>
+                                    <th class="px-4 py-2 text-left text-sm">Statut</th>
+                                    <th class="px-4 py-2 text-left text-sm">Date</th>
+                                    <th class="px-4 py-2 text-left text-sm">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentInstallationsTable">
+                                <tr><td colspan="6" class="text-center py-4">Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
+    <script>
+        let salesChart, statusChart;
+
+        // Charger les données du dashboard
+        async function loadDashboardData() {
+            try {
+                // Récupérer les commandes
+                const { data: orders } = await supabase
+                    .from('orders')
+                    .select('*');
+
+                // Calculer le CA total
+                const totalRevenue = orders?.reduce((sum, o) => sum + o.total, 0) || 0;
+                document.getElementById('totalRevenue').innerHTML = `${totalRevenue.toLocaleString()} FCFA`;
+                document.getElementById('totalOrders').innerHTML = orders?.length || 0;
+
+                // Commandes du mois
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const monthlyOrders = orders?.filter(o => new Date(o.created_at) >= startOfMonth).length || 0;
+                document.getElementById('monthlyOrders').innerHTML = monthlyOrders;
+
+                // Statistiques vendeurs
+                const { data: sellers } = await supabase
+                    .from('user_roles')
+                    .select('*')
+                    .eq('role', 'seller');
+                document.getElementById('totalSellers').innerHTML = sellers?.length || 0;
+
+                // Utilisateurs
+                const { count: totalUsers } = await supabase
+                    .from('user_profiles')
+                    .select('*', { count: 'exact', head: true });
+                document.getElementById('totalUsers').innerHTML = totalUsers || 0;
+
+                // Dernières commandes
+                const { data: recentOrders } = await supabase
+                    .from('orders')
+                    .select(`
+                        *,
+                        user_profiles (display_name)
+                    `)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (recentOrders) {
+                    const tableBody = document.getElementById('recentOrdersTable');
+                    tableBody.innerHTML = recentOrders.map(order => `
+                        <tr class="border-t">
+                            <td class="px-4 py-2 text-xs font-mono">${order.id.slice(0, 8)}</td>
+                            <td class="px-4 py-2">${order.user_profiles?.display_name || 'Client'}</td>
+                            <td class="px-4 py-2 font-semibold">${order.total.toLocaleString()} FCFA</td>
+                            <td class="px-4 py-2">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium
+                                    ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : ''}
+                                    ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : ''}
+                                    ${order.status === 'processing' ? 'bg-blue-100 text-blue-700' : ''}
+                                    ${order.status === 'cancelled' ? 'bg-red-100 text-red-700' : ''}">
+                                    ${order.status}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2">${new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
+                            <td class="px-4 py-2">
+                                <button onclick="viewOrder('${order.id}')" class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Charger graphiques
+                loadCharts();
+
+            } catch (error) {
+                console.error('Erreur chargement dashboard:', error);
+            }
+        }
+
+        async function loadCharts() {
+            // Graphique ventes (12 derniers mois)
+            const { data: ordersByMonth } = await supabase
+                .rpc('get_monthly_sales');
+
+            if (salesChart) salesChart.destroy();
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                    datasets: [{
+                        label: 'Ventes (FCFA)',
+                        data: [400000, 350000, 500000, 700000, 650000, 800000, 900000, 850000, 950000, 1100000, 1200000, 1300000],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Graphique statuts
+            if (statusChart) statusChart.destroy();
+            const ctx2 = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Livrées', 'En cours', 'En attente', 'Annulées'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function viewOrder(orderId) {
+            window.location.href = `order-detail.html?id=${orderId}`;
+        }
+
+        function logout() {
+            supabase.auth.signOut();
+            window.location.href = '../login.html';
+        }
+
+        // Vérifier si admin
+        async function checkAdminAccess() {
+            const user = await checkUser();
+            if (!user) {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            const { data: userRole } = await supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', user.id)
+                .single();
+            
+            if (userRole?.role !== 'admin') {
+                window.location.href = '../index.html';
+                return;
+            }
+            
+            document.getElementById('adminEmail').innerHTML = user.email;
+            loadDashboardData();
+        }
+
+        checkAdminAccess();
+    </script>
+</body>
+</html>
