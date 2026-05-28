@@ -5,6 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin - MAM Shop</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+  /* Styles de base pour l'admin */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #0f172a; }
+  
+  .login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+  .login-box { background: #1e293b; padding: 32px 28px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid #334155; }
+  
+  .admin-layout { display: flex; min-height: 100vh; }
+  .sidebar { width: 260px; background: #0f172a; border-right: 1px solid #1e293b; position: fixed; height: 100vh; overflow-y: auto; }
+  .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #1e293b; }
+  .sidebar-logo h2 { color: white; font-size: 20px; font-weight: 800; }
+  .sidebar-logo p { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+  .sidebar-btn { width: 100%; padding: 14px 20px; text-align: left; background: none; border: none; color: #cbd5e1; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+  .sidebar-btn:hover { background: #1e293b; color: white; }
+  .sidebar-btn.active { background: #1e293b; color: #3b82f6; border-left: 3px solid #3b82f6; }
+  
+  .admin-content { margin-left: 260px; flex: 1; padding: 24px 32px; background: #0f172a; min-height: 100vh; }
+  .admin-title { font-size: 24px; font-weight: 800; color: white; margin-bottom: 24px; }
+  
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: #1e293b; border-radius: 16px; padding: 20px; border-left: 4px solid; }
+  .stat-card .num { font-size: 32px; font-weight: 800; color: white; margin-bottom: 8px; }
+  .stat-card .lbl { color: #94a3b8; font-size: 13px; font-weight: 500; }
+  
+  .table-box { background: #1e293b; border-radius: 16px; overflow-x: auto; margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #334155; color: #e2e8f0; font-size: 14px; }
+  th { color: #94a3b8; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .form-box { background: #1e293b; border-radius: 20px; padding: 24px; max-width: 700px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; outline: none; transition: border 0.2s; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #3b82f6; }
+  
+  .upload-zone { background: #0f172a; border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
+  .upload-zone:hover { border-color: #3b82f6; background: #1e293b; }
+  .upload-zone .icon { font-size: 40px; margin-bottom: 8px; }
+  
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-green { background: #065f46; color: #34d399; }
+  
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 12px; font-size: 13px; z-index: 9999; border-left: 4px solid #3b82f6; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .toast.success { border-left-color: #10b981; }
+  .toast.error { border-left-color: #ef4444; }
+</style>
 </head>
 <body>
 
@@ -18,7 +65,7 @@
     <button onclick="checkLogin()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
       Connexion
     </button>
-    <p style="color:#94a3b8;font-size:12px;margin-top:14px">Acces reserve a l'administrateur</p>
+    <p style="color:#94a3b8;font-size:12px;margin-top:14px">Accès réservé à l'administrateur</p>
   </div>
 </div>
 
@@ -31,14 +78,14 @@
     <button class="sidebar-btn active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
     <button class="sidebar-btn" onclick="showTab('products',this)">🛍️ Produits</button>
     <button class="sidebar-btn" onclick="showTab('add-product',this)">➕ Ajouter produit</button>
-    <button class="sidebar-btn" onclick="showTab('categories',this)">📂 Categories</button>
+    <button class="sidebar-btn" onclick="showTab('categories',this)">📂 Catégories</button>
     <button class="sidebar-btn" onclick="showTab('services',this)">📡 Services</button>
     <button class="sidebar-btn" onclick="showTab('sellers',this)">🏪 Vendeurs</button>
     <button class="sidebar-btn" onclick="showTab('orders',this)">📦 Commandes</button>
-    <button class="sidebar-btn" onclick="showTab('settings',this)">⚙️ Parametres</button>
+    <button class="sidebar-btn" onclick="showTab('settings',this)">⚙️ Paramètres</button>
     <div style="padding:16px 20px;position:absolute;bottom:0;width:100%;border-top:1px solid #334155">
       <a href="index.html" style="color:#94a3b8;font-size:13px">Voir le site →</a><br>
-      <button onclick="logout()" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;margin-top:6px">Deconnexion</button>
+      <button onclick="logout()" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;margin-top:6px">Déconnexion</button>
     </div>
   </div>
 
@@ -49,7 +96,7 @@
       <div class="admin-title">Tableau de bord</div>
       <div class="stat-cards">
         <div class="stat-card" style="border-color:#6366f1"><div class="num" id="s-products">-</div><div class="lbl">Produits actifs</div></div>
-        <div class="stat-card" style="border-color:#10b981"><div class="num" id="s-cats">-</div><div class="lbl">Categories</div></div>
+        <div class="stat-card" style="border-color:#10b981"><div class="num" id="s-cats">-</div><div class="lbl">Catégories</div></div>
         <div class="stat-card" style="border-color:#f59e0b"><div class="num" id="s-sellers">-</div><div class="lbl">Vendeurs</div></div>
         <div class="stat-card" style="border-color:#ef4444"><div class="num" id="s-users">-</div><div class="lbl">Utilisateurs</div></div>
       </div>
@@ -88,7 +135,7 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="form-group"><label>Stock</label><input id="p-stock" type="number" placeholder="100"></div>
-          <div class="form-group"><label>Categorie</label>
+          <div class="form-group"><label>Catégorie</label>
             <select id="p-cat"><option value="">Choisir...</option></select>
           </div>
         </div>
@@ -103,17 +150,17 @@
       </div>
     </div>
 
-    <!-- Categories -->
+    <!-- Catégories -->
     <div id="tab-categories" style="display:none">
-      <div class="admin-title">Categories</div>
+      <div class="admin-title">Catégories</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
         <div class="form-box">
-          <h3 style="color:white;font-weight:700;margin-bottom:16px">Nouvelle categorie</h3>
-          <div class="form-group"><label>Nom *</label><input id="cat-name" placeholder="Ex: Mode & Vetements"></div>
+          <h3 style="color:white;font-weight:700;margin-bottom:16px">Nouvelle catégorie</h3>
+          <div class="form-group"><label>Nom *</label><input id="cat-name" placeholder="Ex: Mode & Vêtements"></div>
           <button onclick="addCategory()" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
         </div>
         <div class="table-box">
-          <div style="padding:14px;color:white;font-weight:700">Categories existantes</div>
+          <div style="padding:14px;color:white;font-weight:700">Catégories existantes</div>
           <table><thead><tr><th>Nom</th><th>Slug</th></tr></thead>
           <tbody id="cats-table"></tbody></table>
         </div>
@@ -130,17 +177,17 @@
             <div class="icon">📡</div><p>Cliquer pour uploader</p>
             <input id="svc-img" type="file" accept="image/*" style="display:none">
           </div>
-          <div class="form-group" style="margin-top:12px"><label>Legende</label><input id="svc-caption" placeholder="Ex: Installation Starlink a Tahoua"></div>
-          <button style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter a la galerie</button>
+          <div class="form-group" style="margin-top:12px"><label>Légende</label><input id="svc-caption" placeholder="Ex: Installation Starlink à Tahoua"></div>
+          <button onclick="addServiceImage()" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter à la galerie</button>
         </div>
         <div class="form-box">
-          <h3 style="color:white;font-weight:700;margin-bottom:16px">Ajouter temoignage</h3>
+          <h3 style="color:white;font-weight:700;margin-bottom:16px">Ajouter témoignage</h3>
           <div class="form-group"><label>Nom du client</label><input id="t-name" placeholder="Ex: Ibrahim M."></div>
-          <div class="form-group"><label>Temoignage</label><textarea id="t-text" rows="3"></textarea></div>
+          <div class="form-group"><label>Témoignage</label><textarea id="t-text" rows="3"></textarea></div>
           <div class="form-group"><label>Note (1-5)</label>
             <select id="t-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
           </div>
-          <button style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter temoignage</button>
+          <button onclick="addTestimonial()" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter témoignage</button>
         </div>
       </div>
     </div>
@@ -169,14 +216,14 @@
 
     <!-- Paramètres -->
     <div id="tab-settings" style="display:none">
-      <div class="admin-title">Parametres du site</div>
+      <div class="admin-title">Paramètres du site</div>
       <div class="form-box">
-        <div class="form-group"><label>Nom du site</label><input value="MAM Shop"></div>
-        <div class="form-group"><label>Numero WhatsApp</label><input value="+227 98 83 66 01"></div>
-        <div class="form-group"><label>Email contact</label><input value="mamshop.niger@gmail.com"></div>
-        <div class="form-group"><label>Adresse</label><input value="Tahoua, Niger"></div>
-        <div class="form-group"><label>Nouveau mot de passe admin</label><input type="password" placeholder="Laisser vide pour ne pas changer"></div>
-        <button style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
+        <div class="form-group"><label>Nom du site</label><input id="site-name" value="MAM Shop"></div>
+        <div class="form-group"><label>Numéro WhatsApp</label><input id="site-whatsapp" value="+227 98 83 66 01"></div>
+        <div class="form-group"><label>Email contact</label><input id="site-email" value="mamshop.niger@gmail.com"></div>
+        <div class="form-group"><label>Adresse</label><input id="site-address" value="Tahoua, Niger"></div>
+        <div class="form-group"><label>Nouveau mot de passe admin</label><input id="new-password" type="password" placeholder="Laisser vide pour ne pas changer"></div>
+        <button onclick="saveSettings()" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
           Sauvegarder
         </button>
       </div>
@@ -185,10 +232,73 @@
   </div>
 </div>
 
-<script src="js/api.js"></script>
 <script>
+// Base de données simulée avec localStorage
 const ADMIN_PASS = 'mamshop2026';
-let allProducts = [], allCats = [];
+let allProducts = [], allCats = [], allUsers = [], allSellers = [], allOrders = [];
+
+// Initialiser les données
+function initData() {
+  // Charger depuis localStorage ou créer des données par défaut
+  const storedProducts = localStorage.getItem('mamshop_products');
+  if (storedProducts) {
+    allProducts = JSON.parse(storedProducts);
+  } else {
+    allProducts = [
+      { id: 'prd_1', name: 'Qamis Premium Blanc', description: 'Qamis de qualité supérieure', price: '25000', compare_price: null, stock: 50, category_id: 'cat_1', is_featured: 1, image_url: '', created_at: new Date().toISOString() },
+      { id: 'prd_2', name: 'Boubou Cérémonie', description: 'Boubou traditionnel', price: '45000', compare_price: '55000', stock: 25, category_id: 'cat_1', is_featured: 1, image_url: '', created_at: new Date().toISOString() }
+    ];
+    localStorage.setItem('mamshop_products', JSON.stringify(allProducts));
+  }
+  
+  const storedCats = localStorage.getItem('mamshop_categories');
+  if (storedCats) {
+    allCats = JSON.parse(storedCats);
+  } else {
+    allCats = [
+      { id: 'cat_1', name: 'Mode & Vêtements', slug: 'mode-vetements' },
+      { id: 'cat_2', name: 'Accessoires', slug: 'accessoires' }
+    ];
+    localStorage.setItem('mamshop_categories', JSON.stringify(allCats));
+  }
+  
+  const storedUsers = localStorage.getItem('mamshop_users');
+  if (storedUsers) {
+    allUsers = JSON.parse(storedUsers);
+  } else {
+    allUsers = [{ id: 'user_1', name: 'Client Test', email: 'client@test.com' }];
+    localStorage.setItem('mamshop_users', JSON.stringify(allUsers));
+  }
+  
+  const storedSellers = localStorage.getItem('mamshop_sellers');
+  if (storedSellers) {
+    allSellers = JSON.parse(storedSellers);
+  } else {
+    allSellers = [];
+    localStorage.setItem('mamshop_sellers', JSON.stringify(allSellers));
+  }
+  
+  const storedOrders = localStorage.getItem('mamshop_orders');
+  if (storedOrders) {
+    allOrders = JSON.parse(storedOrders);
+  } else {
+    allOrders = [];
+    localStorage.setItem('mamshop_orders', JSON.stringify(allOrders));
+  }
+}
+
+function dbQuery(sql) {
+  // Simulation de requête
+  return Promise.resolve([...allProducts.filter(p => !p.is_deleted)]);
+}
+
+function showToast(message, type = 'error') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
 
 function checkLogin() {
   if (document.getElementById('admin-pass').value === ADMIN_PASS) {
@@ -211,127 +321,39 @@ function showTab(id, btn) {
   if (id === 'products') loadAdminProducts();
   if (id === 'categories') loadCategories();
   if (id === 'add-product') loadCatsForForm();
+  if (id === 'dashboard') loadDashboard();
 }
 
 async function loadDashboard() {
-  allProducts = await dbQuery("SELECT * FROM products WHERE is_active=1 ORDER BY created_at DESC");
-  allCats = await dbQuery("SELECT * FROM categories WHERE is_active=1");
-  const sellers = await dbQuery("SELECT * FROM sellers");
-  const users = await dbQuery("SELECT * FROM users");
-  document.getElementById('s-products').textContent = allProducts.length;
+  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
+  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
+  allSellers = JSON.parse(localStorage.getItem('mamshop_sellers') || '[]');
+  allUsers = JSON.parse(localStorage.getItem('mamshop_users') || '[]');
+  
+  document.getElementById('s-products').textContent = allProducts.filter(p => !p.is_deleted).length;
   document.getElementById('s-cats').textContent = allCats.length;
-  document.getElementById('s-sellers').textContent = sellers.length;
-  document.getElementById('s-users').textContent = users.length;
+  document.getElementById('s-sellers').textContent = allSellers.length;
+  document.getElementById('s-users').textContent = allUsers.length;
+  
   const tbody = document.getElementById('dash-products');
-  tbody.innerHTML = allProducts.slice(0,8).map(p => `
+  tbody.innerHTML = allProducts.filter(p => !p.is_deleted).slice(0,8).map(p => `
     <tr>
       <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px">
         ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
       </div></td>
       <td>${p.name}</td>
       <td style="color:#6366f1;font-weight:700">${parseFloat(p.price).toLocaleString()} XOF</td>
-      <td>${p.stock}</td>
-      <td>${p.is_featured=='1' ? '<span class="badge badge-green">Oui</span>' : '<span class="badge" style="background:#1e293b;color:#94a3b8">Non</span>'}</td>
+      <td>${p.stock || 0}</td>
+      <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge" style="background:#1e293b;color:#94a3b8">Non</span>'}</td>
     </tr>`).join('');
 }
 
 function loadAdminProducts() {
+  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
+  const activeProducts = allProducts.filter(p => !p.is_deleted);
   const grid = document.getElementById('admin-products-grid');
-  if (!allProducts.length) { grid.innerHTML = '<div style="color:#94a3b8;padding:20px">Aucun produit</div>'; return; }
-  grid.innerHTML = allProducts.map(p => `
+  if (!activeProducts.length) { grid.innerHTML = '<div style="color:#94a3b8;padding:20px">Aucun produit</div>'; return; }
+  grid.innerHTML = activeProducts.map(p => `
     <div style="background:#1e293b;border-radius:13px;overflow:hidden">
       <div style="height:130px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden">
-        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
-      </div>
-      <div style="padding:12px">
-        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:4px">${p.name}</div>
-        <div style="color:#6366f1;font-weight:700;margin-bottom:8px;font-size:13px">${parseFloat(p.price).toLocaleString()} XOF</div>
-        <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:7px;background:#ef4444;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">Supprimer</button>
-      </div>
-    </div>`).join('');
-}
-
-async function loadCategories() {
-  allCats = await dbQuery("SELECT * FROM categories WHERE is_active=1 ORDER BY sort_order");
-  document.getElementById('cats-table').innerHTML = allCats.map(c =>
-    `<tr><td>${c.name}</td><td style="color:#94a3b8">${c.slug}</td></tr>`).join('');
-}
-
-async function loadCatsForForm() {
-  if (!allCats.length) allCats = await dbQuery("SELECT * FROM categories WHERE is_active=1");
-  const sel = document.getElementById('p-cat');
-  sel.innerHTML = '<option value="">Choisir...</option>' + allCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-
-function previewImg(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('img-preview').innerHTML = `<img src="${e.target.result}" style="max-height:160px;border-radius:8px;max-width:100%">`;
-    window._imgData = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-async function saveProduct() {
-  const name = document.getElementById('p-name').value;
-  const price = document.getElementById('p-price').value;
-  if (!name || !price) { showToast('Nom et prix requis !'); return; }
-  const desc = document.getElementById('p-desc').value;
-  const promo = document.getElementById('p-promo').value;
-  const stock = document.getElementById('p-stock').value || 0;
-  const cat = document.getElementById('p-cat').value;
-  const featured = document.getElementById('p-featured').checked ? 1 : 0;
-  let imgUrl = '';
-  if (window._imgData) {
-    showToast('Upload image en cours...');
-    try {
-      const r = await fetch('https://api.cloudinary.com/v1_1/mamshop/image/upload', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({file: window._imgData, upload_preset: 'mamshop_preset'})
-      });
-      const d = await r.json();
-      imgUrl = d.secure_url || '';
-    } catch(e) { imgUrl = ''; }
-  }
-  const pid = 'prd_' + Date.now();
-  const slug = name.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-  const promoVal = promo ? `'${promo}'` : 'NULL';
-  const sql = `INSERT INTO products (id,seller_id,category_id,name,slug,description,price,compare_price,stock,is_active,is_featured,image_url,created_at,updated_at) VALUES ('${pid}','admin','${cat||'cat_001'}','${name.replace(/'/g,"\\'")}','${slug}','${desc.replace(/'/g,"\\'")}',${price},${promoVal},${stock},1,${featured},'${imgUrl}',datetime('now'),datetime('now'))`;
-  await dbExec(sql);
-  showToast('Produit enregistre avec succes !', 'success');
-  document.getElementById('p-name').value = '';
-  document.getElementById('p-desc').value = '';
-  document.getElementById('p-price').value = '';
-  document.getElementById('p-promo').value = '';
-  document.getElementById('p-stock').value = '';
-  document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
-  window._imgData = null;
-  allProducts = await dbQuery("SELECT * FROM products WHERE is_active=1 ORDER BY created_at DESC");
-}
-
-async function deleteProduct(id) {
-  if (!confirm('Supprimer ce produit ?')) return;
-  await dbExec(`UPDATE products SET is_active=0 WHERE id='${id}'`);
-  allProducts = allProducts.filter(p => p.id !== id);
-  loadAdminProducts();
-  showToast('Produit supprime', 'success');
-}
-
-async function addCategory() {
-  const name = document.getElementById('cat-name').value;
-  if (!name) return;
-  const id = 'cat_' + Date.now();
-  const slug = name.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-  await dbExec(`INSERT INTO categories (id,parent_id,name,slug,is_active,sort_order) VALUES ('${id}',NULL,'${name}','${slug}',1,0)`);
-  document.getElementById('cat-name').value = '';
-  showToast('Categorie ajoutee !', 'success');
-  loadCategories();
-}
-
-document.getElementById('admin-pass').addEventListener('keydown', e => e.key === 'Enter' && checkLogin());
-</script>
-</body>
-</html>
+        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'
