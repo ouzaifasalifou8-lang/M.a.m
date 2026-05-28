@@ -2,252 +2,35 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Supabase - Version Simple</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        .card {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        button {
-            background: #0066cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        button:hover {
-            background: #0052a3;
-        }
-        .error {
-            color: red;
-            padding: 10px;
-            background: #ffebee;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .success {
-            color: green;
-            padding: 10px;
-            background: #e8f5e9;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .info {
-            color: blue;
-            padding: 10px;
-            background: #e3f2fd;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        img {
-            max-width: 200px;
-            margin: 10px;
-        }
-        input {
-            margin: 10px 0;
-            padding: 10px;
-        }
-    </style>
+    <title>Upload Simple</title>
 </head>
 <body>
-    <div class="card">
-        <h2>📤 Test Upload Supabase</h2>
-        
-        <div id="log"></div>
-        
-        <input type="file" id="fileInput" accept="image/*">
-        <button onclick="uploadImage()">Uploader l'image</button>
-        <button onclick="loadImages()">Voir les images</button>
-        
-        <div id="images"></div>
-    </div>
-
+    <h2>Upload Image</h2>
+    <input type="file" id="fileInput">
+    <button onclick="upload()">Upload</button>
+    <div id="result"></div>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Configuration Supabase
-        const SUPABASE_URL = 'https://wnvlziwpoznslrumwgin.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_c1Fim7EtR3EP1fJu44K4wQ_jsR9Xigz';
+        const supabase = window.supabase.createClient(
+            'https://wnvlziwpoznslrumwgin.supabase.co',
+            'sb_publishable_c1Fim7EtR3EP1fJu44K4wQ_jsR9Xigz'
+        );
         
-        // Initialiser Supabase
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        let currentFile = null;
-        
-        // Fonction pour afficher les logs
-        function addLog(message, type = 'info') {
-            const logDiv = document.getElementById('log');
-            const logEntry = document.createElement('div');
-            logEntry.className = type;
-            logEntry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
-            logDiv.appendChild(logEntry);
-            console.log(message);
+        async function upload() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return alert('Choisissez un fichier');
             
-            // Auto-scroll
-            logDiv.scrollTop = logDiv.scrollHeight;
+            const result = document.getElementById('result');
+            result.innerHTML = 'Upload...';
+            
+            const { data, error } = await supabase.storage
+                .from('images')  // bucket créé manuellement
+                .upload(Date.now() + '_' + file.name, file);
+            
+            if (error) result.innerHTML = '❌ Erreur: ' + error.message;
+            else result.innerHTML = '✅ Succès! <br><img src="' + supabase.storage.from('images').getPublicUrl(data.path).data.publicUrl + '" width="200">';
         }
-        
-        // Sélection du fichier
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            currentFile = e.target.files[0];
-            if (currentFile) {
-                addLog(`✅ Fichier sélectionné: ${currentFile.name} (${(currentFile.size/1024).toFixed(2)} KB)`, 'success');
-            }
-        });
-        
-        // Upload de l'image
-        async function uploadImage() {
-            if (!currentFile) {
-                addLog('❌ Veuillez d\'abord sélectionner un fichier', 'error');
-                return;
-            }
-            
-            addLog('📤 Début de l\'upload...', 'info');
-            
-            // Générer un nom unique
-            const timestamp = Date.now();
-            const fileName = `${timestamp}_${currentFile.name}`;
-            
-            try {
-                // Tentative d'upload
-                const { data, error } = await supabase.storage
-                    .from('test-images')
-                    .upload(fileName, currentFile, {
-                        cacheControl: '3600',
-                        upsert: false
-                    });
-                
-                if (error) {
-                    addLog(`❌ Erreur d'upload: ${error.message}`, 'error');
-                    
-                    // Si le bucket n'existe pas, on le crée
-                    if (error.message.includes('bucket')) {
-                        addLog('📁 Création du bucket "test-images"...', 'info');
-                        
-                        const { error: createError } = await supabase.storage
-                            .createBucket('test-images', {
-                                public: true,
-                                allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg'],
-                                fileSizeLimit: 5242880
-                            });
-                        
-                        if (createError) {
-                            addLog(`❌ Erreur création bucket: ${createError.message}`, 'error');
-                        } else {
-                            addLog('✅ Bucket créé avec succès', 'success');
-                            // Réessayer l'upload
-                            const { error: retryError } = await supabase.storage
-                                .from('test-images')
-                                .upload(fileName, currentFile);
-                            
-                            if (retryError) {
-                                addLog(`❌ Second upload échoué: ${retryError.message}`, 'error');
-                            } else {
-                                addLog('✅ Upload réussi après création du bucket !', 'success');
-                                loadImages();
-                            }
-                        }
-                    }
-                } else {
-                    addLog('✅ Upload réussi !', 'success');
-                    loadImages();
-                }
-                
-            } catch (error) {
-                addLog(`❌ Exception: ${error.message}`, 'error');
-            }
-        }
-        
-        // Charger les images
-        async function loadImages() {
-            addLog('🔄 Chargement des images...', 'info');
-            
-            try {
-                const { data, error } = await supabase.storage
-                    .from('test-images')
-                    .list('', {
-                        limit: 100,
-                        sortBy: { column: 'created_at', order: 'desc' }
-                    });
-                
-                if (error) {
-                    addLog(`❌ Erreur chargement: ${error.message}`, 'error');
-                    document.getElementById('images').innerHTML = `<div class="error">Impossible de charger les images: ${error.message}</div>`;
-                    return;
-                }
-                
-                if (!data || data.length === 0) {
-                    document.getElementById('images').innerHTML = '<div class="info">Aucune image trouvée. Uploadez votre première image !</div>';
-                    addLog('ℹ️ Aucune image trouvée', 'info');
-                    return;
-                }
-                
-                // Afficher les images
-                let html = '<h3>Images uploadées :</h3><div style="display: flex; flex-wrap: wrap;">';
-                
-                for (const file of data) {
-                    if (file.name.match(/\.(jpg|jpeg|png|gif)$/i)) {
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('test-images')
-                            .getPublicUrl(file.name);
-                        
-                        html += `
-                            <div style="margin: 10px; text-align: center;">
-                                <img src="${publicUrl}" style="max-width: 150px; max-height: 150px; border-radius: 5px;">
-                                <div><small>${file.name}</small></div>
-                            </div>
-                        `;
-                    }
-                }
-                
-                html += '</div>';
-                document.getElementById('images').innerHTML = html;
-                addLog(`✅ ${data.length} image(s) chargée(s)`, 'success');
-                
-            } catch (error) {
-                addLog(`❌ Exception: ${error.message}`, 'error');
-            }
-        }
-        
-        // Test de connexion au chargement
-        async function testConnexion() {
-            addLog('🔌 Test de connexion à Supabase...', 'info');
-            
-            try {
-                const { data, error } = await supabase.storage.listBuckets();
-                
-                if (error) {
-                    addLog(`❌ Connexion échouée: ${error.message}`, 'error');
-                } else {
-                    addLog(`✅ Connecté à Supabase ! ${data.length} bucket(s) trouvé(s)`, 'success');
-                    
-                    // Vérifier si notre bucket existe
-                    const bucketExists = data.some(b => b.name === 'test-images');
-                    if (bucketExists) {
-                        addLog('✅ Le bucket "test-images" existe déjà', 'success');
-                        loadImages();
-                    } else {
-                        addLog('ℹ️ Le bucket "test-images" sera créé au premier upload', 'info');
-                    }
-                }
-            } catch (error) {
-                addLog(`❌ Exception connexion: ${error.message}`, 'error');
-            }
-        }
-        
-        // Démarrer le test de connexion
-        testConnexion();
     </script>
 </body>
 </html>
