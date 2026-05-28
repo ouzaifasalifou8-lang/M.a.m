@@ -3,77 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Upload Image - Supabase</title>
+    <title>Test Supabase - Upload Image</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 600px;
+            margin: 50px auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: #f0f0f0;
         }
-        .container {
+        .box {
             background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        .upload-area {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            margin: 20px 0;
-            cursor: pointer;
-        }
-        .upload-area.dragover {
-            border-color: #3b82f6;
-            background-color: #f0f8ff;
-        }
-        button {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
             font-size: 16px;
         }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
         button:hover {
-            background-color: #2563eb;
+            background: #0056b3;
         }
         button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+            background: #ccc;
         }
-        #preview {
+        img {
             max-width: 100%;
-            max-height: 200px;
-            margin: 10px 0;
-            display: none;
+            margin-top: 10px;
         }
-        .status {
-            margin: 10px 0;
+        .message {
             padding: 10px;
+            margin: 10px 0;
             border-radius: 5px;
         }
-        .status.success {
-            background-color: #d4edda;
+        .success {
+            background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        .status.error {
-            background-color: #f8d7da;
+        .error {
+            background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        .status.info {
-            background-color: #d1ecf1;
+        .info {
+            background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
-        }
-        .image-list {
-            margin-top: 20px;
         }
         .image-item {
             display: inline-block;
@@ -81,50 +67,34 @@
             text-align: center;
         }
         .image-item img {
-            width: 100px;
-            height: 100px;
+            width: 150px;
+            height: 150px;
             object-fit: cover;
-            border-radius: 5px;
         }
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #imagesList {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📸 Test d'upload d'images - Supabase</h1>
+    <div class="box">
+        <h2>📸 Test Upload Image - Supabase</h2>
         
         <div id="status"></div>
-
-        <div class="upload-area" id="uploadArea">
-            <p>📁 Glissez-déposez une image ici ou cliquez pour sélectionner</p>
-            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        
+        <input type="file" id="fileInput" accept="image/*">
+        <button id="uploadBtn">📤 Uploader l'image</button>
+        
+        <div id="preview" style="display:none;">
+            <h4>Aperçu :</h4>
+            <img id="previewImg">
         </div>
+    </div>
 
-        <div style="text-align: center;">
-            <button id="uploadBtn" disabled>📤 Uploader l'image</button>
-        </div>
-
-        <div id="previewContainer" style="display: none;">
-            <h3>Aperçu :</h3>
-            <img id="preview" alt="Aperçu">
-        </div>
-
-        <div id="imageList" class="image-list">
-            <h3>📷 Images uploadées :</h3>
-            <div id="images"></div>
-        </div>
+    <div class="box">
+        <h3>📷 Images uploadées :</h3>
+        <button id="refreshBtn">🔄 Actualiser</button>
+        <div id="imagesList">Chargement...</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -139,17 +109,17 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Éléments DOM
-        const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const uploadBtn = document.getElementById('uploadBtn');
-        const preview = document.getElementById('preview');
-        const previewContainer = document.getElementById('previewContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
         const statusDiv = document.getElementById('status');
-        const imagesDiv = document.getElementById('images');
+        const previewDiv = document.getElementById('preview');
+        const previewImg = document.getElementById('previewImg');
+        const imagesList = document.getElementById('imagesList');
         
-        // Fonction pour afficher les messages de statut
-        function showStatus(message, type = 'info') {
-            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        // Afficher message
+        function showMessage(message, type) {
+            statusDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
             setTimeout(() => {
                 if (statusDiv.innerHTML.includes(message)) {
                     statusDiv.innerHTML = '';
@@ -157,22 +127,106 @@
             }, 5000);
         }
         
-        // Fonction pour charger les images existantes
-        async function loadImages() {
-            try {
-                imagesDiv.innerHTML = '<div class="loading"></div><p>Chargement des images...</p>';
+        // Sélection du fichier
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showMessage('Veuillez sélectionner une image', 'error');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    showMessage('L\'image ne doit pas dépasser 5MB', 'error');
+                    return;
+                }
                 
-                // Lister les fichiers du bucket 'images' (à créer si nécessaire)
+                selectedFile = file;
+                uploadBtn.disabled = false;
+                
+                // Aperçu
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewDiv.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+                
+                showMessage(`✅ Image sélectionnée: ${file.name}`, 'success');
+            }
+        });
+        
+        // Upload image
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                showMessage('Choisissez une image d\'abord', 'error');
+                return;
+            }
+            
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Upload en cours...';
+            
+            try {
+                // Nom unique pour le fichier
+                const fileExt = selectedFile.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                
+                // Upload vers Supabase
+                const { data, error } = await supabase.storage
+                    .from('images')
+                    .upload(fileName, selectedFile);
+                
+                if (error) {
+                    if (error.message.includes('bucket')) {
+                        // Créer le bucket s'il n'existe pas
+                        showMessage('Création du bucket...', 'info');
+                        await supabase.storage.createBucket('images', {
+                            public: true
+                        });
+                        
+                        // Réupload
+                        const { error: retryError } = await supabase.storage
+                            .from('images')
+                            .upload(fileName, selectedFile);
+                        
+                        if (retryError) throw retryError;
+                    } else {
+                        throw error;
+                    }
+                }
+                
+                showMessage('✅ Upload réussi !', 'success');
+                
+                // Reset
+                selectedFile = null;
+                fileInput.value = '';
+                previewDiv.style.display = 'none';
+                uploadBtn.disabled = true;
+                
+                // Recharger les images
+                loadImages();
+                
+            } catch (error) {
+                showMessage('❌ Erreur: ' + error.message, 'error');
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '📤 Uploader l\'image';
+            }
+        });
+        
+        // Charger les images existantes
+        async function loadImages() {
+            imagesList.innerHTML = '<div class="message info">Chargement...</div>';
+            
+            try {
                 const { data, error } = await supabase.storage
                     .from('images')
                     .list('', {
-                        limit: 100,
+                        limit: 50,
                         sortBy: { column: 'created_at', order: 'desc' }
                     });
                 
                 if (error) {
                     if (error.message.includes('bucket')) {
-                        imagesDiv.innerHTML = '<p style="color: orange;">⚠️ Le bucket "images" n\'existe pas encore. Il sera créé lors du premier upload.</p>';
+                        imagesList.innerHTML = '<div class="message info">Aucune image (bucket à créer)</div>';
                     } else {
                         throw error;
                     }
@@ -180,7 +234,7 @@
                 }
                 
                 if (!data || data.length === 0) {
-                    imagesDiv.innerHTML = '<p>Aucune image uploadée pour le moment.</p>';
+                    imagesList.innerHTML = '<div class="message info">Aucune image uploadée</div>';
                     return;
                 }
                 
@@ -191,182 +245,39 @@
                         const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(file.name);
                         html += `
                             <div class="image-item">
-                                <img src="${publicUrl}" alt="${file.name}" loading="lazy">
-                                <br><small>${file.name.substring(0, 20)}${file.name.length > 20 ? '...' : ''}</small>
+                                <img src="${publicUrl}" alt="${file.name}">
+                                <div><small>${file.name}</small></div>
                             </div>
                         `;
                     }
                 }
                 
-                imagesDiv.innerHTML = html || '<p>Aucune image trouvée.</p>';
+                imagesList.innerHTML = html || '<div class="message info">Aucune image trouvée</div>';
                 
             } catch (error) {
-                console.error('Erreur chargement images:', error);
-                imagesDiv.innerHTML = `<p style="color: red;">❌ Erreur chargement: ${error.message}</p>`;
+                imagesList.innerHTML = `<div class="message error">Erreur: ${error.message}</div>`;
             }
         }
         
-        // Fonction pour uploader l'image
-        async function uploadImage() {
-            if (!selectedFile) {
-                showStatus('Veuillez sélectionner une image d\'abord', 'error');
-                return;
-            }
-            
-            uploadBtn.disabled = true;
-            uploadBtn.textContent = '⏳ Upload en cours...';
-            
-            try {
-                // Générer un nom de fichier unique
-                const fileExt = selectedFile.name.split('.').pop();
-                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-                
-                // Upload vers Supabase Storage
-                const { data, error } = await supabase.storage
-                    .from('images')
-                    .upload(fileName, selectedFile, {
-                        cacheControl: '3600',
-                        upsert: false
-                    });
-                
-                if (error) {
-                    if (error.message.includes('bucket')) {
-                        // Créer le bucket s'il n'existe pas
-                        showStatus('Création du bucket "images"...', 'info');
-                        const { error: createError } = await supabase.storage.createBucket('images', {
-                            public: true,
-                            allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'],
-                            fileSizeLimit: 5242880 // 5MB
-                        });
-                        
-                        if (createError) {
-                            throw new Error(`Impossible de créer le bucket: ${createError.message}`);
-                        }
-                        
-                        // Réessayer l'upload
-                        const { data: retryData, error: retryError } = await supabase.storage
-                            .from('images')
-                            .upload(fileName, selectedFile, {
-                                cacheControl: '3600',
-                                upsert: false
-                            });
-                        
-                        if (retryError) throw retryError;
-                        
-                        showStatus('✅ Bucket créé et image uploadée avec succès!', 'success');
-                    } else {
-                        throw error;
-                    }
-                } else {
-                    showStatus('✅ Image uploadée avec succès!', 'success');
-                }
-                
-                // Rafraîchir la liste des images
-                await loadImages();
-                
-                // Réinitialiser la sélection
-                resetSelection();
-                
-            } catch (error) {
-                console.error('Erreur upload:', error);
-                showStatus(`❌ Erreur lors de l'upload: ${error.message}`, 'error');
-            } finally {
-                uploadBtn.disabled = true;
-                uploadBtn.textContent = '📤 Uploader l\'image';
-            }
-        }
+        // Rafraîchir
+        refreshBtn.addEventListener('click', loadImages);
         
-        // Fonction pour réinitialiser la sélection
-        function resetSelection() {
-            selectedFile = null;
-            fileInput.value = '';
-            preview.style.display = 'none';
-            previewContainer.style.display = 'none';
-            uploadBtn.disabled = true;
-        }
-        
-        // Fonction pour gérer la sélection de fichier
-        function handleFileSelect(file) {
-            if (!file || !file.type.startsWith('image/')) {
-                showStatus('Veuillez sélectionner un fichier image valide', 'error');
-                return false;
-            }
-            
-            // Vérifier la taille (5MB max)
-            if (file.size > 5 * 1024 * 1024) {
-                showStatus('L\'image ne doit pas dépasser 5MB', 'error');
-                return false;
-            }
-            
-            selectedFile = file;
-            uploadBtn.disabled = false;
-            
-            // Afficher l'aperçu
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-                previewContainer.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-            
-            showStatus(`✅ Image sélectionnée: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`, 'success');
-            return true;
-        }
-        
-        // Événements UI
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file) handleFileSelect(file);
-        });
-        
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) handleFileSelect(e.target.files[0]);
-        });
-        
-        uploadBtn.addEventListener('click', uploadImage);
-        
-        // Test de connexion au chargement
+        // Test connexion au chargement
         async function testConnection() {
             try {
-                showStatus('🔌 Test de connexion à Supabase...', 'info');
                 const { data, error } = await supabase.storage.listBuckets();
-                
-                if (error) {
-                    showStatus(`⚠️ Connexion établie mais erreur: ${error.message}`, 'error');
-                } else {
-                    showStatus('✅ Connexion à Supabase réussie!', 'success');
-                    // Vérifier si le bucket images existe
-                    const bucketExists = data.some(bucket => bucket.name === 'images');
-                    if (bucketExists) {
-                        showStatus('✅ Bucket "images" trouvé', 'success');
-                    } else {
-                        showStatus('ℹ️ Le bucket "images" sera créé lors du premier upload', 'info');
-                    }
-                }
+                if (error) throw error;
+                showMessage('✅ Connecté à Supabase', 'success');
+                loadImages();
             } catch (error) {
-                showStatus(`❌ Erreur de connexion: ${error.message}`, 'error');
+                showMessage('⚠️ Erreur connexion: ' + error.message, 'error');
+                imagesList.innerHTML = '<div class="message error">Impossible de se connecter à Supabase</div>';
             }
         }
         
-        // Initialiser
+        // Lancer
         testConnection();
-        loadImages();
+        uploadBtn.disabled = true;
     </script>
 </body>
 </html>
