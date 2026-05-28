@@ -1,35 +1,18 @@
-<div id="boutique">Chargement des produits...</div>
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>MAMshop</h1>
+    <div id="liste">Chargement...</div>
 
-<script src="https://unpkg.com/mongodb-stitch-browser-sdk@4.8.0/dist/browser/mongodb-stitch-browser-sdk.min.js"></script>
-
-<script>
-  // REMPLACEZ 'mongodb+srv://Ouzaif:<WwmcCM6p5XaLYVx0>@cluster0.4amt8zx.mongodb.net/?appName=Cluster0' par l'ID que vous avez trouvé dans MongoDB Atlas > App Services
-  const client = stitch.Stitch.initializeDefaultAppClient('votre-app-id-ici');
-  const mongodb = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas');
-  const db = mongodb.db('MAMshopDB'); // Nom de votre base
-
-  async function afficherProduits() {
-    try {
-      // Connexion anonyme
-      await client.auth.loginWithCredential(new stitch.AnonymousCredential());
-      
-      // Récupérer les produits
-      const produits = await db.collection('Produits').find({}).toArray();
-      
-      const conteneur = document.getElementById('boutique');
-      conteneur.innerHTML = ""; // Vider le chargement
-      
-      produits.forEach(p => {
-        conteneur.innerHTML += `
-          <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
-            <h3>${p.nom}</h3>
-            <p>${p.prix || 'Prix non défini'} FCFA</p>
-          </div>`;
-      });
-    } catch (err) {
-      document.getElementById('boutique').innerHTML = "Erreur de chargement : " + err.message;
-    }
-  }
-
-  afficherProduits();
-</script>
+    <script>
+        async function charger() {
+            const res = await fetch('/api/produits');
+            const data = await res.json();
+            document.getElementById('liste').innerHTML = data.map(p => 
+                `<div><h3>${p.nom}</h3><img src="${p.image_url}" width="200"></div>`
+            ).join('');
+        }
+        charger();
+    </script>
+</body>
+</html>
