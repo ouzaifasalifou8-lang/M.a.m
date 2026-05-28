@@ -19,5 +19,17 @@
             <button type="submit">Ajouter</button>
         </form>
     </section>
+
+    <script>
+        document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nom = document.getElementById('nom').value;
+            const prix = document.getElementById('prix').value;
+            
+            console.log("Envoi du service :", nom, prix);
+            // Ici, nous ajouterons bientôt l'appel vers votre script Python
+            alert("Service envoyé (logique en cours de développement)");
+        });
+    </script>
 </body>
 </html>
