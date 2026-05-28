@@ -1,29 +1,14 @@
-<script src="https://cdn.jsdelivr.net/npm/mongodb-stitch-browser-sdk@4.8.0/dist/browser/mongodb-stitch-browser-sdk.min.js"></script>
+// Remplacez votre bloc catch/if(response.ok) actuel par celui-ci pour tester
+const response = await fetch('/api/produits', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nom: nom })
+});
 
-<script>
-  // Remplacez 'mongodb+srv://Ouzaif:<WwmcCM6p5XaLYVx0>@cluster0.4amt8zx.mongodb.net/?appName=Cluster0' par l'ID que vous trouvez dans votre console MongoDB Atlas > App Services
-  const client = stitch.Stitch.initializeDefaultAppClient('votre-app-id-ici');
-  const mongodb = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas');
-  const db = mongodb.db('MAMshopDB'); // Nom de votre base de données
-
-  async function testerConnexion() {
-    try {
-      // Connexion anonyme pour le test
-      await client.auth.loginWithCredential(new stitch.AnonymousCredential());
-      console.log("Connecté à MongoDB !");
-
-      // Insertion d'un produit de test
-      await db.collection('Produits').insertOne({ 
-        nom: "Produit de Test", 
-        date: new Date() 
-      });
-
-      alert("Succès ! La donnée est bien envoyée dans MongoDB.");
-    } catch (err) {
-      console.error(err);
-      alert("Erreur de connexion : " + err.message);
-    }
-  }
-</script>
-
-<button onclick="testerConnexion()">Tester la connexion MongoDB</button>
+if (response.ok) {
+    alert("Produit ajouté avec succès !");
+} else {
+    // Cela affichera le vrai message d'erreur envoyé par le serveur
+    const errorData = await response.json();
+    alert("Erreur serveur : " + (errorData.error || "Problème inconnu"));
+}
