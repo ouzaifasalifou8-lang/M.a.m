@@ -1,50 +1,29 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administration MAMshop</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        input { padding: 10px; width: 80%; margin-bottom: 10px; }
-        button { padding: 10px 20px; cursor: pointer; background: #0070f3; color: white; border: none; }
-    </style>
-</head>
-<body>
+<script src="https://cdn.jsdelivr.net/npm/mongodb-stitch-browser-sdk@4.8.0/dist/browser/mongodb-stitch-browser-sdk.min.js"></script>
 
-    <h1>Ajouter un produit</h1>
-    <input type="text" id="nomProduit" placeholder="Entrez le nom du produit">
-    <br>
-    <button onclick="publierProduit()">Publier le produit</button>
+<script>
+  // Remplacez 'mongodb+srv://Ouzaif:<WwmcCM6p5XaLYVx0>@cluster0.4amt8zx.mongodb.net/?appName=Cluster0' par l'ID que vous trouvez dans votre console MongoDB Atlas > App Services
+  const client = stitch.Stitch.initializeDefaultAppClient('votre-app-id-ici');
+  const mongodb = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas');
+  const db = mongodb.db('MAMshopDB'); // Nom de votre base de données
 
-    <script>
-        async function publierProduit() {
-            const nom = document.getElementById('nomProduit').value;
-            
-            if (!nom) {
-                alert("Veuillez entrer un nom de produit.");
-                return;
-            }
+  async function testerConnexion() {
+    try {
+      // Connexion anonyme pour le test
+      await client.auth.loginWithCredential(new stitch.AnonymousCredential());
+      console.log("Connecté à MongoDB !");
 
-            try {
-                // Envoi vers votre API Vercel
-                const response = await fetch('/api/produits', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nom: nom })
-                });
+      // Insertion d'un produit de test
+      await db.collection('Produits').insertOne({ 
+        nom: "Produit de Test", 
+        date: new Date() 
+      });
 
-                if (response.ok) {
-                    alert("Produit ajouté avec succès à la base Turso !");
-                    document.getElementById('nomProduit').value = ""; // Vider le champ
-                } else {
-                    alert("Erreur lors de l'ajout.");
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Erreur technique : " + err.message);
-            }
-        }
-    </script>
-</body>
-</html>
+      alert("Succès ! La donnée est bien envoyée dans MongoDB.");
+    } catch (err) {
+      console.error(err);
+      alert("Erreur de connexion : " + err.message);
+    }
+  }
+</script>
+
+<button onclick="testerConnexion()">Tester la connexion MongoDB</button>
