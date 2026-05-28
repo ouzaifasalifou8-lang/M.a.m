@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panier - MAM Shop</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><div class="logo-icon">M</div>MAM Shop</a>
+    <div class="nav-links">
+      <a href="index.html">Accueil</a>
+      <a href="boutique.html">Boutique</a>
+    </div>
+    <div class="nav-actions">
+      <a href="panier.html" class="cart-btn" style="color:#2563eb;font-weight:700">🛒 Panier<span class="cart-count" style="display:none">0</span></a>
+    </div>
+  </div>
+</nav>
+
+<div style="max-width:700px;margin:40px auto;padding:0 20px">
+  <h1 style="font-size:26px;font-weight:800;margin-bottom:22px">Mon Panier</h1>
+  <div id="cart-items"></div>
+</div>
+
+<footer>
+  <div class="footer-bottom" style="padding:20px">© 2026 MAM Shop - Tous droits reserves</div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+function renderCart() {
+  const cart = getCart();
+  const el = document.getElementById('cart-items');
+  if (!cart.length) {
+    el.innerHTML = `<div style="background:white;border-radius:16px;padding:60px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.07)">
+      <div style="font-size:60px;margin-bottom:16px">🛒</div>
+      <p style="color:#64748b;font-size:17px;margin-bottom:20px">Panier vide</p>
+      <a href="boutique.html" class="btn btn-primary">Continuer les achats</a>
+    </div>`;
+    return;
+  }
+  const total = cart.reduce((s,p) => s+parseFloat(p.compare_price||p.price||0)*(p.qty||1), 0);
+  el.innerHTML = cart.map((p,i) => `
+    <div style="background:white;border-radius:13px;padding:15px;margin-bottom:11px;display:flex;gap:14px;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+      <div style="width:68px;height:68px;background:#f1f5f9;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px">
+        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:700;margin-bottom:3px">${p.name}</div>
+        <div style="color:#2563eb;font-weight:800">${parseFloat(p.compare_price||p.price).toLocaleString()} XOF</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="changeQty(${i},-1)" style="width:28px;height:28px;border:1px solid #e2e8f0;border-radius:6px;background:white;font-size:16px;cursor:pointer">-</button>
+        <span style="font-weight:700;min-width:20px;text-align:center">${p.qty||1}</span>
+        <button onclick="changeQty(${i},1)" style="width:28px;height:28px;border:1px solid #e2e8f0;border-radius:6px;background:white;font-size:16px;cursor:pointer">+</button>
+      </div>
+      <button onclick="removeItem(${i})" style="background:#fee2e2;color:#dc2626;border:none;padding:7px 12px;border-radius:8px;font-weight:700;cursor:pointer">✕</button>
+    </div>`).join('') + `
+    <div style="background:white;border-radius:13px;padding:22px;margin-top:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:18px">
+        <span style="font-weight:600;font-size:17px">Total</span>
+        <span style="font-weight:900;font-size:21px;color:#2563eb">${total.toLocaleString()} XOF</span>
+      </div>
+      <button onclick="orderCartWhatsApp()" style="width:100%;padding:14px;background:#25d366;color:white;border:none;border-radius:11px;font-weight:800;font-size:15px;cursor:pointer">
+        Commander sur WhatsApp 📱
+      </button>
+    </div>`;
+}
+
+function removeItem(i) {
+  const c = getCart(); c.splice(i,1); saveCart(c); renderCart();
+}
+function changeQty(i, delta) {
+  const c = getCart();
+  c[i].qty = Math.max(1, (c[i].qty||1) + delta);
+  saveCart(c); renderCart();
+}
+renderCart();
+</script>
+</body>
+</html>
