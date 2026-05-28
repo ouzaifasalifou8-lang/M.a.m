@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devenir vendeur - MAM Shop</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><div class="logo-icon">M</div>MAM Shop</a>
+    <div class="nav-links">
+      <a href="index.html">Accueil</a>
+      <a href="marketplace.html">Marketplace</a>
+    </div>
+  </div>
+</nav>
+
+<div style="max-width:580px;margin:48px auto;padding:0 20px">
+  <div style="text-align:center;margin-bottom:32px">
+    <div style="font-size:54px;margin-bottom:12px">🏪</div>
+    <h1 style="font-size:28px;font-weight:800;margin-bottom:8px">Devenir vendeur</h1>
+    <p style="color:#64748b">Rejoignez la communaute MAM Shop et vendez vos produits</p>
+  </div>
+  <div style="background:white;padding:30px;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+    <div style="margin-bottom:15px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Nom de votre boutique *</label>
+      <input id="v-shop" placeholder="Ex: Boutique Moussa" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:15px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Votre nom complet *</label>
+      <input id="v-name" placeholder="Nom et prenom" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:15px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Telephone *</label>
+      <input id="v-phone" type="tel" placeholder="+227 XX XX XX XX" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:15px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Email</label>
+      <input id="v-email" type="email" placeholder="votre@email.com" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:15px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Ville / Adresse</label>
+      <input id="v-city" placeholder="Ex: Tahoua" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Description de vos produits</label>
+      <textarea id="v-desc" rows="3" placeholder="Quels types de produits vendez-vous ?" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;resize:vertical"></textarea>
+    </div>
+    <button onclick="submitVendeur()" style="width:100%;padding:14px;background:#7c3aed;color:white;border:none;border-radius:11px;font-weight:800;font-size:15px;cursor:pointer">
+      Envoyer ma demande via WhatsApp
+    </button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom" style="padding:20px">© 2026 MAM Shop - Tous droits reserves</div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+function submitVendeur() {
+  const shop = document.getElementById('v-shop').value;
+  const name = document.getElementById('v-name').value;
+  const phone = document.getElementById('v-phone').value;
+  if (!shop || !name || !phone) { showToast('Veuillez remplir les champs obligatoires !'); return; }
+  const msg = encodeURIComponent(`Nouvelle demande vendeur MAM Shop:\\n\\nBoutique: ${shop}\\nNom: ${name}\\nTel: ${phone}\\nEmail: ${document.getElementById('v-email').value}\\nVille: ${document.getElementById('v-city').value}\\nProduits: ${document.getElementById('v-desc').value}`);
+  window.open(`https://wa.me/22798836601?text=${msg}`, '_blank');
+}
+</script>
+</body>
+</html>
