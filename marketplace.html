@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketplace - MAM Shop</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><div class="logo-icon">M</div>MAM Shop</a>
+    <div class="nav-links">
+      <a href="index.html">Accueil</a>
+      <a href="boutique.html">Boutique</a>
+      <a href="antennes.html">Services</a>
+      <a href="marketplace.html" style="color:#7c3aed;font-weight:700">Marketplace</a>
+      <a href="a-propos.html">A propos</a>
+    </div>
+    <div class="nav-actions">
+      <a href="panier.html" class="cart-btn">🛒<span class="cart-count" style="display:none">0</span></a>
+      <a href="vendeur.html" class="btn" style="background:#7c3aed;color:white">Espace vendeur</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero" style="background:linear-gradient(135deg,#7c3aed,#2563eb);padding:60px 20px">
+  <h1>Marketplace</h1>
+  <p>Achetez et vendez dans toute la communaute</p>
+  <div class="hero-btns">
+    <a href="inscription-vendeur.html" class="btn" style="background:#fbbf24;color:#1e293b;font-size:15px;padding:13px 26px">Devenir vendeur</a>
+    <a href="https://wa.me/22798836601" class="btn btn-wa" style="font-size:15px;padding:13px 26px" target="_blank">Commander WA</a>
+  </div>
+</div>
+
+<div class="section">
+  <div class="container">
+    <div class="grid-cards" id="market-products">
+      <div style="grid-column:1/-1;text-align:center;padding:50px;color:#64748b">Chargement...</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom" style="padding:20px">© 2026 MAM Shop - Tous droits reserves</div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+async function loadMarket() {
+  const products = await dbQuery("SELECT * FROM products WHERE is_active=1 ORDER BY created_at DESC LIMIT 50");
+  renderProducts(products, 'market-products');
+}
+loadMarket();
+</script>
+</body>
+</html>
