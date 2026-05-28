@@ -1,14 +1,36 @@
-// Remplacez votre bloc catch/if(response.ok) actuel par celui-ci pour tester
-const response = await fetch('/api/produits', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nom: nom })
-});
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Administration MAMshop</h1>
+    <input type="text" id="nom" placeholder="Nom produit">
+    <input type="file" id="photo">
+    <button onclick="publier()">Publier le produit</button>
 
-if (response.ok) {
-    alert("Produit ajouté avec succès !");
-} else {
-    // Cela affichera le vrai message d'erreur envoyé par le serveur
-    const errorData = await response.json();
-    alert("Erreur serveur : " + (errorData.error || "Problème inconnu"));
-}
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = supabase.createClient(
+            'https://wnvlziwpoznslrumwgin.supabase.co', 
+            'Sb_publishable_c1Fim7EtR3EP1fJu44K4wQ_jsR9Xigz'
+        );
+
+        async function publier() {
+            const nom = document.getElementById('nom').value;
+            const file = document.getElementById('photo').files[0];
+            let url = "";
+
+            if (file) {
+                const { data } = await supabase.storage.from('medias').upload(Date.now() + "_" + file.name, file);
+                url = supabase.storage.from('medias').getPublicUrl(data.path).data.publicUrl;
+            }
+
+            const res = await fetch('/api/produits', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ nom, image_url: url })
+            });
+
+            if (res.ok) { alert("Succès !"); } else { alert("Erreur."); }
+        }
+    </script>
+</body>
+</html>
