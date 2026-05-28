@@ -1,36 +1,608 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Test Supabase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Grid Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e8ebff;
+        }
+
+        /* Form Elements */
+        input[type="text"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%);
+        }
+
+        /* Image Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .image-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .image-card .filename {
+            font-size: 11px;
+            margin: 8px 0;
+            word-break: break-all;
+            color: #666;
+        }
+
+        .image-card .delete-btn {
+            background: #dc3545;
+            padding: 5px 10px;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #666;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
 <body>
-    <h1>Administration MAMshop</h1>
-    <input type="text" id="nom" placeholder="Nom produit">
-    <input type="file" id="photo">
-    <button onclick="publier()">Publier le produit</button>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Admin Panel - Test Supabase</h1>
+            <p>Interface complète pour tester et gérer votre base de données Supabase</p>
+            <div id="connectionStatus"></div>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('upload')">📤 Upload Images</button>
+            <button class="tab" onclick="switchTab('manage')">🖼️ Gérer Images</button>
+            <button class="tab" onclick="switchTab('database')">💾 Base de Données</button>
+            <button class="tab" onclick="switchTab('settings')">⚙️ Configuration</button>
+        </div>
+
+        <!-- Tab Upload -->
+        <div id="uploadTab" class="tab-content active">
+            <div class="dashboard">
+                <div class="card">
+                    <h2>📤 Upload d'Image</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <p>📁 Glissez-déposez une image ici</p>
+                        <p style="font-size: 12px; color: #666;">ou cliquez pour sélectionner</p>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="previewContainer" style="display: none;">
+                        <img id="preview" style="max-width: 100%; max-height: 200px; margin: 10px 0;">
+                    </div>
+                    <button id="uploadBtn" disabled style="width: 100%;">📤 Uploader</button>
+                </div>
+
+                <div class="card">
+                    <h2>📊 Statistiques</h2>
+                    <div id="stats">
+                        <p><strong>Images totales:</strong> <span id="totalImages">0</span></p>
+                        <p><strong>Bucket:</strong> <span id="bucketName">images</span></p>
+                        <p><strong>Status:</strong> <span id="bucketStatus">-</span></p>
+                    </div>
+                    <button onclick="refreshImages()" class="btn-success" style="width: 100%; margin-top: 10px;">🔄 Actualiser</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Manage Images -->
+        <div id="manageTab" class="tab-content">
+            <div class="card">
+                <h2>🖼️ Gestion des Images</h2>
+                <div id="imageGrid" class="image-grid">
+                    <p>Chargement des images...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Database -->
+        <div id="databaseTab" class="tab-content">
+            <div class="card">
+                <h2>💾 Requêtes SQL Personnalisées</h2>
+                <textarea id="sqlQuery" rows="4" placeholder="SELECT * FROM your_table LIMIT 10;" style="width: 100%; font-family: monospace;"></textarea>
+                <button onclick="executeSQL()" style="margin-top: 10px;">▶️ Exécuter</button>
+                <div id="sqlResult" style="margin-top: 20px;">
+                    <div class="data-table">
+                        <table id="resultTable">
+                            <thead>
+                                <tr><th>Résultats</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>En attente d'une requête...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Settings -->
+        <div id="settingsTab" class="tab-content">
+            <div class="card">
+                <h2>⚙️ Configuration Supabase</h2>
+                <div>
+                    <label>URL Supabase:</label>
+                    <input type="text" id="supabaseUrl" value="https://wnvlziwpoznslrumwgin.supabase.co">
+                    
+                    <label>Clé Anonyme:</label>
+                    <input type="text" id="supabaseKey" value="sb_publishable_c1Fim7EtR3EP1fJu44K4wQ_jsR9Xigz">
+                    
+                    <label>Bucket Name:</label>
+                    <input type="text" id="bucketNameInput" value="images">
+                    
+                    <button onclick="reconnectSupabase()" style="margin-top: 10px;">🔌 Reconnecter</button>
+                    <button onclick="testConnection()" class="btn-success" style="margin-top: 10px; margin-left: 10px;">📡 Tester la connexion</button>
+                    <button onclick="createBucket()" style="margin-top: 10px; margin-left: 10px;">📁 Créer le bucket</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const supabase = supabase.createClient(
-            'https://wnvlziwpoznslrumwgin.supabase.co', 
-            'Sb_publishable_c1Fim7EtR3EP1fJu44K4wQ_jsR9Xigz'
-        );
+        let supabase = null;
+        let selectedFile = null;
+        let currentTab = 'upload';
 
-        async function publier() {
-            const nom = document.getElementById('nom').value;
-            const file = document.getElementById('photo').files[0];
-            let url = "";
+        // Initialisation
+        function init() {
+            reconnectSupabase();
+        }
 
-            if (file) {
-                const { data } = await supabase.storage.from('medias').upload(Date.now() + "_" + file.name, file);
-                url = supabase.storage.from('medias').getPublicUrl(data.path).data.publicUrl;
+        // Reconnexion à Supabase
+        function reconnectSupabase() {
+            const url = document.getElementById('supabaseUrl').value;
+            const key = document.getElementById('supabaseKey').value;
+            supabase = window.supabase.createClient(url, key);
+            testConnection();
+        }
+
+        // Test de connexion
+        async function testConnection() {
+            try {
+                showAlert('Test de connexion...', 'info');
+                const { data, error } = await supabase.storage.listBuckets();
+                
+                if (error) throw error;
+                
+                showAlert('✅ Connexion réussie!', 'success');
+                document.getElementById('connectionStatus').innerHTML = '<div class="connection-status status-online">✅ Connecté à Supabase</div>';
+                
+                // Vérifier le bucket
+                const bucketName = document.getElementById('bucketNameInput').value;
+                const bucketExists = data.some(b => b.name === bucketName);
+                document.getElementById('bucketStatus').innerHTML = bucketExists ? '✅ Existe' : '❌ N\'existe pas';
+                
+                if (bucketExists) {
+                    await refreshImages();
+                }
+            } catch (error) {
+                showAlert('❌ Erreur de connexion: ' + error.message, 'error');
+                document.getElementById('connectionStatus').innerHTML = '<div class="connection-status status-offline">❌ Non connecté</div>';
+            }
+        }
+
+        // Créer un bucket
+        async function createBucket() {
+            const bucketName = document.getElementById('bucketNameInput').value;
+            try {
+                showAlert('Création du bucket...', 'info');
+                const { error } = await supabase.storage.createBucket(bucketName, {
+                    public: true,
+                    allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'],
+                    fileSizeLimit: 10485760 // 10MB
+                });
+                
+                if (error) throw error;
+                
+                showAlert('✅ Bucket créé avec succès!', 'success');
+                await testConnection();
+            } catch (error) {
+                showAlert('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // Upload d'image
+        async function uploadImage() {
+            if (!selectedFile) {
+                showAlert('Veuillez sélectionner une image', 'error');
+                return;
             }
 
-            const res = await fetch('/api/produits', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ nom, image_url: url })
-            });
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Upload en cours...';
 
-            if (res.ok) { alert("Succès !"); } else { alert("Erreur."); }
+            try {
+                const bucketName = document.getElementById('bucketNameInput').value;
+                const fileExt = selectedFile.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+
+                const { data, error } = await supabase.storage
+                    .from(bucketName)
+                    .upload(fileName, selectedFile, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (error) throw error;
+
+                showAlert('✅ Image uploadée avec succès!', 'success');
+                await refreshImages();
+                resetSelection();
+            } catch (error) {
+                showAlert('❌ Erreur upload: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '📤 Uploader';
+            }
         }
-    </script>
-</body>
-</html>
+
+        // Rafraîchir les images
+        async function refreshImages() {
+            const bucketName = document.getElementById('bucketNameInput').value;
+            
+            try {
+                const { data, error } = await supabase.storage
+                    .from(bucketName)
+                    .list('', {
+                        limit: 100,
+                        sortBy: { column: 'created_at', order: 'desc' }
+                    });
+
+                if (error) throw error;
+
+                document.getElementById('totalImages').innerText = data?.length || 0;
+                displayImages(data || []);
+            } catch (error) {
+                showAlert('Erreur chargement images: ' + error.message, 'error');
+                document.getElementById('imageGrid').innerHTML = '<p>❌ Erreur chargement des images</p>';
+            }
+        }
+
+        // Afficher les images
+        function displayImages(images) {
+            const grid = document.getElementById('imageGrid');
+            const bucketName = document.getElementById('bucketNameInput').value;
+            
+            if (!images || images.length === 0) {
+                grid.innerHTML = '<p>Aucune image trouvée. Uploadez votre première image!</p>';
+                return;
+            }
+
+            let html = '';
+            images.forEach(image => {
+                if (image.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                    const { data: { publicUrl } } = supabase.storage.from(bucketName).getPublicUrl(image.name);
+                    html += `
+                        <div class="image-card">
+                            <img src="${publicUrl}" alt="${image.name}" loading="lazy">
+                            <div class="filename">${image.name.substring(0, 30)}${image.name.length > 30 ? '...' : ''}</div>
+                            <button class="delete-btn" onclick="deleteImage('${image.name}')">🗑️ Supprimer</button>
+                            <button onclick="copyUrl('${publicUrl}')" style="background: #28a745; margin-top: 5px;">📋 Copier URL</button>
+                        </div>
+                    `;
+                }
+            });
+            
+            grid.innerHTML = html;
+        }
+
+        // Supprimer une image
+        async function deleteImage(fileName) {
+            if (!confirm('Supprimer cette image définitivement ?')) return;
+            
+            const bucketName = document.getElementById('bucketNameInput').value;
+            try {
+                const { error } = await supabase.storage.from(bucketName).remove([fileName]);
+                if (error) throw error;
+                
+                showAlert('✅ Image supprimée', 'success');
+                await refreshImages();
+            } catch (error) {
+                showAlert('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // Copier l'URL
+        function copyUrl(url) {
+            navigator.clipboard.writeText(url);
+            showAlert('URL copiée dans le presse-papier!', 'success');
+        }
+
+        // Exécuter SQL
+        async function executeSQL() {
+            const query = document.getElementById('sqlQuery').value;
+            if (!query.trim()) {
+                showAlert('Veuillez entrer une requête SQL', 'error');
+                return;
+            }
+
+            try {
+                showAlert('Exécution de la requête...', 'info');
+                const { data, error } = await supabase.rpc('exec_sql', { query: query });
+                
+                if (error) throw error;
+                
+                displaySQLResults(data || []);
+                showAlert('✅ Requête exécutée avec succès', 'success');
+            } catch (error) {
+                showAlert('❌ Erreur SQL: ' + error.message, 'error');
+            }
+        }
+
+        // Afficher résultats SQL
+        function displaySQLResults(data) {
+            const table = document.getElementById('resultTable');
+            if (!data || data.length === 0) {
+                table.innerHTML = '<thead><tr><th>Résultat</th></tr></thead><tbody><tr><td>Aucune donnée retournée</td></tr></tbody>';
+                return;
+            }
+
+            const columns = Object.keys(data[0]);
+            let html =
