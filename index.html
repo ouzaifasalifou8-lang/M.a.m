@@ -1,18 +1,372 @@
 <!DOCTYPE html>
-<html>
-<body>
-    <h1>MAMshop</h1>
-    <div id="liste">Chargement...</div>
-
-    <script>
-        async function charger() {
-            const res = await fetch('/api/produits');
-            const data = await res.json();
-            document.getElementById('liste').innerHTML = data.map(p => 
-                `<div><h3>${p.nom}</h3><img src="${p.image_url}" width="200"></div>`
-            ).join('');
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Upload Image - Supabase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-        charger();
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: #f0f8ff;
+        }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin: 10px 0;
+            display: none;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .image-list {
+            margin-top: 20px;
+        }
+        .image-item {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .image-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 Test d'upload d'images - Supabase</h1>
+        
+        <div id="status"></div>
+
+        <div class="upload-area" id="uploadArea">
+            <p>📁 Glissez-déposez une image ici ou cliquez pour sélectionner</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+
+        <div style="text-align: center;">
+            <button id="uploadBtn" disabled>📤 Uploader l'image</button>
+        </div>
+
+        <div id="previewContainer" style="display: none;">
+            <h3>Aperçu :</h3>
+            <img id="preview" alt="Aperçu">
+        </div>
+
+        <div id="imageList" class="image-list">
+            <h3>📷 Images uploadées :</h3>
+            <div id="images"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuration Supabase
+        const SUPABASE_URL = 'https://wnvlziwpoznslrumwgin.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_c1Fim7EtR3EP1fJu44K4wQ_jsR9Xigz';
+        
+        let selectedFile = null;
+        
+        // Initialiser Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Éléments DOM
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const preview = document.getElementById('preview');
+        const previewContainer = document.getElementById('previewContainer');
+        const statusDiv = document.getElementById('status');
+        const imagesDiv = document.getElementById('images');
+        
+        // Fonction pour afficher les messages de statut
+        function showStatus(message, type = 'info') {
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                if (statusDiv.innerHTML.includes(message)) {
+                    statusDiv.innerHTML = '';
+                }
+            }, 5000);
+        }
+        
+        // Fonction pour charger les images existantes
+        async function loadImages() {
+            try {
+                imagesDiv.innerHTML = '<div class="loading"></div><p>Chargement des images...</p>';
+                
+                // Lister les fichiers du bucket 'images' (à créer si nécessaire)
+                const { data, error } = await supabase.storage
+                    .from('images')
+                    .list('', {
+                        limit: 100,
+                        sortBy: { column: 'created_at', order: 'desc' }
+                    });
+                
+                if (error) {
+                    if (error.message.includes('bucket')) {
+                        imagesDiv.innerHTML = '<p style="color: orange;">⚠️ Le bucket "images" n\'existe pas encore. Il sera créé lors du premier upload.</p>';
+                    } else {
+                        throw error;
+                    }
+                    return;
+                }
+                
+                if (!data || data.length === 0) {
+                    imagesDiv.innerHTML = '<p>Aucune image uploadée pour le moment.</p>';
+                    return;
+                }
+                
+                // Afficher les images
+                let html = '';
+                for (const file of data) {
+                    if (file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                        const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(file.name);
+                        html += `
+                            <div class="image-item">
+                                <img src="${publicUrl}" alt="${file.name}" loading="lazy">
+                                <br><small>${file.name.substring(0, 20)}${file.name.length > 20 ? '...' : ''}</small>
+                            </div>
+                        `;
+                    }
+                }
+                
+                imagesDiv.innerHTML = html || '<p>Aucune image trouvée.</p>';
+                
+            } catch (error) {
+                console.error('Erreur chargement images:', error);
+                imagesDiv.innerHTML = `<p style="color: red;">❌ Erreur chargement: ${error.message}</p>`;
+            }
+        }
+        
+        // Fonction pour uploader l'image
+        async function uploadImage() {
+            if (!selectedFile) {
+                showStatus('Veuillez sélectionner une image d\'abord', 'error');
+                return;
+            }
+            
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Upload en cours...';
+            
+            try {
+                // Générer un nom de fichier unique
+                const fileExt = selectedFile.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+                
+                // Upload vers Supabase Storage
+                const { data, error } = await supabase.storage
+                    .from('images')
+                    .upload(fileName, selectedFile, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                
+                if (error) {
+                    if (error.message.includes('bucket')) {
+                        // Créer le bucket s'il n'existe pas
+                        showStatus('Création du bucket "images"...', 'info');
+                        const { error: createError } = await supabase.storage.createBucket('images', {
+                            public: true,
+                            allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'],
+                            fileSizeLimit: 5242880 // 5MB
+                        });
+                        
+                        if (createError) {
+                            throw new Error(`Impossible de créer le bucket: ${createError.message}`);
+                        }
+                        
+                        // Réessayer l'upload
+                        const { data: retryData, error: retryError } = await supabase.storage
+                            .from('images')
+                            .upload(fileName, selectedFile, {
+                                cacheControl: '3600',
+                                upsert: false
+                            });
+                        
+                        if (retryError) throw retryError;
+                        
+                        showStatus('✅ Bucket créé et image uploadée avec succès!', 'success');
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    showStatus('✅ Image uploadée avec succès!', 'success');
+                }
+                
+                // Rafraîchir la liste des images
+                await loadImages();
+                
+                // Réinitialiser la sélection
+                resetSelection();
+                
+            } catch (error) {
+                console.error('Erreur upload:', error);
+                showStatus(`❌ Erreur lors de l'upload: ${error.message}`, 'error');
+            } finally {
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '📤 Uploader l\'image';
+            }
+        }
+        
+        // Fonction pour réinitialiser la sélection
+        function resetSelection() {
+            selectedFile = null;
+            fileInput.value = '';
+            preview.style.display = 'none';
+            previewContainer.style.display = 'none';
+            uploadBtn.disabled = true;
+        }
+        
+        // Fonction pour gérer la sélection de fichier
+        function handleFileSelect(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                showStatus('Veuillez sélectionner un fichier image valide', 'error');
+                return false;
+            }
+            
+            // Vérifier la taille (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showStatus('L\'image ne doit pas dépasser 5MB', 'error');
+                return false;
+            }
+            
+            selectedFile = file;
+            uploadBtn.disabled = false;
+            
+            // Afficher l'aperçu
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+            
+            showStatus(`✅ Image sélectionnée: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`, 'success');
+            return true;
+        }
+        
+        // Événements UI
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFileSelect(file);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFileSelect(e.target.files[0]);
+        });
+        
+        uploadBtn.addEventListener('click', uploadImage);
+        
+        // Test de connexion au chargement
+        async function testConnection() {
+            try {
+                showStatus('🔌 Test de connexion à Supabase...', 'info');
+                const { data, error } = await supabase.storage.listBuckets();
+                
+                if (error) {
+                    showStatus(`⚠️ Connexion établie mais erreur: ${error.message}`, 'error');
+                } else {
+                    showStatus('✅ Connexion à Supabase réussie!', 'success');
+                    // Vérifier si le bucket images existe
+                    const bucketExists = data.some(bucket => bucket.name === 'images');
+                    if (bucketExists) {
+                        showStatus('✅ Bucket "images" trouvé', 'success');
+                    } else {
+                        showStatus('ℹ️ Le bucket "images" sera créé lors du premier upload', 'info');
+                    }
+                }
+            } catch (error) {
+                showStatus(`❌ Erreur de connexion: ${error.message}`, 'error');
+            }
+        }
+        
+        // Initialiser
+        testConnection();
+        loadImages();
     </script>
 </body>
 </html>
