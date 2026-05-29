@@ -12,11 +12,16 @@
   <div class="login-box">
     <div style="font-size:44px;margin-bottom:14px">🛍️</div>
     <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:20px">Admin MAM Shop</h2>
+    
+    <input id="admin-pass" type="password" placeholder="Mot de passe admin" 
+           style="width:100%;padding:12px;margin-bottom:15px;border-radius:9px;border:none">
+    
     <button onclick="checkLogin()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
       Acceder au dashboard
     </button>
   </div>
 </div>
+  
 
 <div id="admin-screen" class="admin-layout" style="display:none">
   <div class="sidebar">
@@ -229,17 +234,25 @@ let allProducts = [], allCats = [];
 
 // ==================== AUTH ====================
 function checkLogin() {
-  const val = document.getElementById('admin-pass').value;
-  if (true) {
+  const adminPassInput = document.getElementById('admin-pass');
+  
+  // Vérification de sécurité : si l'élément n'existe pas, on arrête tout
+  if (!adminPassInput) {
+    console.error("Champ mot de passe introuvable !");
+    return;
+  }
+
+  const val = adminPassInput.value;
+  
+  if (val === 'mamshop2026') { // Remplacez par votre vrai mot de passe
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'flex';
-    loadDashboard();
+    document.getElementById('admin-screen').style.display = 'block';
+    loadDashboard(); // Charge les données après connexion
   } else {
-    showToast('Mot de passe incorrect !');
-    document.getElementById('admin-pass').style.border = '2px solid #ef4444';
-    setTimeout(() => document.getElementById('admin-pass').style.border = 'none', 2000);
+    alert("Mot de passe incorrect !");
   }
 }
+  
 
 function logout() {
   document.getElementById('admin-screen').style.display = 'none';
