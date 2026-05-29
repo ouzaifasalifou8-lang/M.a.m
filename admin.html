@@ -280,8 +280,8 @@ async function sbGet(table, query = '') {
     const url = `${SUPA_URL}/rest/v1/${table}?${query}`;
     const res = await fetch(url, {
       headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': `Bearer ${SUPA_SECRET}`
+        'apikey': SUPA_ANON_KEY,
+        'Authorization': `Bearer ${SUPA_SERVICE_ROLE},`//
       }
     });
     if (!res.ok) return [];
