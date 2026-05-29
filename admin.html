@@ -1,475 +1,258 @@
+html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin - MAM Shop</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #0f172a; }
+  body { font-family: system-ui, sans-serif; background: #0f172a; }
   
-  /* Login */
   .login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
-  .login-box { background: #1e293b; padding: 32px 28px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid #334155; }
-  .login-box input { width: 100%; padding: 12px 15px; border-radius: 9px; border: none; margin-bottom: 14px; font-size: 15px; outline: none; background: #0f172a; color: white; }
-  .login-box button { width: 100%; padding: 13px; background: #2563eb; color: white; border: none; border-radius: 9px; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .login-box { background: #1e293b; padding: 32px 28px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; }
+  .login-box input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 9px; color: white; margin-bottom: 14px; }
+  .login-box button { width: 100%; padding: 13px; background: #2563eb; color: white; border: none; border-radius: 9px; cursor: pointer; }
   
-  /* Admin Layout */
   .admin-layout { display: flex; min-height: 100vh; }
   .sidebar { width: 260px; background: #0f172a; border-right: 1px solid #1e293b; position: fixed; height: 100vh; overflow-y: auto; }
   .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #1e293b; }
-  .sidebar-logo h2 { color: white; font-size: 20px; font-weight: 800; }
-  .sidebar-logo p { color: #94a3b8; font-size: 12px; margin-top: 4px; }
-  .sidebar-btn { width: 100%; padding: 14px 20px; text-align: left; background: none; border: none; color: #cbd5e1; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
-  .sidebar-btn:hover { background: #1e293b; color: white; }
+  .sidebar-logo h2 { color: white; }
+  .sidebar-btn { width: 100%; padding: 14px 20px; text-align: left; background: none; border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+  .sidebar-btn:hover { background: #1e293b; }
   .sidebar-btn.active { background: #1e293b; color: #3b82f6; border-left: 3px solid #3b82f6; }
   
-  .admin-content { margin-left: 260px; flex: 1; padding: 24px 32px; background: #0f172a; min-height: 100vh; }
+  .admin-content { margin-left: 260px; flex: 1; padding: 24px 32px; }
   .admin-title { font-size: 24px; font-weight: 800; color: white; margin-bottom: 24px; }
   
-  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
-  .stat-card { background: #1e293b; border-radius: 16px; padding: 20px; border-left: 4px solid; }
-  .stat-card .num { font-size: 32px; font-weight: 800; color: white; margin-bottom: 8px; }
-  .stat-card .lbl { color: #94a3b8; font-size: 13px; font-weight: 500; }
-  
-  .table-box { background: #1e293b; border-radius: 16px; overflow-x: auto; margin-top: 16px; }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #334155; color: #e2e8f0; font-size: 14px; }
-  th { color: #94a3b8; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-  
-  .form-box { background: #1e293b; border-radius: 20px; padding: 24px; max-width: 700px; }
+  .form-box { background: #1e293b; border-radius: 20px; padding: 24px; max-width: 600px; }
   .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; outline: none; }
-  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #3b82f6; }
-  
-  .upload-zone { background: #0f172a; border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
-  .upload-zone:hover { border-color: #3b82f6; background: #1e293b; }
-  .upload-zone .icon { font-size: 40px; margin-bottom: 8px; }
-  
-  .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-  .badge-green { background: #065f46; color: #34d399; }
+  .form-group label { display: block; color: #cbd5e1; margin-bottom: 8px; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; }
   
   .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
   .product-card { background: #1e293b; border-radius: 12px; overflow: hidden; }
   .product-card .product-img { height: 140px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 40px; }
   .product-card .product-info { padding: 12px; }
-  .product-card .product-name { color: white; font-weight: 700; font-size: 13px; margin-bottom: 4px; }
-  .product-card .product-price { color: #3b82f6; font-weight: 700; font-size: 14px; }
-  .product-card button { width: 100%; margin-top: 8px; padding: 6px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .product-card .product-name { color: white; font-weight: 700; }
+  .product-card .product-price { color: #3b82f6; font-weight: 700; }
+  .product-card button { width: 100%; margin-top: 8px; padding: 6px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; }
   
-  .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 12px; font-size: 13px; z-index: 9999; border-left: 4px solid #3b82f6; }
-  .toast.success { border-left-color: #10b981; }
-  .toast.error { border-left-color: #ef4444; }
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: #1e293b; border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6; }
+  .stat-card .num { font-size: 32px; font-weight: 800; color: white; }
+  .stat-card .lbl { color: #94a3b8; font-size: 13px; }
   
+  .table-box { background: #1e293b; border-radius: 16px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #334155; color: #e2e8f0; }
+  
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 12px 20px; border-radius: 12px; border-left: 4px solid #10b981; color: white; z-index: 9999; }
   button:disabled { opacity: 0.6; cursor: not-allowed; }
-  .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid white; border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; margin-right: 8px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  
-  @media (max-width: 768px) {
-    .sidebar { width: 200px; }
-    .admin-content { margin-left: 200px; padding: 16px; }
-  }
 </style>
 </head>
 <body>
 
-<!-- Login Screen -->
 <div id="login-screen" class="login-page">
   <div class="login-box">
-    <div style="font-size:42px;margin-bottom:14px">🔐</div>
-    <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:22px">Admin MAM Shop</h2>
-    <input id="admin-pass" type="password" placeholder="Mot de passe">
+    <h2 style="color:white;margin-bottom:22px">Admin MAM Shop</h2>
+    <input id="admin-email" type="email" placeholder="Email" value="admin@mamshop.com">
+    <input id="admin-password" type="password" placeholder="Mot de passe">
     <button id="login-btn">Connexion</button>
-    <p style="color:#94a3b8;font-size:12px;margin-top:14px">Accès réservé à l'administrateur</p>
   </div>
 </div>
 
-<!-- Admin Screen -->
 <div id="admin-screen" class="admin-layout" style="display:none">
   <div class="sidebar">
-    <div class="sidebar-logo">
-      <h2>MAM Shop</h2>
-      <p>Interface Admin</p>
-    </div>
+    <div class="sidebar-logo"><h2>MAM Shop</h2><p>Admin</p></div>
     <button class="sidebar-btn active" data-tab="dashboard">📊 Dashboard</button>
     <button class="sidebar-btn" data-tab="products">🛍️ Produits</button>
     <button class="sidebar-btn" data-tab="add-product">➕ Ajouter produit</button>
     <button class="sidebar-btn" data-tab="categories">📂 Catégories</button>
-    <div style="padding:16px 20px;position:absolute;bottom:0;width:100%;border-top:1px solid #334155">
-      <a href="index.html" style="color:#94a3b8;font-size:13px">Voir le site →</a><br>
-      <button id="logout-btn" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;margin-top:6px">Déconnexion</button>
+    <div style="padding:20px;position:absolute;bottom:0">
+      <button id="logout-btn" style="background:none;border:none;color:#ef4444;cursor:pointer">Déconnexion</button>
     </div>
   </div>
 
   <div class="admin-content">
-    <!-- Dashboard -->
     <div id="tab-dashboard" class="tab-content">
-      <div class="admin-title">Tableau de bord</div>
+      <div class="admin-title">Dashboard</div>
       <div class="stat-cards">
-        <div class="stat-card" style="border-color:#6366f1"><div class="num" id="s-products">-</div><div class="lbl">Produits actifs</div></div>
-        <div class="stat-card" style="border-color:#10b981"><div class="num" id="s-cats">-</div><div class="lbl">Catégories</div></div>
-        <div class="stat-card" style="border-color:#f59e0b"><div class="num" id="s-sellers">-</div><div class="lbl">Vendeurs</div></div>
-        <div class="stat-card" style="border-color:#ef4444"><div class="num" id="s-users">-</div><div class="lbl">Utilisateurs</div></div>
+        <div class="stat-card"><div class="num" id="s-products">-</div><div class="lbl">Produits</div></div>
+        <div class="stat-card"><div class="num" id="s-categories">-</div><div class="lbl">Catégories</div></div>
+        <div class="stat-card"><div class="num" id="s-orders">-</div><div class="lbl">Commandes</div></div>
       </div>
-      <div class="table-box">
-        <div style="padding:16px 16px 0;color:white;font-weight:700;font-size:15px">Derniers produits</div>
-        <table style="width:100%">
-          <thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th><th>Vedette</th></tr></thead>
-          <tbody id="dash-products"></tbody>
-        </table>
-      </div>
+      <div class="table-box"><table><thead><tr><th>Nom</th><th>Prix</th><th>Stock</th></tr></thead><tbody id="dashboard-products"></tbody></table></div>
     </div>
 
-    <!-- Produits -->
     <div id="tab-products" class="tab-content" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-        <div class="admin-title" style="margin:0">Produits</div>
-        <button onclick="showTab('add-product')" style="background:#2563eb;color:white;padding:10px 18px;border-radius:9px;border:none;cursor:pointer">+ Ajouter</button>
-      </div>
-      <div id="admin-products-grid" class="products-grid"></div>
+      <div class="admin-title">Produits</div>
+      <div id="products-grid" class="products-grid"></div>
     </div>
 
-    <!-- Ajouter produit -->
     <div id="tab-add-product" class="tab-content" style="display:none">
       <div class="admin-title">Ajouter un produit</div>
       <div class="form-box">
-        <div class="upload-zone" onclick="document.getElementById('img-file').click()">
-          <div id="img-preview"><div class="icon">📸</div><p>Cliquer pour uploader une photo</p></div>
-          <input id="img-file" type="file" accept="image/*" style="display:none" onchange="previewImg(this)">
-        </div>
-        <div class="form-group"><label>Nom du produit *</label><input id="p-name" placeholder="Ex: Qamis blanc premium"></div>
-        <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3" placeholder="Description..."></textarea></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="form-group"><label>Prix (FCFA) *</label><input id="p-price" type="number" placeholder="15000"></div>
-          <div class="form-group"><label>Stock</label><input id="p-stock" type="number" placeholder="100"></div>
-        </div>
-        <div class="form-group">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="p-featured" style="width:auto"> Produit vedette
-          </label>
-        </div>
-        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;cursor:pointer">Enregistrer le produit</button>
+        <div class="form-group"><label>Nom</label><input id="p-name" placeholder="Nom du produit"></div>
+        <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3"></textarea></div>
+        <div class="form-group"><label>Prix (FCFA)</label><input id="p-price" type="number"></div>
+        <div class="form-group"><label>Stock</label><input id="p-stock" type="number" value="0"></div>
+        <div class="form-group"><label>Catégorie</label><select id="p-category"></select></div>
+        <div class="form-group"><label><input type="checkbox" id="p-featured"> Produit vedette</label></div>
+        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;cursor:pointer">Enregistrer</button>
       </div>
     </div>
 
-    <!-- Catégories -->
     <div id="tab-categories" class="tab-content" style="display:none">
       <div class="admin-title">Catégories</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
-        <div class="form-box">
-          <h3 style="color:white;font-weight:700;margin-bottom:16px">Nouvelle catégorie</h3>
-          <div class="form-group"><label>Nom *</label><input id="cat-name" placeholder="Ex: Mode & Vêtements"></div>
-          <button id="add-cat-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;cursor:pointer">Ajouter</button>
-        </div>
-        <div class="table-box">
-          <div style="padding:14px;color:white;font-weight:700">Catégories existantes</div>
-          <table style="width:100%"><thead><tr><th>Nom</th><th>Slug</th></tr></thead><tbody id="cats-table"></tbody></table>
-        </div>
+      <div class="form-box" style="margin-bottom:20px">
+        <div class="form-group"><label>Nouvelle catégorie</label><input id="new-cat-name" placeholder="Nom"></div>
+        <button id="add-cat-btn" style="background:#2563eb;color:white;padding:10px;border:none;border-radius:8px;cursor:pointer">Ajouter</button>
       </div>
+      <div class="table-box"><table><thead><tr><th>Nom</th><th>Slug</th></tr></thead><tbody id="categories-list"></tbody></table></div>
     </div>
   </div>
 </div>
 
+<script src="js/supabase.js"></script>
 <script>
-// Configuration Turso
-const TURSO_URL = 'https://mam-ouzaif.aws-eu-west-1.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3Nzk5MjQ3MzgsImlkIjoiMDE5ZTZiYmYtN2IwMS03ODAwLTgxMjAtMmIxYWU3ZmY5NDhiIiwicmlkIjoiNTc5N2IxMTMtYWJkNS00NzNmLWE0ZDQtMjg3NDczZmYxOTFiIn0.XbdprTEP9RO1kuQywjbrwcLpTjyf5k4avD6UZrG7Ht54tYEq2_yu-dCmdAfdXvJiUC5M55DjeEf-EdwXvsa8CQ';
+let currentUser = null;
 
-// Mot de passe admin
-const ADMIN_PASS = 'mamshop2026';
-
-// Fonction pour exécuter des requêtes SQL
-async function dbQuery(sql) {
-    try {
-        const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${TURSO_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ requests: [{ type: "execute", stmt: { sql: sql } }] })
-        });
-        
-        const data = await response.json();
-        const result = data.results?.[0]?.response?.result;
-        
-        if (!result || !result.rows) return [];
-        
-        const cols = result.cols?.map(c => c.name) || [];
-        const rows = result.rows || [];
-        
-        return rows.map(row => {
-            const obj = {};
-            cols.forEach((col, idx) => {
-                obj[col] = row[idx]?.value;
-            });
-            return obj;
-        });
-    } catch (error) {
-        console.error('Erreur:', error);
-        return [];
-    }
-}
-
-async function dbExec(sql) {
-    try {
-        const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${TURSO_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ requests: [{ type: "execute", stmt: { sql: sql } }] })
-        });
-        return await response.json();
-    } catch (error) {
-        console.error('Erreur exec:', error);
-        throw error;
-    }
-}
-
-// Initialisation de la base
-async function initDatabase() {
-    // Créer la table products si elle n'existe pas
-    await dbExec(`CREATE TABLE IF NOT EXISTS products (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT,
-        price REAL NOT NULL,
-        stock INTEGER DEFAULT 0,
-        category_id TEXT,
-        is_featured INTEGER DEFAULT 0,
-        is_active INTEGER DEFAULT 1,
-        image_url TEXT,
-        created_at TEXT
-    )`);
-    
-    // Créer la table categories
-    await dbExec(`CREATE TABLE IF NOT EXISTS categories (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        slug TEXT UNIQUE
-    )`);
-    
-    // Ajouter des catégories par défaut si vide
-    const cats = await dbQuery("SELECT COUNT(*) as count FROM categories");
-    if (cats.length === 0 || cats[0].count == 0) {
-        await dbExec("INSERT INTO categories (id, name, slug) VALUES ('cat_1', 'Mode & Vêtements', 'mode-vetements')");
-        await dbExec("INSERT INTO categories (id, name, slug) VALUES ('cat_2', 'Électronique', 'electronique')");
-        await dbExec("INSERT INTO categories (id, name, slug) VALUES ('cat_3', 'Maison', 'maison')");
-    }
-    
-    // Ajouter des produits par défaut si vide
-    const prods = await dbQuery("SELECT COUNT(*) as count FROM products");
-    if (prods.length === 0 || prods[0].count == 0) {
-        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) VALUES 
-            ('prd_1', 'Qamis Blanc Premium', 'Superbe qamis en coton de haute qualité', 25000, 50, 1, 1, datetime('now'))`);
-        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) VALUES 
-            ('prd_2', 'Boubou Cérémonie', 'Boubou traditionnel pour grandes occasions', 45000, 25, 1, 1, datetime('now'))`);
-        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) VALUES 
-            ('prd_3', 'Montre Connectée', 'Montre intelligente', 35000, 30, 1, 1, datetime('now'))`);
-    }
-    
-    console.log('Base initialisée');
-}
-
-// Utilitaires
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
-
-// Connexion
 document.getElementById('login-btn').onclick = async () => {
-    const pass = document.getElementById('admin-pass').value;
-    if (pass === ADMIN_PASS) {
-        await initDatabase();
+    const email = document.getElementById('admin-email').value;
+    const password = document.getElementById('admin-password').value;
+    
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+        showToast('Email ou mot de passe incorrect', 'error');
+    } else {
+        currentUser = data.user;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-screen').style.display = 'flex';
-        await loadDashboard();
-        showToast('Connexion réussie !', 'success');
-    } else {
-        showToast('Mot de passe incorrect !', 'error');
+        loadDashboard();
+        loadProducts();
+        loadCategories();
+        showToast('Connexion réussie');
     }
 };
 
-document.getElementById('admin-pass').onkeypress = (e) => {
-    if (e.key === 'Enter') document.getElementById('login-btn').click();
-};
-
-document.getElementById('logout-btn').onclick = () => {
+document.getElementById('logout-btn').onclick = async () => {
+    await supabase.auth.signOut();
     document.getElementById('admin-screen').style.display = 'none';
     document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('admin-pass').value = '';
 };
 
-// Navigation
-function showTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-    document.getElementById(`tab-${tabId}`).style.display = 'block';
-    document.querySelectorAll('.sidebar-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.tab === tabId) btn.classList.add('active');
-    });
-    
-    if (tabId === 'products') loadProducts();
-    if (tabId === 'categories') loadCategories();
-    if (tabId === 'dashboard') loadDashboard();
-}
-
 document.querySelectorAll('.sidebar-btn').forEach(btn => {
-    btn.onclick = () => showTab(btn.dataset.tab);
+    btn.onclick = () => {
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        document.getElementById(`tab-${btn.dataset.tab}`).style.display = 'block';
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.tab === 'products') loadProducts();
+        if (btn.dataset.tab === 'categories') loadCategories();
+        if (btn.dataset.tab === 'add-product') loadCategorySelect();
+    };
 });
 
-// Dashboard
 async function loadDashboard() {
-    const products = await dbQuery("SELECT * FROM products WHERE is_active = 1 ORDER BY created_at DESC LIMIT 5");
-    const cats = await dbQuery("SELECT COUNT(*) as count FROM categories");
-    const sellers = await dbQuery("SELECT COUNT(*) as count FROM sellers");
-    const users = await dbQuery("SELECT COUNT(*) as count FROM users");
+    const products = await getProducts();
+    const categories = await getCategories();
+    document.getElementById('s-products').textContent = products.length;
+    document.getElementById('s-categories').textContent = categories.length;
+    document.getElementById('s-orders').textContent = '0';
     
-    document.getElementById('s-products').textContent = (await dbQuery("SELECT COUNT(*) as count FROM products WHERE is_active=1"))[0]?.count || 0;
-    document.getElementById('s-cats').textContent = cats[0]?.count || 0;
-    document.getElementById('s-sellers').textContent = sellers[0]?.count || 0;
-    document.getElementById('s-users').textContent = users[0]?.count || 0;
-    
-    const tbody = document.getElementById('dash-products');
-    if (products.length > 0) {
-        tbody.innerHTML = products.map(p => `
-            <tr>
-                <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;display:flex;align-items:center;justify-content:center">🛍️</div></td>
-                <td>${p.name}</td>
-                <td style="color:#3b82f6">${(p.price || 0).toLocaleString()} FCFA</td>
-                <td>${p.stock || 0}</td>
-                <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge">Non</span>'}</td>
-            </tr>
-        `).join('');
-    } else {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Aucun produit</td></tr>';
-    }
+    const tbody = document.getElementById('dashboard-products');
+    tbody.innerHTML = products.slice(0,5).map(p => `<tr><td>${p.name}</td><td>${p.price} FCFA</td><td>${p.stock}</td>`).join('');
 }
 
-// Produits
 async function loadProducts() {
-    const products = await dbQuery("SELECT * FROM products WHERE is_active = 1 ORDER BY created_at DESC");
-    const grid = document.getElementById('admin-products-grid');
-    
-    if (products.length === 0) {
-        grid.innerHTML = '<div style="color:#94a3b8;padding:20px;text-align:center">Aucun produit</div>';
-        return;
-    }
-    
+    const products = await getProducts();
+    const grid = document.getElementById('products-grid');
     grid.innerHTML = products.map(p => `
         <div class="product-card">
-            <div class="product-img">${p.image_url ? '📷' : '🛍️'}</div>
+            <div class="product-img">🛍️</div>
             <div class="product-info">
                 <div class="product-name">${p.name}</div>
-                <div class="product-price">${(p.price || 0).toLocaleString()} FCFA</div>
-                <button onclick="deleteProduct('${p.id}')">🗑 Supprimer</button>
+                <div class="product-price">${p.price} FCFA</div>
+                <button onclick="deleteProduct('${p.id}')">Supprimer</button>
             </div>
         </div>
     `).join('');
 }
 
-async function deleteProduct(id) {
-    if (!confirm('Supprimer ce produit ?')) return;
-    await dbExec(`DELETE FROM products WHERE id = '${id}'`);
-    showToast('Produit supprimé', 'success');
-    await loadProducts();
-    await loadDashboard();
+async function loadCategories() {
+    const categories = await getCategories();
+    const tbody = document.getElementById('categories-list');
+    tbody.innerHTML = categories.map(c => `<tr><td>${c.name}</td><td>${c.slug}</td>`).join('');
 }
 
-// Ajout produit
-let currentImageData = null;
-
-function previewImg(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('img-preview').innerHTML = `<img src="${e.target.result}" style="max-height:160px;border-radius:8px;max-width:100%">`;
-        currentImageData = e.target.result;
-    };
-    reader.readAsDataURL(file);
+async function loadCategorySelect() {
+    const categories = await getCategories();
+    const select = document.getElementById('p-category');
+    select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
 }
 
 document.getElementById('save-product-btn').onclick = async () => {
-    const name = document.getElementById('p-name').value.trim();
-    const price = document.getElementById('p-price').value;
+    const name = document.getElementById('p-name').value;
+    const price = parseFloat(document.getElementById('p-price').value);
+    const stock = parseInt(document.getElementById('p-stock').value);
+    const categoryId = document.getElementById('p-category').value;
+    const featured = document.getElementById('p-featured').checked;
     
     if (!name || !price) {
-        showToast('Nom et prix requis !', 'error');
+        showToast('Nom et prix requis', 'error');
         return;
     }
+ const { data, error } = await supabase.from('products').insert([{
+        name, price, stock, category_id: categoryId, is_featured: featured, is_active: true, slug: name.toLowerCase().replace(/\s+/g, '-')
+    }]);
     
-    const btn = document.getElementById('save-product-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span> Enregistrement...';
-    
-    try {
-        const id = 'prod_' + Date.now();
-        const desc = document.getElementById('p-desc').value;
-        const stock = document.getElementById('p-stock').value || 0;
-        const featured = document.getElementById('p-featured').checked ? 1 : 0;
-        
-        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) 
-            VALUES ('${id}', '${name.replace(/'/g, "''")}', '${desc.replace(/'/g, "''")}', ${price}, ${stock}, ${featured}, 1, datetime('now'))`);
-        
-        showToast('Produit ajouté avec succès !', 'success');
-        
-        // Reset form
-        document.getElementById('p-name').value = '';
-        document.getElementById('p-desc').value = '';
-        document.getElementById('p-price').value = '';
-        document.getElementById('p-stock').value = '';
-        document.getElementById('p-featured').checked = false;
-        document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
-        currentImageData = null;
-        
-        await loadProducts();
-        await loadDashboard();
-    } catch (error) {
+    if (error) {
         showToast('Erreur: ' + error.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Enregistrer le produit';
+    } else {
+        showToast('Produit ajouté');
+        document.getElementById('p-name').value = '';
+        document.getElementById('p-price').value = '';
+        document.getElementById('p-stock').value = '0';
+        document.getElementById('p-featured').checked = false;
+        loadProducts();
+        loadDashboard();
     }
 };
-
-// Catégories
-async function loadCategories() {
-    const cats = await dbQuery("SELECT * FROM categories ORDER BY name");
-    document.getElementById('cats-table').innerHTML = cats.map(c => `
-        <tr><td>${c.name}</td><td style="color:#94a3b8">${c.slug}</td></tr>
-    `).join('');
-}
 
 document.getElementById('add-cat-btn').onclick = async () => {
-    const name = document.getElementById('cat-name').value.trim();
-    if (!name) {
-        showToast('Nom de catégorie requis', 'error');
-        return;
-    }
+    const name = document.getElementById('new-cat-name').value;
+    if (!name) return;
     
-    const id = 'cat_' + Date.now();
-    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const { error } = await supabase.from('categories').insert([{
+        name, slug: name.toLowerCase().replace(/\s+/g, '-'), is_active: true
+    }]);
     
-    try {
-        await dbExec(`INSERT INTO categories (id, name, slug) VALUES ('${id}', '${name}', '${slug}')`);
-        document.getElementById('cat-name').value = '';
-        showToast('Catégorie ajoutée !', 'success');
-        await loadCategories();
-    } catch (error) {
-        showToast('Erreur: ' + error.message, 'error');
+    if (!error) {
+        showToast('Catégorie ajoutée');
+        document.getElementById('new-cat-name').value = '';
+        loadCategories();
+        loadCategorySelect();
     }
 };
 
-// Raccourci showTab global
-window.showTab = showTab;
+async function deleteProduct(id) {
+    if (!confirm('Supprimer ce produit ?')) return;
+    await supabase.from('products').update({ is_active: false }).eq('id', id);
+    loadProducts();
+    loadDashboard();
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
 window.deleteProduct = deleteProduct;
 </script>
 </body>
