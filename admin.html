@@ -12,16 +12,11 @@
   <div class="login-box">
     <div style="font-size:44px;margin-bottom:14px">🛍️</div>
     <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:20px">Admin MAM Shop</h2>
-    
-    <input id="admin-pass" type="password" placeholder="Mot de passe admin" 
-           style="width:100%;padding:12px;margin-bottom:15px;border-radius:9px;border:none">
-    
     <button onclick="checkLogin()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
       Acceder au dashboard
     </button>
   </div>
 </div>
-  
 
 <div id="admin-screen" class="admin-layout" style="display:none">
   <div class="sidebar">
@@ -40,7 +35,6 @@
     <button class="sidebar-btn" onclick="showTab('settings',this)">⚙️ Parametres</button>
     <div style="padding:16px 20px;border-top:1px solid #334155;margin-top:20px">
       <a href="index.html" style="color:#94a3b8;font-size:13px;display:block;margin-bottom:8px">← Voir le site</a>
-      <button onclick="logout()" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer">Deconnexion</button>
     </div>
   </div>
 
@@ -210,10 +204,6 @@
         <div class="form-group"><label>Email de contact</label><input id="set-email" value="mamshop.niger@gmail.com"></div>
         <div class="form-group"><label>Adresse</label><input id="set-address" value="Tahoua, Niger"></div>
         <div class="form-group"><label>Frais de livraison (XOF)</label><input id="set-delivery" type="number" value="0"></div>
-        <hr style="border-color:#334155;margin:20px 0">
-        <h3 style="color:white;font-weight:700;margin-bottom:18px;font-size:15px">Securite</h3>
-        <div class="form-group"><label>Mot de passe admin actuel</label><input id="set-pass-old" type="password" placeholder="Mot de passe actuel"></div>
-        <div class="form-group"><label>Nouveau mot de passe</label><input id="set-pass-new" type="password" placeholder="Nouveau mot de passe"></div>
         <button onclick="saveSettings()" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
           Sauvegarder
         </button>
@@ -221,48 +211,23 @@
     </div>
 
   </div>
-        </div>
-        <script src="js/api.js"></script>
+</div>
+
+<script src="js/api.js"></script>
 <script>
 const SUPA_URL = "https://rqoaclfelpezlbbnjwrl.supabase.co";
 const SUPA_KEY = "sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei";
 const SUPA_SECRET = "sb_secret_vUHRNXMGbev8jOivG3zSaw_mC4Y_Ujj";
 const BUCKET = "products";
 
-let ADMIN_PASS = 'mamshop2026';
 let allProducts = [], allCats = [];
 
-// ==================== AUTH ====================
 function checkLogin() {
-  const adminPassInput = document.getElementById('admin-pass');
-  
-  // Vérification de sécurité : si l'élément n'existe pas, on arrête tout
-  if (!adminPassInput) {
-    console.error("Champ mot de passe introuvable !");
-    return;
-  }
-
-  const val = adminPassInput.value;
-  
-  if (val === 'mamshop2026') { // Remplacez par votre vrai mot de passe
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'block';
-    loadDashboard(); // Charge les données après connexion
-  } else {
-    alert("Mot de passe incorrect !");
-  }
-}
-  
-
-function logout() {
-  document.getElementById('admin-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('admin-pass').value = '';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'flex';
+  loadDashboard();
 }
 
-document.getElementById('admin-pass').addEventListener('keydown', e => e.key === 'Enter' && checkLogin());
-
-// ==================== TABS ====================
 function showTab(id, btn) {
   document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
   document.getElementById(`tab-${id}`).style.display = 'block';
@@ -276,18 +241,15 @@ function showTab(id, btn) {
   if (id === 'testimonials') loadTestimonialsAdmin();
 }
 
-// ==================== DASHBOARD ====================
 async function loadDashboard() {
   allProducts = await sbGet('products', 'is_active=eq.true&order=created_at.desc');
   allCats = await sbGet('categories', 'is_active=eq.true');
   const sellers = await sbGet('sellers', 'select=id');
   const testimonials = await sbGet('testimonials', 'select=id');
-
   document.getElementById('s-products').textContent = Array.isArray(allProducts) ? allProducts.length : 0;
   document.getElementById('s-cats').textContent = Array.isArray(allCats) ? allCats.length : 0;
   document.getElementById('s-sellers').textContent = Array.isArray(sellers) ? sellers.length : 0;
   document.getElementById('s-testimonials').textContent = Array.isArray(testimonials) ? testimonials.length : 0;
-
   const prods = Array.isArray(allProducts) ? allProducts : [];
   document.getElementById('dash-products').innerHTML = prods.slice(0, 8).map(p => `
     <tr>
@@ -308,7 +270,6 @@ async function loadDashboard() {
     </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucun produit</td></tr>';
 }
 
-// ==================== PRODUITS ====================
 function loadAdminProducts() {
   const grid = document.getElementById('admin-products-grid');
   const prods = Array.isArray(allProducts) ? allProducts : [];
@@ -319,13 +280,11 @@ function loadAdminProducts() {
   grid.innerHTML = prods.map(p => `
     <div style="background:#1e293b;border-radius:13px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.2)">
       <div style="height:140px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;position:relative">
-        ${p.image_url
-          ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;font-size:32px>🛍️</div>'">`
-          : '🛍️'}
+        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='🛍️'">` : '🛍️'}
         ${p.is_featured ? '<div style="position:absolute;top:6px;right:6px;background:#f59e0b;color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">⭐ VEDETTE</div>' : ''}
       </div>
       <div style="padding:12px">
-        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.name}">${p.name}</div>
+        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
         <div style="color:#6366f1;font-weight:700;margin-bottom:4px;font-size:13px">
           ${parseFloat(p.price).toLocaleString()} XOF
           ${p.promo_price ? `<span style="color:#10b981;font-size:11px;margin-left:4px">→ ${parseFloat(p.promo_price).toLocaleString()}</span>` : ''}
@@ -337,8 +296,7 @@ function loadAdminProducts() {
       </div>
     </div>`).join('');
 }
-
-async function deleteProduct(id) {
+        async function deleteProduct(id) {
   if (!confirm('Supprimer ce produit ?')) return;
   const res = await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${id}`, {
     method: 'PATCH',
@@ -354,25 +312,11 @@ async function deleteProduct(id) {
     loadAdminProducts();
     document.getElementById('s-products').textContent = allProducts.length;
     showToast('Produit supprime !', 'success');
-    // Refresh dashboard table
-    const prods = allProducts;
-    document.getElementById('dash-products').innerHTML = prods.slice(0, 8).map(p => `
-      <tr>
-        <td><div style="width:44px;height:44px;background:#334155;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px">
-          ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
-        </div></td>
-        <td style="font-weight:600">${p.name}</td>
-        <td style="color:#6366f1;font-weight:700">${parseFloat(p.price).toLocaleString()} XOF</td>
-        <td>${p.stock || 0}</td>
-        <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge" style="background:#334155;color:#94a3b8">Non</span>'}</td>
-        <td><button onclick="deleteProduct('${p.id}')" style="background:#ef4444;color:white;border:none;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:700">Supprimer</button></td>
-      </tr>`).join('');
   } else {
-    showToast('Erreur lors de la suppression');
+    showToast('Erreur suppression - verifiez Supabase');
   }
 }
 
-// ==================== IMAGE UPLOAD ====================
 function previewImg(input) {
   const file = input.files[0];
   if (!file) return;
@@ -381,9 +325,8 @@ function previewImg(input) {
   reader.onload = e => {
     document.getElementById('img-preview').innerHTML = `
       <img src="${e.target.result}" style="max-height:160px;border-radius:8px;max-width:100%;object-fit:contain">
-      <p style="color:#94a3b8;font-size:11px;margin-top:6px">${file.name} (${(file.size/1024).toFixed(0)}KB)</p>`;
+      <p style="color:#94a3b8;font-size:11px;margin-top:6px">${file.name}</p>`;
     window._imgFile = file;
-    window._imgData = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -394,14 +337,12 @@ async function uploadImage(file, folder) {
   const status = document.getElementById('upload-status');
   progress.style.display = 'block';
   bar.style.width = '20%';
-  status.textContent = 'Preparation upload...';
-
+  status.textContent = 'Preparation...';
   try {
     const ext = file.name.split('.').pop().toLowerCase();
-    const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2,8)}.${ext}`;
+    const fileName = `${folder}/${Date.now()}.${ext}`;
     bar.style.width = '50%';
     status.textContent = 'Upload en cours...';
-
     const res = await fetch(`${SUPA_URL}/storage/v1/object/${BUCKET}/${fileName}`, {
       method: 'POST',
       headers: {
@@ -411,18 +352,13 @@ async function uploadImage(file, folder) {
       },
       body: file
     });
-
-    bar.style.width = '80%';
-    const data = await res.json();
-
-    if (data.Key || data.path || res.ok) {
-      bar.style.width = '100%';
+    bar.style.width = '100%';
+    if (res.ok) {
       status.textContent = 'Upload termine !';
-      const url = `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
       setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 2000);
-      return url;
+      return `${SUPA_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
     } else {
-      status.textContent = 'Erreur upload: ' + (data.error || data.message || 'Inconnue');
+      status.textContent = 'Erreur upload';
       return '';
     }
   } catch (e) {
@@ -431,36 +367,23 @@ async function uploadImage(file, folder) {
   }
 }
 
-// ==================== SAVE PRODUCT ====================
 async function saveProduct() {
   const name = document.getElementById('p-name').value.trim();
   const price = document.getElementById('p-price').value;
   if (!name || !price) { showToast('Nom et prix requis !'); return; }
-
   const btn = document.getElementById('save-btn');
   const msg = document.getElementById('save-msg');
   btn.disabled = true;
   btn.textContent = 'Enregistrement...';
   btn.style.opacity = '0.7';
-  msg.style.display = 'none';
-
   let imgUrl = '';
   if (window._imgFile) {
     imgUrl = await uploadImage(window._imgFile, 'products');
-    if (!imgUrl) {
-      showToast('Probleme upload image, produit sauvegarde sans photo');
-    }
   }
-
   const promo = document.getElementById('p-promo').value;
-  const slug = name.toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
-    .substring(0, 80);
-
+  const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').substring(0, 80);
   const productData = {
-    name,
-    slug,
+    name, slug,
     description: document.getElementById('p-desc').value,
     price: parseFloat(price),
     promo_price: promo ? parseFloat(promo) : null,
@@ -471,7 +394,6 @@ async function saveProduct() {
     image_url: imgUrl,
     seller_id: null
   };
-
   const res = await fetch(`${SUPA_URL}/rest/v1/products`, {
     method: 'POST',
     headers: {
@@ -482,18 +404,15 @@ async function saveProduct() {
     },
     body: JSON.stringify(productData)
   });
-
   btn.disabled = false;
   btn.textContent = 'Enregistrer le produit';
   btn.style.opacity = '1';
-
   if (res.ok) {
     msg.style.display = 'block';
     msg.style.background = '#065f46';
     msg.style.color = '#6ee7b7';
-    msg.textContent = '✅ Produit enregistre avec succes !';
+    msg.textContent = '✅ Produit enregistre !';
     showToast('Produit ajoute !', 'success');
-    // Reset form
     document.getElementById('p-name').value = '';
     document.getElementById('p-desc').value = '';
     document.getElementById('p-price').value = '';
@@ -503,8 +422,6 @@ async function saveProduct() {
     document.getElementById('p-cat').value = '';
     document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
     window._imgFile = null;
-    window._imgData = null;
-    // Refresh products list
     allProducts = await sbGet('products', 'is_active=eq.true&order=created_at.desc');
     document.getElementById('s-products').textContent = Array.isArray(allProducts) ? allProducts.length : 0;
     setTimeout(() => { msg.style.display = 'none'; }, 4000);
@@ -513,12 +430,11 @@ async function saveProduct() {
     msg.style.display = 'block';
     msg.style.background = '#450a0a';
     msg.style.color = '#fca5a5';
-    msg.textContent = 'Erreur: ' + (err.message || err.code || 'Verifiez la console');
+    msg.textContent = 'Erreur: ' + (err.message || err.code || 'Inconnue');
     showToast('Erreur enregistrement');
   }
 }
 
-// ==================== CATEGORIES ====================
 async function loadCategories() {
   allCats = await sbGet('categories', 'is_active=eq.true&order=name');
   if (!Array.isArray(allCats)) allCats = [];
@@ -527,9 +443,7 @@ async function loadCategories() {
       <td style="font-weight:600">${c.name}</td>
       <td style="color:#94a3b8;font-size:12px">${c.slug}</td>
       <td>
-        <button onclick="deleteCategory('${c.id}')" style="background:#ef4444;color:white;border:none;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:700">
-          Suppr.
-        </button>
+        <button onclick="deleteCategory('${c.id}')" style="background:#ef4444;color:white;border:none;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-weight:700">Suppr.</button>
       </td>
     </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:16px">Aucune categorie</td></tr>';
 }
@@ -570,18 +484,13 @@ async function deleteCategory(id) {
   if (!confirm('Supprimer cette categorie ?')) return;
   await fetch(`${SUPA_URL}/rest/v1/categories?id=eq.${id}`, {
     method: 'PATCH',
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': `Bearer ${SUPA_SECRET}`,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_SECRET}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ is_active: false })
   });
-  showToast('Categorie supprimee', 'success');
+  showToast('Supprimee !', 'success');
   loadCategories();
 }
 
-// ==================== GALERIE ====================
 function previewSvc(input) {
   const file = input.files[0];
   if (!file) return;
@@ -614,10 +523,9 @@ async function addGallery() {
   document.getElementById('svc-client').value = '';
   document.getElementById('svc-preview').innerHTML = '<div class="icon">📡</div><p>Cliquer pour uploader</p>';
   window._svcFile = null;
-  showToast('Photo ajoutee a la galerie !', 'success');
+  showToast('Photo ajoutee !', 'success');
 }
 
-// ==================== TEMOIGNAGES ====================
 async function addTestimonial() {
   const name = document.getElementById('t-name').value;
   const text = document.getElementById('t-text').value;
@@ -631,7 +539,7 @@ async function addTestimonial() {
     document.getElementById('t-name').value = '';
     document.getElementById('t-text').value = '';
     showToast('Temoignage ajoute !', 'success');
-  } else showToast('Erreur ajout temoignage');
+  } else showToast('Erreur');
 }
 
 async function loadTestimonialsAdmin() {
@@ -640,7 +548,7 @@ async function loadTestimonialsAdmin() {
   document.getElementById('testimonials-table').innerHTML = list.length ? list.map(t => `
     <tr>
       <td style="font-weight:600">${t.customer_name}</td>
-      <td style="color:#94a3b8;font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(t.content || '').substring(0, 50)}...</td>
+      <td style="color:#94a3b8;font-size:12px">${(t.content || '').substring(0, 50)}...</td>
       <td style="color:#f59e0b">${'★'.repeat(t.rating || 5)}</td>
       <td>${t.is_approved ? '<span class="badge badge-green">Publie</span>' : '<span class="badge badge-orange">Cache</span>'}</td>
       <td>
@@ -665,7 +573,7 @@ async function toggleTestimonial(id, val) {
 }
 
 async function deleteTestimonial(id) {
-  if (!confirm('Supprimer ce temoignage ?')) return;
+  if (!confirm('Supprimer ?')) return;
   await fetch(`${SUPA_URL}/rest/v1/testimonials?id=eq.${id}`, {
     method: 'DELETE',
     headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_SECRET}` }
@@ -674,7 +582,6 @@ async function deleteTestimonial(id) {
   showToast('Supprime', 'success');
 }
 
-// ==================== VENDEURS ====================
 async function loadSellers() {
   const sellers = await sbGet('sellers', 'order=created_at.desc');
   const list = Array.isArray(sellers) ? sellers : [];
@@ -686,8 +593,7 @@ async function loadSellers() {
       <td style="color:#f59e0b">${'★'.repeat(Math.round(s.rating || 5))}</td>
       <td>${s.is_approved ? '<span class="badge badge-green">Approuve</span>' : '<span class="badge badge-orange">En attente</span>'}</td>
       <td>
-        <button onclick="toggleSeller('${s.id}',${!s.is_approved})"
-          style="background:${s.is_approved ? '#ef4444' : '#10b981'};color:white;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:700">
+        <button onclick="toggleSeller('${s.id}',${!s.is_approved})" style="background:${s.is_approved ? '#ef4444' : '#10b981'};color:white;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:700">
           ${s.is_approved ? 'Desactiver' : 'Approuver'}
         </button>
       </td>
@@ -701,10 +607,9 @@ async function toggleSeller(id, val) {
     body: JSON.stringify({ is_approved: val })
   });
   loadSellers();
-  showToast(val ? 'Vendeur approuve !' : 'Vendeur desactive', 'success');
+  showToast(val ? 'Approuve !' : 'Desactive', 'success');
 }
 
-// ==================== COMMANDES ====================
 async function loadOrders() {
   const orders = await sbGet('orders', 'order=created_at.desc&limit=50');
   const list = Array.isArray(orders) ? orders : [];
@@ -713,15 +618,10 @@ async function loadOrders() {
       <td style="font-family:monospace;font-size:11px">${(o.order_number || o.id || '').toString().substring(0, 8)}</td>
       <td>${o.customer_name || '-'}</td>
       <td style="color:#6366f1;font-weight:700">${parseFloat(o.total_amount || o.total || 0).toLocaleString()} XOF</td>
-      <td>
-        <span class="badge ${o.status === 'delivered' ? 'badge-green' : o.status === 'pending' ? 'badge-orange' : 'badge-blue'}">
-          ${o.status || 'pending'}
-        </span>
-      </td>
+      <td><span class="badge ${o.status === 'delivered' ? 'badge-green' : o.status === 'pending' ? 'badge-orange' : 'badge-blue'}">${o.status || 'pending'}</span></td>
       <td style="color:#94a3b8;font-size:12px">${(o.created_at || '').substring(0, 10)}</td>
       <td>
-        <select onchange="updateOrder('${o.id}', this.value)"
-          style="background:#334155;color:white;border:1px solid #475569;border-radius:6px;padding:4px 6px;font-size:11px;cursor:pointer">
+        <select onchange="updateOrder('${o.id}', this.value)" style="background:#334155;color:white;border:1px solid #475569;border-radius:6px;padding:4px 6px;font-size:11px;cursor:pointer">
           <option ${o.status === 'pending' ? 'selected' : ''} value="pending">En attente</option>
           <option ${o.status === 'confirmed' ? 'selected' : ''} value="confirmed">Confirme</option>
           <option ${o.status === 'shipped' ? 'selected' : ''} value="shipped">Envoye</option>
@@ -741,16 +641,7 @@ async function updateOrder(id, status) {
   showToast('Statut mis a jour !', 'success');
 }
 
-// ==================== PARAMETRES ====================
 function saveSettings() {
-  const newPass = document.getElementById('set-pass-new').value;
-  const oldPass = document.getElementById('set-pass-old').value;
-  if (newPass) {
-    if (oldPass !== ADMIN_PASS) { showToast('Mot de passe actuel incorrect !'); return; }
-    ADMIN_PASS = newPass;
-    document.getElementById('set-pass-old').value = '';
-    document.getElementById('set-pass-new').value = '';
-  }
   showToast('Parametres sauvegardes !', 'success');
 }
 </script>
