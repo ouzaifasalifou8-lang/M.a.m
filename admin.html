@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin - MAM Shop</title>
 <style>
-  /* Styles de base pour l'admin */
+  /* Styles */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #0f172a; }
   
@@ -39,7 +39,8 @@
   .form-group label { display: block; color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
   .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; outline: none; transition: border 0.2s; }
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #3b82f6; }
-   .upload-zone { background: #0f172a; border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
+  
+  .upload-zone { background: #0f172a; border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
   .upload-zone:hover { border-color: #3b82f6; background: #1e293b; }
   .upload-zone .icon { font-size: 40px; margin-bottom: 8px; }
   
@@ -49,6 +50,11 @@
   .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 12px; font-size: 13px; z-index: 9999; border-left: 4px solid #3b82f6; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .toast.success { border-left-color: #10b981; }
   .toast.error { border-left-color: #ef4444; }
+  
+  .loading { display: inline-block; width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -57,11 +63,8 @@
   <div class="login-box">
     <div style="font-size:42px;margin-bottom:14px">🔐</div>
     <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:22px">Admin MAM Shop</h2>
-    <input id="admin-pass" type="password" placeholder="Mot de passe"
-      style="width:100%;padding:12px 15px;border-radius:9px;border:none;margin-bottom:14px;font-size:15px;outline:none">
-    <button id="login-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
-      Connexion
-    </button>
+    <input id="admin-pass" type="password" placeholder="Mot de passe" style="width:100%;padding:12px 15px;border-radius:9px;border:none;margin-bottom:14px;font-size:15px;outline:none">
+    <button id="login-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">Connexion</button>
     <p style="color:#94a3b8;font-size:12px;margin-top:14px">Accès réservé à l'administrateur</p>
   </div>
 </div>
@@ -87,7 +90,6 @@
   </div>
 
   <div class="admin-content">
-
     <!-- Dashboard -->
     <div id="tab-dashboard" class="tab-content">
       <div class="admin-title">Tableau de bord</div>
@@ -99,13 +101,14 @@
       </div>
       <div class="table-box">
         <div style="padding:16px 16px 0;color:white;font-weight:700;font-size:15px">Derniers produits</div>
-        <table>
+        <table style="width:100%">
           <thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th><th>Vedette</th></tr></thead>
           <tbody id="dash-products"></tbody>
         </table>
       </div>
     </div>
-      <!-- Produits -->
+
+    <!-- Produits -->
     <div id="tab-products" class="tab-content" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div class="admin-title" style="margin:0">Produits</div>
@@ -122,7 +125,6 @@
           <div id="img-preview"><div class="icon">📸</div><p>Cliquer pour uploader une photo</p></div>
           <input id="img-file" type="file" accept="image/*" style="display:none" onchange="previewImg(this)">
         </div>
-        <div style="height:14px"></div>
         <div class="form-group"><label>Nom du produit *</label><input id="p-name" placeholder="Ex: Qamis blanc premium"></div>
         <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3" placeholder="Description du produit..."></textarea></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -131,22 +133,17 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="form-group"><label>Stock</label><input id="p-stock" type="number" placeholder="100"></div>
-          <div class="form-group"><label>Catégorie</label>
-            <select id="p-cat"><option value="">Choisir...</option></select>
-          </div>
+          <div class="form-group"><label>Catégorie</label><select id="p-cat"><option value="">Choisir...</option></select></div>
         </div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="p-featured" style="width:auto"> Produit vedette (page d'accueil)
+            <input type="checkbox" id="p-featured" style="width:auto"> Produit vedette
           </label>
         </div>
-        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
-          Enregistrer le produit
-        </button>
+        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">Enregistrer le produit</button>
       </div>
-    </div>
-
-    <!-- Catégories -->
+  </div>
+  <!-- Catégories -->
     <div id="tab-categories" class="tab-content" style="display:none">
       <div class="admin-title">Catégories</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
@@ -157,12 +154,12 @@
         </div>
         <div class="table-box">
           <div style="padding:14px;color:white;font-weight:700">Catégories existantes</div>
-          <table><thead><tr><th>Nom</th><th>Slug</th></tr></thead>
-          <tbody id="cats-table"></tbody>
-        </table>
+          <table><thead><tr><th>Nom</th><th>Slug</th></tr></thead><tbody id="cats-table"></tbody></table>
+        </div>
       </div>
-      </div>
-        <!-- Services -->
+    </div>
+
+    <!-- Services -->
     <div id="tab-services" class="tab-content" style="display:none">
       <div class="admin-title">Services - Antennes & Starlink</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
@@ -172,17 +169,15 @@
             <div class="icon">📡</div><p>Cliquer pour uploader</p>
             <input id="svc-img" type="file" accept="image/*" style="display:none">
           </div>
-          <div class="form-group" style="margin-top:12px"><label>Légende</label><input id="svc-caption" placeholder="Ex: Installation Starlink à Tahoua"></div>
-          <button id="add-service-img-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter à la galerie</button>
+          <div class="form-group" style="margin-top:12px"><label>Légende</label><input id="svc-caption" placeholder="Ex: Installation Starlink"></div>
+          <button id="add-service-img-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
         </div>
         <div class="form-box">
           <h3 style="color:white;font-weight:700;margin-bottom:16px">Ajouter témoignage</h3>
-          <div class="form-group"><label>Nom du client</label><input id="t-name" placeholder="Ex: Ibrahim M."></div>
+          <div class="form-group"><label>Nom</label><input id="t-name" placeholder="Ex: Ibrahim M."></div>
           <div class="form-group"><label>Témoignage</label><textarea id="t-text" rows="3"></textarea></div>
-          <div class="form-group"><label>Note (1-5)</label>
-            <select id="t-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
-          </div>
-          <button id="add-testimonial-btn" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter témoignage</button>
+          <div class="form-group"><label>Note</label><select id="t-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+          <button id="add-testimonial-btn" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
         </div>
       </div>
     </div>
@@ -191,10 +186,7 @@
     <div id="tab-sellers" class="tab-content" style="display:none">
       <div class="admin-title">Vendeurs inscrits</div>
       <div class="table-box">
-        </table>
-          <thead><tr><th>Boutique</th><th>Email</th><th>Note</th><th>Ventes</th><th>Statut</th><th>Action</th></tr></thead>
-          <tbody id="sellers-table"><tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucun vendeur pour le moment</td></tr></tbody>
-        </table>
+        <table><thead><tr><th>Boutique</th><th>Email</th><th>Note</th><th>Ventes</th><th>Statut</th></tr></thead><tbody id="sellers-table"></tbody></table>
       </div>
     </div>
 
@@ -202,80 +194,123 @@
     <div id="tab-orders" class="tab-content" style="display:none">
       <div class="admin-title">Commandes</div>
       <div class="table-box">
-        <table>
-          <thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead>
-          <tbody id="orders-table"><tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">Aucune commande pour le moment</td></tr></tbody>
-        </table>
+        <table><thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="orders-table"></tbody></table>
       </div>
     </div>
 
     <!-- Paramètres -->
     <div id="tab-settings" class="tab-content" style="display:none">
-      <div class="admin-title">Paramètres du site</div>
+      <div class="admin-title">Paramètres</div>
       <div class="form-box">
         <div class="form-group"><label>Nom du site</label><input id="site-name" value="MAM Shop"></div>
-        <div class="form-group"><label>Numéro WhatsApp</label><input id="site-whatsapp" value="+227 98 83 66 01"></div>
-        <div class="form-group"><label>Email contact</label><input id="site-email" value="mamshop.niger@gmail.com"></div>
+        <div class="form-group"><label>WhatsApp</label><input id="site-whatsapp" value="+227 98 83 66 01"></div>
+        <div class="form-group"><label>Email</label><input id="site-email" value="mamshop.niger@gmail.com"></div>
         <div class="form-group"><label>Adresse</label><input id="site-address" value="Tahoua, Niger"></div>
-        <div class="form-group"><label>Nouveau mot de passe admin</label><input id="new-password" type="password" placeholder="Laisser vide pour ne pas changer"></div>
-        <button id="save-settings-btn" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
-          Sauvegarder
-        </button>
+        <button id="save-settings-btn" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;cursor:pointer">Sauvegarder</button>
       </div>
     </div>
+  </div>
+</div>
 
-  </div>
-  </div>
-  <script>
-// MOT DE PASSE ADMIN
+<script>
+// Configuration Turso
+const TURSO_URL = 'https://mam-ouzaif.aws-eu-west-1.turso.io';
+const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3Nzk5MjQ3MzgsImlkIjoiMDE5ZTZiYmYtN2IwMS03ODAwLTgxMjAtMmIxYWU3ZmY5NDhiIiwicmlkIjoiNTc5N2IxMTMtYWJkNS00NzNmLWE0ZDQtMjg3NDczZmYxOTFiIn0.XbdprTEP9RO1kuQywjbrwcLpTjyf5k4avD6UZrG7Ht54tYEq2_yu-dCmdAfdXvJiUC5M55DjeEf-EdwXvsa8CQ';
+
+// Mot de passe admin local
 const ADMIN_PASS = 'mamshop2026';
 
-// Données globales
-let allProducts = [], allCats = [], allUsers = [], allSellers = [], allOrders = [];
+async function queryTurso(sql) {
+  try {
+    const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${TURSO_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        requests: [{ type: "execute", stmt: { sql: sql } }]
+      })
+    });
+    
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    return data.results?.[0]?.response?.result || { rows: [] };
+  } catch (error) {
+    console.error('Turso error:', error);
+    throw error;
+  }
+}
 
-// Initialiser les données
-function initData() {
-  const storedProducts = localStorage.getItem('mamshop_products');
-  if (storedProducts) {
-    allProducts = JSON.parse(storedProducts);
-  } else {
-    allProducts = [];
-    localStorage.setItem('mamshop_products', JSON.stringify(allProducts));
+async function initDatabase() {
+  const tables = [
+    `CREATE TABLE IF NOT EXISTS products (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      price REAL NOT NULL,
+      compare_price REAL,
+      stock INTEGER DEFAULT 0,
+      category_id TEXT,
+      is_featured INTEGER DEFAULT 0,
+      image_url TEXT,
+      created_at TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS categories (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      slug TEXT UNIQUE
+    )`,
+    `CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      email TEXT,
+      phone TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS sellers (
+      id TEXT PRIMARY KEY,
+      shop_name TEXT,
+      email TEXT,
+      rating REAL DEFAULT 0,
+      sales INTEGER DEFAULT 0
+    )`,
+    `CREATE TABLE IF NOT EXISTS orders (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      total REAL,
+      status TEXT,
+      created_at TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS galleries (
+      id TEXT PRIMARY KEY,
+      image TEXT,
+      caption TEXT,
+      type TEXT,
+      created_at TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS testimonials (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      text TEXT,
+      rating INTEGER,
+      created_at TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )`
+  ];
+  
+  for (const sql of tables) {
+    try { await queryTurso(sql); } catch(e) { console.log('Table exists or error:', e); }
   }
   
-  const storedCats = localStorage.getItem('mamshop_categories');
-  if (storedCats) {
-    allCats = JSON.parse(storedCats);
-  } else {
-    allCats = [
-      { id: 'cat_1', name: 'Mode & Vêtements', slug: 'mode-vetements' },
-      { id: 'cat_2', name: 'Accessoires', slug: 'accessoires' }
-    ];
-    localStorage.setItem('mamshop_categories', JSON.stringify(allCats));
-  }
-  
-  const storedUsers = localStorage.getItem('mamshop_users');
-  if (storedUsers) {
-    allUsers = JSON.parse(storedUsers);
-  } else {
-    allUsers = [{ id: 'user_1', name: 'Client Test', email: 'client@test.com' }];
-    localStorage.setItem('mamshop_users', JSON.stringify(allUsers));
-  }
-  
-  const storedSellers = localStorage.getItem('mamshop_sellers');
-  if (storedSellers) {
-    allSellers = JSON.parse(storedSellers);
-  } else {
-    allSellers = [];
-    localStorage.setItem('mamshop_sellers', JSON.stringify(allSellers));
-  }
-  
-  const storedOrders = localStorage.getItem('mamshop_orders');
-  if (storedOrders) {
-    allOrders = JSON.parse(storedOrders);
-  } else {
-    allOrders = [];
-    localStorage.setItem('mamshop_orders', JSON.stringify(allOrders));
+  // Insert default categories if empty
+  const cats = await queryTurso("SELECT COUNT(*) as count FROM categories");
+  if (cats.rows?.[0]?.count === 0) {
+    await queryTurso("INSERT INTO categories (id, name, slug) VALUES ('cat_1', 'Mode & Vêtements', 'mode-vetements')");
+    await queryTurso("INSERT INTO categories (id, name, slug) VALUES ('cat_2', 'Accessoires', 'accessoires')");
+    await queryTurso("INSERT INTO categories (id, name, slug) VALUES ('cat_3', 'Électronique', 'electronique')");
   }
 }
 
@@ -287,16 +322,15 @@ function showToast(message, type = 'error') {
   setTimeout(() => toast.remove(), 3000);
 }
 
-// CONNEXION
 function checkLogin() {
   const passInput = document.getElementById('admin-pass');
-  if (!passInput) return;
-  
   if (passInput.value === ADMIN_PASS) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-screen').style.display = 'flex';
-    loadDashboard();
-    showToast('Connexion réussie !', 'success');
+    initDatabase().then(() => {
+      loadDashboard();
+      showToast('Connexion réussie !', 'success');
+    });
   } else {
     showToast('Mot de passe incorrect !');
   }
@@ -315,9 +349,7 @@ function showTab(tabId) {
   
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
     btn.classList.remove('active');
-    if (btn.getAttribute('data-tab') === tabId) {
-      btn.classList.add('active');
-    }
+    if (btn.getAttribute('data-tab') === tabId) btn.classList.add('active');
   });
   
   if (tabId === 'products') loadAdminProducts();
@@ -326,59 +358,66 @@ function showTab(tabId) {
   if (tabId === 'dashboard') loadDashboard();
 }
 
-function loadDashboard() {
-  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
-  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
-  allSellers = JSON.parse(localStorage.getItem('mamshop_sellers') || '[]');
-  allUsers = JSON.parse(localStorage.getItem('mamshop_users') || '[]');
+async function loadDashboard() {
+  const products = await queryTurso("SELECT * FROM products ORDER BY created_at DESC LIMIT 10");
+  const cats = await queryTurso("SELECT COUNT(*) as count FROM categories");
+  const sellers = await queryTurso("SELECT COUNT(*) as count FROM sellers");
+  const users = await queryTurso("SELECT COUNT(*) as count FROM users");
   
-  document.getElementById('s-products').textContent = allProducts.length;
-  document.getElementById('s-cats').textContent = allCats.length;
-  document.getElementById('s-sellers').textContent = allSellers.length;
-  document.getElementById('s-users').textContent = allUsers.length;
+  document.getElementById('s-products').textContent = products.rows?.length || 0;
+  document.getElementById('s-cats').textContent = cats.rows?.[0]?.count || 0;
+  document.getElementById('s-sellers').textContent = sellers.rows?.[0]?.count || 0;
+  document.getElementById('s-users').textContent = users.rows?.[0]?.count || 0;
   
   const tbody = document.getElementById('dash-products');
-  tbody.innerHTML = allProducts.slice(0,8).map(p => `
-    <tr>
-      <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px">
-        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
-      </div></td>
-      <td>${p.name || 'Sans nom'}</td>
-      <td style="color:#6366f1;font-weight:700">${parseFloat(p.price || 0).toLocaleString()} XOF</td>
-      <td>${p.stock || 0}</td>
-      <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge" style="background:#1e293b;color:#94a3b8">Non</span>'}</td>
-    </tr>`).join('');
-}
-    function loadAdminProducts() {
-  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
-  const grid = document.getElementById('admin-products-grid');
-  if (!allProducts.length) { 
-    grid.innerHTML = '<div style="color:#94a3b8;padding:20px">Aucun produit</div>'; 
-    return; 
+  if (products.rows?.length) {
+    tbody.innerHTML = products.rows.map(p => `
+      <tr>
+        <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px">${p.image_url ? '📷' : '🛍️'}</div></td>
+        <td>${p.name}</td>
+        <td style="color:#6366f1">${(p.price || 0).toLocaleString()} XOF</td>
+        <td>${p.stock || 0}</td>
+        <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge">Non</span>'}</td>
+      </tr>`).join('');
+  } else {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Aucun produit</td></tr>';
   }
-  grid.innerHTML = allProducts.map(p => `
+}
+  async function loadAdminProducts() {
+  const result = await queryTurso("SELECT * FROM products ORDER BY created_at DESC");
+  const products = result.rows || [];
+  const grid = document.getElementById('admin-products-grid');
+  
+  if (!products.length) {
+    grid.innerHTML = '<div style="color:#94a3b8;padding:20px">Aucun produit</div>';
+    return;
+  }
+  
+  grid.innerHTML = products.map(p => `
     <div style="background:#1e293b;border-radius:13px;overflow:hidden">
-      <div style="height:130px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden">
-        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
+      <div style="height:130px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:30px">
+        ${p.image_url ? '📷' : '🛍️'}
       </div>
       <div style="padding:12px">
-        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:4px">${p.name || 'Sans nom'}</div>
-        <div style="color:#6366f1;font-weight:700;margin-bottom:8px;font-size:13px">${parseFloat(p.price || 0).toLocaleString()} XOF</div>
-        <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:7px;background:#ef4444;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">Supprimer</button>
+        <div style="color:white;font-weight:700;font-size:13px">${p.name}</div>
+        <div style="color:#6366f1;font-weight:700;margin:8px 0">${(p.price || 0).toLocaleString()} XOF</div>
+        <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:7px;background:#ef4444;color:white;border:none;border-radius:7px;cursor:pointer">Supprimer</button>
       </div>
     </div>`).join('');
 }
 
-function loadCategories() {
-  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
-  document.getElementById('cats-table').innerHTML = allCats.map(c =>
+async function loadCategories() {
+  const result = await queryTurso("SELECT * FROM categories ORDER BY name");
+  const cats = result.rows || [];
+  document.getElementById('cats-table').innerHTML = cats.map(c =>
     `<tr><td>${c.name}</td><td style="color:#94a3b8">${c.slug}</td></tr>`).join('');
 }
 
-function loadCatsForForm() {
-  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
+async function loadCatsForForm() {
+  const result = await queryTurso("SELECT * FROM categories ORDER BY name");
+  const cats = result.rows || [];
   const sel = document.getElementById('p-cat');
-  sel.innerHTML = '<option value="">Choisir...</option>' + allCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  sel.innerHTML = '<option value="">Choisir...</option>' + cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
 }
 
 function previewImg(input) {
@@ -392,113 +431,115 @@ function previewImg(input) {
   reader.readAsDataURL(file);
 }
 
-function saveProduct() {
+async function saveProduct() {
   const name = document.getElementById('p-name').value.trim();
   const price = document.getElementById('p-price').value;
   
-  if (!name || !price) { 
-    showToast('Nom et prix requis !'); 
-    return; 
+  if (!name || !price) {
+    showToast('Nom et prix requis !');
+    return;
   }
   
-  const desc = document.getElementById('p-desc').value;
-  const promo = document.getElementById('p-promo').value;
-  const stock = document.getElementById('p-stock').value || 0;
-  const cat = document.getElementById('p-cat').value;
-  const featured = document.getElementById('p-featured').checked ? 1 : 0;
-  let imgUrl = window._imgData || '';
+  const btn = document.getElementById('save-product-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> Enregistrement...';
   
-  const pid = 'prd_' + Date.now();
-  
-  const newProduct = {
-    id: pid,
-    name: name,
-    description: desc,
-    price: parseFloat(price),
-    compare_price: promo ? parseFloat(promo) : null,
-    stock: parseInt(stock),
-    category_id: cat || allCats[0]?.id || '',
-    is_featured: featured,
-    image_url: imgUrl,
-    created_at: new Date().toISOString()
-  };
-  
-  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
-  allProducts.push(newProduct);
-  localStorage.setItem('mamshop_products', JSON.stringify(allProducts));
-  
-  showToast('Produit enregistré avec succès !', 'success');
-  
-  document.getElementById('p-name').value = '';
-  document.getElementById('p-desc').value = '';
-  document.getElementById('p-price').value = '';
-  document.getElementById('p-promo').value = '';
-  document.getElementById('p-stock').value = '';
-  document.getElementById('p-featured').checked = false;
-  document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
-  window._imgData = null;
-  document.getElementById('img-file').value = '';
-  
-  loadDashboard();
-  loadAdminProducts();
+  try {
+    const id = 'prd_' + Date.now();
+    const desc = document.getElementById('p-desc').value;
+    const promo = document.getElementById('p-promo').value;
+    const stock = document.getElementById('p-stock').value || 0;
+    const catId = document.getElementById('p-cat').value || 'cat_1';
+    const featured = document.getElementById('p-featured').checked ? 1 : 0;
+    const imageUrl = window._imgData || '';
+    
+    const sql = `INSERT INTO products (id, name, description, price, compare_price, stock, category_id, is_featured, image_url, created_at) 
+                 VALUES ('${id}', '${name.replace(/'/g, "''")}', '${desc.replace(/'/g, "''")}', ${price}, ${promo || 'NULL'}, ${stock}, '${catId}', ${featured}, '${imageUrl.replace(/'/g, "''")}', datetime('now'))`;
+    
+    await queryTurso(sql);
+    showToast('Produit enregistré avec succès !', 'success');
+    
+    // Reset form
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-desc').value = '';
+    document.getElementById('p-price').value = '';
+    document.getElementById('p-promo').value = '';
+    document.getElementById('p-stock').value = '';
+    document.getElementById('p-featured').checked = false;
+    document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
+    window._imgData = null;
+    document.getElementById('img-file').value = '';
+    
+    await loadDashboard();
+    await loadAdminProducts();
+  } catch (error) {
+    showToast('Erreur: ' + error.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Enregistrer le produit';
+  }
 }
 
-function deleteProduct(id) {
+async function deleteProduct(id) {
   if (!confirm('Supprimer ce produit ?')) return;
-  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
-  allProducts = allProducts.filter(p => p.id !== id);
-  localStorage.setItem('mamshop_products', JSON.stringify(allProducts));
-  showToast('Produit supprimé', 'success');
-  loadAdminProducts();
-  loadDashboard();
+  try {
+    await queryTurso(`DELETE FROM products WHERE id = '${id}'`);
+    showToast('Produit supprimé', 'success');
+    await loadAdminProducts();
+    await loadDashboard();
+  } catch (error) {
+    showToast('Erreur: ' + error.message);
+  }
 }
 
-function addCategory() {
+async function addCategory() {
   const name = document.getElementById('cat-name').value.trim();
   if (!name) {
     showToast('Nom de catégorie requis');
     return;
   }
+  
   const id = 'cat_' + Date.now();
-  const slug = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   
-  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
-  allCats.push({ id, name, slug });
-  localStorage.setItem('mamshop_categories', JSON.stringify(allCats));
-  
-  document.getElementById('cat-name').value = '';
-  showToast('Catégorie ajoutée !', 'success');
-  loadCategories();
-  loadCatsForForm();
+  try {
+    await queryTurso(`INSERT INTO categories (id, name, slug) VALUES ('${id}', '${name}', '${slug}')`);
+    document.getElementById('cat-name').value = '';
+    showToast('Catégorie ajoutée !', 'success');
+    await loadCategories();
+    await loadCatsForForm();
+  } catch (error) {
+    showToast('Erreur: ' + error.message);
+  }
 }
 
-function addServiceImage() {
+async function addServiceImage() {
   const fileInput = document.getElementById('svc-img');
   const caption = document.getElementById('svc-caption').value;
   
   if (!fileInput.files[0]) {
     showToast('Veuillez sélectionner une image');
     return;
-    }
+  }
+  
   const reader = new FileReader();
-  reader.onload = function(e) {
-    let galleries = JSON.parse(localStorage.getItem('mamshop_galleries') || '[]');
-    galleries.push({
-      id: 'gal_' + Date.now(),
-      image: e.target.result,
-      caption: caption,
-      type: 'service',
-      date: new Date().toISOString()
-    });
-    localStorage.setItem('mamshop_galleries', JSON.stringify(galleries));
-    showToast('Image ajoutée à la galerie !', 'success');
-    document.getElementById('svc-img').value = '';
-    document.getElementById('svc-caption').value = '';
+  reader.onload = async function(e) {
+    try {
+      const id = 'gal_' + Date.now();
+      const sql = `INSERT INTO galleries (id, image, caption, type, created_at) 
+                   VALUES ('${id}', '${e.target.result.replace(/'/g, "''")}', '${caption.replace(/'/g, "''")}', 'service', datetime('now'))`;
+      await queryTurso(sql);
+      showToast('Image ajoutée !', 'success');
+      document.getElementById('svc-img').value = '';
+      document.getElementById('svc-caption').value = '';
+    } catch (error) {
+      showToast('Erreur: ' + error.message);
+    }
   };
   reader.readAsDataURL(fileInput.files[0]);
 }
 
-function addTestimonial() {
+async function addTestimonial() {
   const name = document.getElementById('t-name').value.trim();
   const text = document.getElementById('t-text').value.trim();
   const rating = document.getElementById('t-rating').value;
@@ -508,101 +549,47 @@ function addTestimonial() {
     return;
   }
   
-  let testimonials = JSON.parse(localStorage.getItem('mamshop_testimonials') || '[]');
-  testimonials.push({
-    id: 'test_' + Date.now(),
-    name: name,
-    text: text,
-    rating: parseInt(rating),
-    date: new Date().toISOString()
-  });
-  localStorage.setItem('mamshop_testimonials', JSON.stringify(testimonials));
-  showToast('Témoignage ajouté !', 'success');
-  document.getElementById('t-name').value = '';
-  document.getElementById('t-text').value = '';
-}
-
-function saveSettings() {
-  const siteName = document.getElementById('site-name').value;
-  const whatsapp = document.getElementById('site-whatsapp').value;
-  const email = document.getElementById('site-email').value;
-  const address = document.getElementById('site-address').value;
-  const newPassword = document.getElementById('new-password').value;
-  
-  const settings = { siteName, whatsapp, email, address };
-  localStorage.setItem('mamshop_settings', JSON.stringify(settings));
-  
-  if (newPassword) {
-    showToast('Paramètres sauvegardés (mot de passe modifié)', 'success');
-  } else {
-    showToast('Paramètres sauvegardés', 'success');
+  try {
+    const id = 'test_' + Date.now();
+    await queryTurso(`INSERT INTO testimonials (id, name, text, rating, created_at) 
+                     VALUES ('${id}', '${name.replace(/'/g, "''")}', '${text.replace(/'/g, "''")}', ${rating}, datetime('now'))`);
+    showToast('Témoignage ajouté !', 'success');
+    document.getElementById('t-name').value = '';
+    document.getElementById('t-text').value = '';
+  } catch (error) {
+    showToast('Erreur: ' + error.message);
   }
 }
 
-// ATTACHER LES ÉVÉNEMENTS QUAND LE DOM EST CHARGÉ
-document.addEventListener('DOMContentLoaded', function() {
-  initData();
+async function saveSettings() {
+  const settings = {
+    site_name: document.getElementById('site-name').value,
+    whatsapp: document.getElementById('site-whatsapp').value,
+    email: document.getElementById('site-email').value,
+    address: document.getElementById('site-address').value
+  };
   
-  // Bouton de connexion
-  const loginBtn = document.getElementById('login-btn');
-  if (loginBtn) {
-    loginBtn.addEventListener('click', checkLogin);
+  for (const [key, value] of Object.entries(settings)) {
+    await queryTurso(`INSERT OR REPLACE INTO settings (key, value) VALUES ('${key}', '${value.replace(/'/g, "''")}')`);
   }
+  showToast('Paramètres sauvegardés !', 'success');
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('login-btn').addEventListener('click', checkLogin);
+  document.getElementById('admin-pass').addEventListener('keypress', e => e.key === 'Enter' && checkLogin());
+  document.getElementById('logout-btn').addEventListener('click', logout);
+  document.getElementById('save-product-btn').addEventListener('click', saveProduct);
+  document.getElementById('add-cat-btn').addEventListener('click', addCategory);
+  document.getElementById('add-service-img-btn').addEventListener('click', addServiceImage);
+  document.getElementById('add-testimonial-btn').addEventListener('click', addTestimonial);
+  document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
   
-  // Mot de passe - touche Entrée
-  const passInput = document.getElementById('admin-pass');
-  if (passInput) {
-    passInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') checkLogin();
-    });
-  }
-  
-  // Boutons de la sidebar
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const tabId = this.getAttribute('data-tab');
-      if (tabId) showTab(tabId);
-    });
+    btn.addEventListener('click', () => showTab(btn.getAttribute('data-tab')));
   });
-  
-  // Bouton déconnexion
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', logout);
-  }
-  
-  // Bouton sauvegarde produit
-  const saveProductBtn = document.getElementById('save-product-btn');
-  if (saveProductBtn) {
-    saveProductBtn.addEventListener('click', saveProduct);
-  }
-  
-  // Bouton ajout catégorie
-  const addCatBtn = document.getElementById('add-cat-btn');
-  if (addCatBtn) {
-    addCatBtn.addEventListener('click', addCategory);
-  }
-  
-  // Bouton ajout image service
-  const addServiceBtn = document.getElementById('add-service-img-btn');
-  if (addServiceBtn) {
-    addServiceBtn.addEventListener('click', addServiceImage);
-  }
-  
-  // Bouton ajout témoignage
-  const addTestimonialBtn = document.getElementById('add-testimonial-btn');
-  if (addTestimonialBtn) {
-    addTestimonialBtn.addEventListener('click', addTestimonial);
-  }
-  
-  // Bouton sauvegarde paramètres
-  const saveSettingsBtn = document.getElementById('save-settings-btn');
-  if (saveSettingsBtn) {
-    saveSettingsBtn.addEventListener('click', saveSettings);
-  }
 });
 </script>
 </body>
 </html>
-    
-  
