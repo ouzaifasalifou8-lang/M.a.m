@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,250 +9,568 @@ html
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: system-ui, sans-serif; background: #0f172a; }
   
-  .login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
-  .login-box { background: #1e293b; padding: 32px 28px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; }
-  .login-box input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 9px; color: white; margin-bottom: 14px; }
-  .login-box button { width: 100%; padding: 13px; background: #2563eb; color: white; border: none; border-radius: 9px; cursor: pointer; }
-  
   .admin-layout { display: flex; min-height: 100vh; }
   .sidebar { width: 260px; background: #0f172a; border-right: 1px solid #1e293b; position: fixed; height: 100vh; overflow-y: auto; }
   .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #1e293b; }
   .sidebar-logo h2 { color: white; }
-  .sidebar-btn { width: 100%; padding: 14px 20px; text-align: left; background: none; border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+  .sidebar-logo p { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+  .sidebar-btn { width: 100%; padding: 14px 20px; text-align: left; background: none; border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; }
   .sidebar-btn:hover { background: #1e293b; }
   .sidebar-btn.active { background: #1e293b; color: #3b82f6; border-left: 3px solid #3b82f6; }
   
   .admin-content { margin-left: 260px; flex: 1; padding: 24px 32px; }
   .admin-title { font-size: 24px; font-weight: 800; color: white; margin-bottom: 24px; }
   
-  .form-box { background: #1e293b; border-radius: 20px; padding: 24px; max-width: 600px; }
+  .form-box { background: #1e293b; border-radius: 20px; padding: 24px; max-width: 700px; }
   .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; color: #cbd5e1; margin-bottom: 8px; }
-  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; }
+  .form-group label { display: block; color: #cbd5e1; margin-bottom: 8px; font-size: 14px; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #3b82f6; }
   
-  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-  .product-card { background: #1e293b; border-radius: 12px; overflow: hidden; }
-  .product-card .product-img { height: 140px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-  .product-card .product-info { padding: 12px; }
-  .product-card .product-name { color: white; font-weight: 700; }
-  .product-card .product-price { color: #3b82f6; font-weight: 700; }
-  .product-card button { width: 100%; margin-top: 8px; padding: 6px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  .image-preview { margin-top: 12px; position: relative; display: inline-block; }
+  .image-preview img { width: 150px; height: 150px; object-fit: cover; border-radius: 12px; border: 2px solid #334155; }
+  .remove-image { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px; }
   
-  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
-  .stat-card { background: #1e293b; border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6; }
-  .stat-card .num { font-size: 32px; font-weight: 800; color: white; }
-  .stat-card .lbl { color: #94a3b8; font-size: 13px; }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .product-card { background: #1e293b; border-radius: 16px; overflow: hidden; transition: transform 0.2s; }
+  .product-card:hover { transform: translateY(-2px); }
+  .product-card .product-img { height: 160px; background: #334155; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .product-card .product-img img { width: 100%; height: 100%; object-fit: cover; }
+  .product-card .product-info { padding: 16px; }
+  .product-card .product-name { color: white; font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .product-card .product-category { color: #94a3b8; font-size: 12px; margin-bottom: 8px; }
+  .product-card .product-price { color: #3b82f6; font-weight: 700; font-size: 18px; margin-bottom: 12px; }
+  .product-card button { width: 100%; margin-top: 8px; padding: 8px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; }
+  .product-card button:hover { background: #dc2626; }
+  
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
+  .stat-card { background: #1e293b; border-radius: 20px; padding: 24px; border-left: 4px solid #3b82f6; }
+  .stat-card .num { font-size: 36px; font-weight: 800; color: white; }
+  .stat-card .lbl { color: #94a3b8; font-size: 13px; margin-top: 4px; }
   
   .table-box { background: #1e293b; border-radius: 16px; overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #334155; color: #e2e8f0; }
+  th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #334155; color: #e2e8f0; }
+  th { background: #0f172a; color: #94a3b8; font-weight: 600; font-size: 13px; }
   
-  .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 12px 20px; border-radius: 12px; border-left: 4px solid #10b981; color: white; z-index: 9999; }
-  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 12px 24px; border-radius: 12px; border-left: 4px solid #10b981; color: white; z-index: 9999; animation: slideIn 0.3s ease; }
+  .toast.error { border-left-color: #ef4444; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  
+  .edit-btn { background: #3b82f6; margin-right: 8px; }
+  .edit-btn:hover { background: #2563eb; }
+  .action-buttons { display: flex; gap: 8px; }
+  .action-buttons button { margin-top: 0; padding: 6px 12px; font-size: 12px; width: auto; }
+  
+  .loading { text-align: center; padding: 60px; color: #94a3b8; }
+  .upload-progress { background: #3b82f6; height: 4px; border-radius: 2px; margin-top: 8px; width: 0%; transition: width 0.3s; }
 </style>
 </head>
 <body>
 
-<div id="login-screen" class="login-page">
-  <div class="login-box">
-    <h2 style="color:white;margin-bottom:22px">Admin MAM Shop</h2>
-    <input id="admin-email" type="email" placeholder="Email" value="admin@mamshop.com">
-    <input id="admin-password" type="password" placeholder="Mot de passe">
-    <button id="login-btn">Connexion</button>
-  </div>
-</div>
-
-<div id="admin-screen" class="admin-layout" style="display:none">
+<div class="admin-layout">
   <div class="sidebar">
-    <div class="sidebar-logo"><h2>MAM Shop</h2><p>Admin</p></div>
+    <div class="sidebar-logo">
+      <h2>🛍️ MAM Shop</h2>
+      <p>Administration</p>
+    </div>
     <button class="sidebar-btn active" data-tab="dashboard">📊 Dashboard</button>
     <button class="sidebar-btn" data-tab="products">🛍️ Produits</button>
     <button class="sidebar-btn" data-tab="add-product">➕ Ajouter produit</button>
     <button class="sidebar-btn" data-tab="categories">📂 Catégories</button>
-    <div style="padding:20px;position:absolute;bottom:0">
-      <button id="logout-btn" style="background:none;border:none;color:#ef4444;cursor:pointer">Déconnexion</button>
-    </div>
   </div>
 
   <div class="admin-content">
-    <div id="tab-dashboard" class="tab-content">
-      <div class="admin-title">Dashboard</div>
-      <div class="stat-cards">
-        <div class="stat-card"><div class="num" id="s-products">-</div><div class="lbl">Produits</div></div>
-        <div class="stat-card"><div class="num" id="s-categories">-</div><div class="lbl">Catégories</div></div>
-        <div class="stat-card"><div class="num" id="s-orders">-</div><div class="lbl">Commandes</div></div>
+    <div id="loading" class="loading">⏳ Connexion à Supabase...</div>
+    
+    <div id="main-content" style="display:none">
+      <!-- Dashboard -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="admin-title">📊 Dashboard</div>
+        <div class="stat-cards">
+          <div class="stat-card"><div class="num" id="s-products">0</div><div class="lbl">Produits</div></div>
+          <div class="stat-card"><div class="num" id="s-categories">0</div><div class="lbl">Catégories</div></div>
+          <div class="stat-card"><div class="num" id="s-featured">0</div><div class="lbl">Produits vedettes</div></div>
+        </div>
+        <div class="admin-title" style="font-size: 18px; margin-top: 20px;">📦 Derniers produits</div>
+        <div class="table-box">
+          <table>
+            <thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th><th>Catégorie</th></thead>
+            <tbody id="dashboard-products"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="table-box"><table><thead><tr><th>Nom</th><th>Prix</th><th>Stock</th></tr></thead><tbody id="dashboard-products"></tbody></table></div>
-    </div>
 
-    <div id="tab-products" class="tab-content" style="display:none">
-      <div class="admin-title">Produits</div>
-      <div id="products-grid" class="products-grid"></div>
-    </div>
-
-    <div id="tab-add-product" class="tab-content" style="display:none">
-      <div class="admin-title">Ajouter un produit</div>
-      <div class="form-box">
-        <div class="form-group"><label>Nom</label><input id="p-name" placeholder="Nom du produit"></div>
-        <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3"></textarea></div>
-        <div class="form-group"><label>Prix (FCFA)</label><input id="p-price" type="number"></div>
-        <div class="form-group"><label>Stock</label><input id="p-stock" type="number" value="0"></div>
-        <div class="form-group"><label>Catégorie</label><select id="p-category"></select></div>
-        <div class="form-group"><label><input type="checkbox" id="p-featured"> Produit vedette</label></div>
-        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;cursor:pointer">Enregistrer</button>
+      <!-- Produits -->
+      <div id="tab-products" class="tab-content" style="display:none">
+        <div class="admin-title">🛍️ Tous les produits</div>
+        <div id="products-grid" class="products-grid"></div>
       </div>
-    </div>
 
-    <div id="tab-categories" class="tab-content" style="display:none">
-      <div class="admin-title">Catégories</div>
-      <div class="form-box" style="margin-bottom:20px">
-        <div class="form-group"><label>Nouvelle catégorie</label><input id="new-cat-name" placeholder="Nom"></div>
-        <button id="add-cat-btn" style="background:#2563eb;color:white;padding:10px;border:none;border-radius:8px;cursor:pointer">Ajouter</button>
+      <!-- Ajouter produit -->
+      <div id="tab-add-product" class="tab-content" style="display:none">
+        <div class="admin-title">➕ Ajouter un produit</div>
+        <div class="form-box">
+          <div class="form-group"><label>Nom du produit *</label><input id="p-name" placeholder="Ex: Smartphone XYZ"></div>
+          <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3" placeholder="Description détaillée..."></textarea></div>
+          <div class="form-group"><label>Prix (FCFA) *</label><input id="p-price" type="number" placeholder="15000"></div>
+          <div class="form-group"><label>Stock</label><input id="p-stock" type="number" value="10"></div>
+          <div class="form-group"><label>Catégorie</label><select id="p-category"></select></div>
+          <div class="form-group">
+            <label>Photo du produit</label>
+            <input type="file" id="p-image" accept="image/*" style="padding: 8px;">
+            <div id="image-preview" class="image-preview"></div>
+            <div id="upload-progress" class="upload-progress"></div>
+          </div>
+          <div class="form-group"><label><input type="checkbox" id="p-featured"> ⭐ Produit vedette</label></div>
+          <button id="save-product-btn" style="width:100%;padding:14px;background:#3b82f6;color:white;border:none;border-radius:10px;cursor:pointer;font-size:16px;font-weight:600;">💾 Enregistrer</button>
+        </div>
       </div>
-      <div class="table-box"><table><thead><tr><th>Nom</th><th>Slug</th></tr></thead><tbody id="categories-list"></tbody></table></div>
+
+      <!-- Catégories -->
+      <div id="tab-categories" class="tab-content" style="display:none">
+        <div class="admin-title">📂 Gestion des catégories</div>
+        <div class="form-box" style="margin-bottom: 24px;">
+          <div class="form-group"><label>➕ Nouvelle catégorie</label><input id="new-cat-name" placeholder="Ex: Électronique, Mode, Maison..."></div>
+          <button id="add-cat-btn" style="background:#3b82f6;color:white;padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-weight:600;">Ajouter</button>
+        </div>
+        <div class="table-box">
+          <table>
+            <thead><tr><th>Nom</th><th>Slug</th><th>Actions</th></tr></thead>
+            <tbody id="categories-list"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="js/supabase.js"></script>
 <script>
-let currentUser = null;
+// Configuration Supabase - Vos identifiants
+const SUPABASE_URL = 'https://rqoaclfelpezlbbnjwrl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei';
 
-document.getElementById('login-btn').onclick = async () => {
-    const email = document.getElementById('admin-email').value;
-    const password = document.getElementById('admin-password').value;
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Variables
+let products = [];
+let categories = [];
+let currentImageFile = null;
+let currentImageUrl = null;
+let editMode = false;
+let editProductId = null;
+
+// Initialisation
+async function init() {
+  try {
+    // Tester la connexion
+    const { data, error } = await supabase.from('categories').select('count', { count: 'exact', head: true });
+    if (error) throw error;
     
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    console.log('✅ Connecté à Supabase');
+    showToast('Connecté à Supabase avec succès', 'success');
     
-    if (error) {
-        showToast('Email ou mot de passe incorrect', 'error');
-    } else {
-        currentUser = data.user;
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('admin-screen').style.display = 'flex';
-        loadDashboard();
-        loadProducts();
-        loadCategories();
-        showToast('Connexion réussie');
-    }
-};
-
-document.getElementById('logout-btn').onclick = async () => {
-    await supabase.auth.signOut();
-    document.getElementById('admin-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
-};
-
-document.querySelectorAll('.sidebar-btn').forEach(btn => {
-    btn.onclick = () => {
-        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-        document.getElementById(`tab-${btn.dataset.tab}`).style.display = 'block';
-        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if (btn.dataset.tab === 'products') loadProducts();
-        if (btn.dataset.tab === 'categories') loadCategories();
-        if (btn.dataset.tab === 'add-product') loadCategorySelect();
-    };
-});
-
-async function loadDashboard() {
-    const products = await getProducts();
-    const categories = await getCategories();
-    document.getElementById('s-products').textContent = products.length;
-    document.getElementById('s-categories').textContent = categories.length;
-    document.getElementById('s-orders').textContent = '0';
+    await loadCategories();
+    await loadProducts();
     
-    const tbody = document.getElementById('dashboard-products');
-    tbody.innerHTML = products.slice(0,5).map(p => `<tr><td>${p.name}</td><td>${p.price} FCFA</td><td>${p.stock}</td>`).join('');
-}
-
-async function loadProducts() {
-    const products = await getProducts();
-    const grid = document.getElementById('products-grid');
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <div class="product-img">🛍️</div>
-            <div class="product-info">
-                <div class="product-name">${p.name}</div>
-                <div class="product-price">${p.price} FCFA</div>
-                <button onclick="deleteProduct('${p.id}')">Supprimer</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-async function loadCategories() {
-    const categories = await getCategories();
-    const tbody = document.getElementById('categories-list');
-    tbody.innerHTML = categories.map(c => `<tr><td>${c.name}</td><td>${c.slug}</td>`).join('');
-}
-
-async function loadCategorySelect() {
-    const categories = await getCategories();
-    const select = document.getElementById('p-category');
-    select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-
-document.getElementById('save-product-btn').onclick = async () => {
-    const name = document.getElementById('p-name').value;
-    const price = parseFloat(document.getElementById('p-price').value);
-    const stock = parseInt(document.getElementById('p-stock').value);
-    const categoryId = document.getElementById('p-category').value;
-    const featured = document.getElementById('p-featured').checked;
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
     
-    if (!name || !price) {
-        showToast('Nom et prix requis', 'error');
-        return;
-    }
- const { data, error } = await supabase.from('products').insert([{
-        name, price, stock, category_id: categoryId, is_featured: featured, is_active: true, slug: name.toLowerCase().replace(/\s+/g, '-')
-    }]);
-    
-    if (error) {
-        showToast('Erreur: ' + error.message, 'error');
-    } else {
-        showToast('Produit ajouté');
-        document.getElementById('p-name').value = '';
-        document.getElementById('p-price').value = '';
-        document.getElementById('p-stock').value = '0';
-        document.getElementById('p-featured').checked = false;
-        loadProducts();
-        loadDashboard();
-    }
-};
-
-document.getElementById('add-cat-btn').onclick = async () => {
-    const name = document.getElementById('new-cat-name').value;
-    if (!name) return;
-    
-    const { error } = await supabase.from('categories').insert([{
-        name, slug: name.toLowerCase().replace(/\s+/g, '-'), is_active: true
-    }]);
-    
-    if (!error) {
-        showToast('Catégorie ajoutée');
-        document.getElementById('new-cat-name').value = '';
-        loadCategories();
-        loadCategorySelect();
-    }
-};
-
-async function deleteProduct(id) {
-    if (!confirm('Supprimer ce produit ?')) return;
-    await supabase.from('products').update({ is_active: false }).eq('id', id);
-    loadProducts();
     loadDashboard();
+    loadCategorySelect();
+    setupEventListeners();
+    setupImageUpload();
+  } catch (error) {
+    console.error('❌ Erreur de connexion:', error);
+    document.getElementById('loading').innerHTML = '❌ Erreur de connexion à Supabase<br><small>' + error.message + '</small><br><button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#3b82f6;border:none;border-radius:8px;color:white;cursor:pointer;">Réessayer</button>';
+  }
+}
+
+// Configuration upload d'image
+function setupImageUpload() {
+  const fileInput = document.getElementById('p-image');
+  fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = document.getElementById('image-preview');
+      preview.innerHTML = `
+        <div style="position: relative; display: inline-block;">
+          <img src="${e.target.result}" alt="Preview">
+          <button type="button" class="remove-image" onclick="clearImage()">✕</button>
+        </div>
+      `;
+    };
+    reader.readAsDataURL(file);
+    
+    currentImageFile = file;
+  };
+}
+
+// Effacer l'image
+window.clearImage = () => {
+  currentImageFile = null;
+  currentImageUrl = null;
+  document.getElementById('image-preview').innerHTML = '';
+  document.getElementById('p-image').value = '';
+};
+
+// Uploader l'image vers Supabase Storage
+async function uploadImage(productId) {
+  if (!currentImageFile) return null;
+  
+  const fileExt = currentImageFile.name.split('.').pop();
+  const fileName = `${productId}_${Date.now()}.${fileExt}`;
+  const filePath = `products/${fileName}`;
+  
+  // Afficher la progression
+  const progressDiv = document.getElementById('upload-progress');
+  progressDiv.style.width = '50%';
+  
+  const { error: uploadError } = await supabase.storage
+    .from('product-images')
+    .upload(filePath, currentImageFile);
+  
+  if (uploadError) {
+    console.error('Upload error:', uploadError);
+    showToast('Erreur upload image: ' + uploadError.message, 'error');
+    return null;
+  }
+  
+  progressDiv.style.width = '100%';
+  
+  // Obtenir l'URL publique
+  const { data } = supabase.storage
+    .from('product-images')
+    .getPublicUrl(filePath);
+  
+  setTimeout(() => {
+    progressDiv.style.width = '0%';
+  }, 500);
+  
+  return data.publicUrl;
+}
+
+// Charger les catégories
+async function loadCategories() {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('is_active', true);
+  
+  if (error) {
+    console.error('Erreur chargement catégories:', error);
+    return [];
+  }
+  categories = data || [];
+  return categories;
+}
+
+// Charger les produits
+async function loadProducts() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, categories(name)')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Erreur chargement produits:', error);
+    return [];
+  }
+  products = data.map(p => ({
+    ...p,
+    category_name: p.categories?.name || 'Non catégorisé'
+  }));
+  return products;
+}
+
+// Dashboard
+async function loadDashboard() {
+  const activeProducts = products.filter(p => p.is_active !== false);
+  const featuredProducts = activeProducts.filter(p => p.is_featured);
+  
+  document.getElementById('s-products').textContent = activeProducts.length;
+  document.getElementById('s-categories').textContent = categories.length;
+  document.getElementById('s-featured').textContent = featuredProducts.length;
+  
+  const tbody = document.getElementById('dashboard-products');
+  tbody.innerHTML = activeProducts.slice(0, 5).map(p => `
+    <tr>
+      <td>${p.image_url ? `<img src="${p.image_url}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">` : '📦'}</td>
+      <td>${escapeHtml(p.name)}</td>
+      <td>${p.price.toLocaleString()} FCFA</td>
+      <td>${p.stock || 0}</td>
+      <td>${p.category_name}</td>
+    </tr>
+  `).join('');
+  
+  if (activeProducts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Aucun produit</td></tr>';
+  }
+}
+
+// Afficher les produits
+async function displayProducts() {
+  const grid = document.getElementById('products-grid');
+  
+  if (products.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="text-align:center;padding:60px;color:#64748b;">📦 Aucun produit. Cliquez sur "Ajouter produit" pour commencer.</div>';
+    return;
+  }
+  
+  grid.innerHTML = products.map(p => `
+    <div class="product-card">
+      <div class="product-img">
+        ${p.image_url ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}">` : '<span style="font-size:48px;">🛍️</span>'}
+      </div>
+      <div class="product-info">
+        <div class="product-name">${escapeHtml(p.name)}</div>
+        <div class="product-category">${p.category_name}</div>
+        <div class="product-price">${p.price.toLocaleString()} FCFA</div>
+        <div style="font-size:12px;color:#94a3b8;">Stock: ${p.stock || 0}</div>
+        <div class="action-buttons">
+          <button onclick="editProduct(${p.id})" class="edit-btn" style="background:#3b82f6;">✏️ Modifier</button>
+          <button onclick="deleteProduct(${p.id})">🗑️ Supprimer</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Charger le select des catégories
+async function loadCategorySelect() {
+  await loadCategories();
+  const select = document.getElementById('p-category');
+  select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  if (categories.length === 0) {
+    select.innerHTML = '<option value="">⚠️ Créez une catégorie d\'abord</option>';
+  }
+}
+
+// Afficher les catégories
+async function displayCategories() {
+  await loadCategories();
+  const tbody = document.getElementById('categories-list');
+  
+  if (categories.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;">Aucune catégorie</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = categories.map(c => `
+    <tr>
+      <td>${escapeHtml(c.name)}</td>
+      <td>${c.slug}</td>
+      <td><button onclick="deleteCategory(${c.id})" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">Supprimer</button></td>
+    </tr>
+  `).join('');
+}
+
+// Reset form
+function resetForm() {
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-desc').value = '';
+  document.getElementById('p-price').value = '';
+  document.getElementById('p-stock').value = '10';
+  document.getElementById('p-featured').checked = false;
+  clearImage();
+  
+  const saveBtn = document.getElementById('save-product-btn');
+  saveBtn.textContent = '💾 Enregistrer';
+  saveBtn.style.background = '#3b82f6';
+  editMode = false;
+  editProductId = null;
+}
+
+// Ajouter/Modifier un produit
+document.getElementById('save-product-btn').onclick = async () => {
+  const name = document.getElementById('p-name').value.trim();
+  const price = parseFloat(document.getElementById('p-price').value);
+  const stock = parseInt(document.getElementById('p-stock').value) || 0;
+  const categoryId = parseInt(document.getElementById('p-category').value);
+  const is_featured = document.getElementById('p-featured').checked;
+  const description = document.getElementById('p-desc').value;
+  
+  if (!name) {
+    showToast('Le nom est requis', 'error');
+    return;
+  }
+  if (isNaN(price) || price <= 0) {
+    showToast('Prix invalide', 'error');
+    return;
+  }
+  
+  const productData = {
+    name, description, price, stock, 
+    category_id: categoryId, 
+    is_featured,
+    is_active: true,
+    slug: name.toLowerCase().replace(/\s+/g, '-')
+  };
+  
+  let result;
+  
+  if (editMode && editProductId) {
+    // Mise à jour
+    result = await supabase.from('products').update(productData).eq('id', editProductId);
+  } else {
+    // Création
+    result = await supabase.from('products').insert([productData]).select();
+  }
+  
+  if (result.error) {
+    showToast('Erreur: ' + result.error.message, 'error');
+    return;
+  }
+  
+  let productId = editProductId;
+  if (!editMode) {
+    productId = result.data[0].id;
+  }
+  
+  // Upload de l'image si présente
+  if (currentImageFile) {
+    showToast('Upload de l\'image...', 'success');
+    const imageUrl = await uploadImage(productId);
+    if (imageUrl) {
+      await supabase.from('products').update({ image_url: imageUrl }).eq('id', productId);
+      showToast('Image uploadée avec succès', 'success');
+    }
+  }
+  
+  showToast(editMode ? '✅ Produit modifié' : '✅ Produit ajouté');
+  resetForm();
+  await loadProducts();
+  loadDashboard();
+  displayProducts();
+};
+
+// Modifier un produit
+window.editProduct = async (id) => {
+  const product = products.find(p => p.id === id);
+  if (!product) return;
+  
+  editMode = true;
+  editProductId = id;
+  
+  document.getElementById('p-name').value = product.name;
+  document.getElementById('p-desc').value = product.description || '';
+  document.getElementById('p-price').value = product.price;
+  document.getElementById('p-stock').value = product.stock;
+  document.getElementById('p-category').value = product.category_id;
+  document.getElementById('p-featured').checked = product.is_featured;
+  
+  if (product.image_url) {
+    currentImageUrl = product.image_url;
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = `
+      <div style="position: relative; display: inline-block;">
+        <img src="${product.image_url}" alt="Preview" style="width:150px;height:150px;object-fit:cover;border-radius:12px;">
+        <button type="button" class="remove-image" onclick="clearImage()">✕</button>
+      </div>
+    `;
+  }
+  
+  const saveBtn = document.getElementById('save-product-btn');
+  saveBtn.textContent = '✏️ Mettre à jour';
+  saveBtn.style.background = '#f59e0b';
+  
+  document.querySelector('[data-tab="add-product"]').click();
+  showToast('✏️ Modification du produit: ' + product.name);
+};
+
+// Supprimer un produit
+window.deleteProduct = async (id) => {
+  if (!confirm('Supprimer ce produit ?')) return;
+  const { error } = await supabase.from('products').update({ is_active: false }).eq('id', id);
+  if (error) {
+    showToast('Erreur: ' + error.message, 'error');
+  } else {
+    showToast('🗑️ Produit supprimé');
+    await loadProducts();
+    loadDashboard();
+    displayProducts();
+  }
+};
+
+// Ajouter une catégorie
+document.getElementById('add-cat-btn').onclick = async () => {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if (!name) {
+    showToast('Entrez un nom', 'error');
+    return;
+  }
+  
+  const { error } = await supabase.from('categories').insert([{
+    name, slug: name.toLowerCase().replace(/\s+/g, '-'), is_active: true
+  }]);
+  
+  if (error) {
+    showToast('Erreur: ' + error.message, 'error');
+  } else {
+    showToast('✅ Catégorie ajoutée');
+    document.getElementById('new-cat-name').value = '';
+    await displayCategories();
+    await loadCategorySelect();
+  }
+};
+
+// Supprimer une catégorie
+window.deleteCategory = async (id) => {
+  const productsInCat = products.filter(p => p.category_id === id);
+  if (productsInCat.length > 0) {
+    showToast(`⚠️ ${productsInCat.length} produit(s) utilisent cette catégorie`, 'error');
+    return;
+  }
+  
+  if (!confirm('Supprimer cette catégorie ?')) return;
+  const { error } = await supabase.from('categories').update({ is_active: false }).eq('id', id);
+  if (error) {
+    showToast('Erreur: ' + error.message, 'error');
+  } else {
+    showToast('Catégorie supprimée');
+    await displayCategories();
+    await loadCategorySelect();
+  }
+};
+
+// Utilitaires
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 
-window.deleteProduct = deleteProduct;
+function setupEventListeners() {
+  document.querySelectorAll('.sidebar-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.getElementById(`tab-${btn.dataset.tab}`).style.display = 'block';
+      document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      if (btn.dataset.tab === 'products') displayProducts();
+      if (btn.dataset.tab === 'categories') displayCategories();
+      if (btn.dataset.tab === 'add-product') resetForm();
+    };
+  });
+}
+
+// Démarrer
+init();
 </script>
 </body>
 </html>
