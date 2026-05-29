@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inscription Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h2>Créer un compte admin</h2>
+    <input id="email" placeholder="Email" value="admin@mamshop.com">
+    <input id="password" placeholder="Mot de passe" value="Admin2024">
+    <button onclick="signup()">Créer</button>
+    
+    <script>
+        const supabase = supabase.createClient(
+            'https://rqoaclfelpezlbbnjwrl.supabase.co',
+            'sb_publishable_Kyg7s5KiLMYrUll4YwT0OA_mFsQ2onr'
+        );
+        
+        async function signup() {
+            const { data, error } = await supabase.auth.signUp({
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            });
+            if (error) alert('Erreur: ' + error.message);
+            else alert('Compte créé ! Vérifiez vos emails');
+        }
+    </script>
+</body>
+</html>
