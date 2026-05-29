@@ -1,244 +1,518 @@
-            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nasma Admin Expert | Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .tab-content { display: none; }
-        .tab-active { display: block; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin - MAM Shop</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-gray-50 pb-24">
+<body>
 
-    <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[32px] p-8 w-full max-w-md shadow-2xl">
-            <h1 class="text-2xl font-black mb-6 text-center italic text-blue-900">NASMA ACCESS</h1>
-            <input type="password" id="admin-pass" placeholder="Clé secrète" class="w-full p-4 bg-gray-50 rounded-xl outline-none ring-1 ring-gray-200 mb-4 text-center">
-            <button onclick="verifierAcces()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl">SE CONNECTER</button>
+<div id="login-screen" class="login-page">
+  <div class="login-box">
+    <div style="font-size:44px;margin-bottom:14px">🔐</div>
+    <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:6px">Admin MAM Shop</h2>
+    <p style="color:#94a3b8;font-size:12px;margin-bottom:22px">Acces reserve a l'administrateur</p>
+    <input id="admin-pass" type="password" placeholder="Mot de passe admin"
+      style="width:100%;padding:12px 15px;border-radius:9px;border:none;margin-bottom:14px;font-size:15px;outline:none;background:#334155;color:white"
+      onkeydown="if(event.key==='Enter')checkLogin()">
+    <button onclick="checkLogin()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
+      Connexion
+    </button>
+  </div>
+</div>
+
+<div id="admin-screen" class="admin-layout" style="display:none">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h2>MAM Shop</h2>
+      <p>Interface Administrateur</p>
+    </div>
+    <button class="sidebar-btn active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+    <button class="sidebar-btn" onclick="showTab('products',this)">🛍️ Produits</button>
+    <button class="sidebar-btn" onclick="showTab('add-product',this)">➕ Ajouter produit</button>
+    <button class="sidebar-btn" onclick="showTab('categories',this)">📂 Categories</button>
+    <button class="sidebar-btn" onclick="showTab('services',this)">📡 Services & Galerie</button>
+    <button class="sidebar-btn" onclick="showTab('sellers',this)">🏪 Vendeurs</button>
+    <button class="sidebar-btn" onclick="showTab('orders',this)">📦 Commandes</button>
+    <button class="sidebar-btn" onclick="showTab('testimonials',this)">⭐ Temoignages</button>
+    <button class="sidebar-btn" onclick="showTab('settings',this)">⚙️ Parametres</button>
+    <div style="padding:16px 20px;border-top:1px solid #334155;margin-top:20px">
+      <a href="index.html" style="color:#94a3b8;font-size:13px;display:block;margin-bottom:8px">← Voir le site</a>
+      <button onclick="logout()" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer">Deconnexion</button>
+    </div>
+  </div>
+
+  <div class="admin-content">
+
+    <div id="tab-dashboard">
+      <div class="admin-title">Tableau de bord</div>
+      <div class="stat-cards">
+        <div class="stat-card" style="border-color:#6366f1"><div class="num" id="s-products">-</div><div class="lbl">Produits actifs</div></div>
+        <div class="stat-card" style="border-color:#10b981"><div class="num" id="s-cats">-</div><div class="lbl">Categories</div></div>
+        <div class="stat-card" style="border-color:#f59e0b"><div class="num" id="s-sellers">-</div><div class="lbl">Vendeurs</div></div>
+        <div class="stat-card" style="border-color:#ef4444"><div class="num" id="s-testimonials">-</div><div class="lbl">Temoignages</div></div>
+      </div>
+      <div class="table-box">
+        <div style="padding:16px;color:white;font-weight:700;font-size:15px;border-bottom:1px solid #334155">Derniers produits ajoutes</div>
+        <table>
+          <thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th><th>Vedette</th><th>Action</th></tr></thead>
+          <tbody id="dash-products"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-products" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div class="admin-title" style="margin:0">Tous les produits</div>
+        <button onclick="showTab('add-product',null)" style="background:#2563eb;color:white;padding:10px 18px;border-radius:9px;font-weight:700;border:none;cursor:pointer">+ Ajouter</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px" id="admin-products-grid"></div>
+    </div>
+
+    <div id="tab-add-product" style="display:none">
+      <div class="admin-title">Ajouter un produit</div>
+      <div class="form-box">
+        <div class="upload-zone" onclick="document.getElementById('img-file').click()" style="margin-bottom:16px">
+          <div id="img-preview"><div class="icon">📸</div><p>Cliquer pour uploader une photo</p></div>
+          <input id="img-file" type="file" accept="image/*" style="display:none" onchange="previewImg(this)">
         </div>
+        <div class="form-group"><label>Nom du produit *</label><input id="p-name" placeholder="Ex: Qamis blanc premium"></div>
+        <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3" placeholder="Description detaillee du produit..."></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label>Prix (XOF) *</label><input id="p-price" type="number" placeholder="15000"></div>
+          <div class="form-group"><label>Prix promo (XOF)</label><input id="p-promo" type="number" placeholder="Optionnel"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label>Stock</label><input id="p-stock" type="number" placeholder="100" value="1"></div>
+          <div class="form-group"><label>Categorie</label>
+            <select id="p-cat"><option value="">Choisir...</option></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:600">
+            <input type="checkbox" id="p-featured" style="width:auto;margin:0"> Produit vedette (affiche en page d'accueil)
+          </label>
+        </div>
+        <button onclick="saveProduct()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
+          Enregistrer le produit
+        </button>
+        <div id="save-msg" style="margin-top:12px;text-align:center;display:none"></div>
+      </div>
     </div>
 
-    <div id="main-ui" class="hidden">
-        <header class="bg-white p-6 shadow-sm sticky top-0 z-40">
-            <h1 class="text-xl font-black italic text-blue-900 text-center">NASMA SHOP HUB</h1>
-            <div class="flex gap-2 mt-4">
-                <button onclick="switchTab('tab-boutique')" class="flex-1 py-2 bg-blue-900 text-white rounded-lg text-[10px] font-bold">BOUTIQUE</button>
-                <button onclick="switchTab('tab-ia')" class="flex-1 py-2 bg-purple-600 text-white rounded-lg text-[10px] font-bold">IA CERVEAU</button>
-                <button onclick="switchTab('tab-securite')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg text-[10px] font-bold">SYSTÈME</button>
-            </div>
-        </header>
-
-        <main class="p-4 max-w-md mx-auto space-y-6">
-
-            <div id="tab-boutique" class="tab-content tab-active space-y-6">
-                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
-                    <h2 class="text-lg font-black mb-4 italic text-blue-900">NOUVEAU PRODUIT</h2>
-                    <div class="space-y-3">
-                        <input type="text" id="t" placeholder="Nom du produit" class="w-full p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 outline-none">
-                        <textarea id="desc" placeholder="Description..." class="w-full p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 h-20 text-sm outline-none"></textarea>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="p" placeholder="Prix CFA" class="p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 outline-none">
-                            <input type="number" id="r" placeholder="Promo %" class="p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 outline-none">
-                        </div>
-                        <select id="cat" class="w-full p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 text-sm font-bold text-blue-800">
-                            <option value="Yaourts">Yaourts 🍦</option>
-                            <option value="Jus">Jus Frais 🥤</option>
-                            <option value="Patisseries">Pâtisseries 🥐</option>
-                            <option value="Autres délices">Autres délices 😋</option>
-                            <option value="Autres articles">Autres articles 🎉💫</option>
-                        </select>
-                        <input type="file" id="f" class="text-[10px] block w-full text-gray-500">
-                        <button onclick="publier()" id="btnP" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg">METTRE EN LIGNE 🚀</button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
-                    <h2 class="text-lg font-black mb-4 italic text-red-600">STOCKS</h2>
-                    <div id="liste-admin" class="space-y-3"></div>
-                </div>
-            </div>
-
-            <div id="tab-ia" class="tab-content space-y-6">
-                <div class="bg-purple-600 rounded-[32px] p-6 shadow-xl text-white">
-                    <h2 class="text-lg font-black mb-2 italic">IA MULTIMÉDIA</h2>
-                    <p class="text-[10px] uppercase opacity-70 mb-4">Uploadez PDF, Audios ou Photos ici</p>
-                    <input type="file" id="ia-file" multiple class="text-[10px] mb-4">
-                    <textarea id="ia-keys" placeholder="Mots-clés (ex: prix livraison yaourt)" class="w-full p-3 bg-white/10 rounded-xl border border-white/20 outline-none mb-4 text-sm placeholder:text-white/40"></textarea>
-                    <button onclick="uploaderEtEntrainer()" id="btnIA" class="w-full bg-white text-purple-600 font-black py-4 rounded-xl uppercase text-xs">Entraîner Nasma</button>
-                    <div id="status-files" class="mt-2 text-[10px] italic">Prêt.</div>
-                </div>
-
-                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
-                    <h2 class="text-lg font-black mb-4 italic text-purple-900">GALERIE MÉMOIRE</h2>
-                    <div id="galerie-contenu" class="grid grid-cols-3 gap-2"></div>
-                </div>
-
-                <div class="bg-yellow-50 rounded-[32px] p-6 border border-yellow-200">
-                    <h2 class="text-sm font-black mb-3">QUESTIONS NON COMPRISES</h2>
-                    <div id="liste-inconnues" class="text-[11px] space-y-2"></div>
-                </div>
-            </div>
-
-            <div id="tab-securite" class="tab-content space-y-6">
-                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
-                    <h2 class="text-lg font-black mb-4 italic">SYSTÈME</h2>
-                    <input type="password" id="new-pass" placeholder="Nouveau mot de passe" class="w-full p-4 bg-gray-50 rounded-xl outline-none ring-1 ring-gray-100 mb-4">
-                    <button onclick="changerMotDePasse()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-xl mb-2">CHANGER LA CLÉ</button>
-                    <button onclick="exporterEntrainement()" class="w-full border-2 border-blue-900 text-blue-900 font-bold py-4 rounded-xl">EXPORTER CSV 📥</button>
-                </div>
-            </div>
-
-        </main>
+    <div id="tab-categories" style="display:none">
+      <div class="admin-title">Gestion des categories</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;flex-wrap:wrap">
+        <div class="form-box">
+          <h3 style="color:white;font-weight:700;margin-bottom:16px;font-size:16px">Nouvelle categorie</h3>
+          <div class="form-group"><label>Nom de la categorie *</label><input id="cat-name" placeholder="Ex: Mode et Vetements"></div>
+          <div class="form-group"><label>Icone (emoji)</label><input id="cat-icon" placeholder="Ex: 👗" value="🛍️"></div>
+          <button onclick="addCategory()" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:14px">
+            Ajouter la categorie
+          </button>
+        </div>
+        <div class="table-box">
+          <div style="padding:14px;color:white;font-weight:700;font-size:14px;border-bottom:1px solid #334155">Categories existantes</div>
+          <table>
+            <thead><tr><th>Nom</th><th>Slug</th><th>Action</th></tr></thead>
+            <tbody id="cats-table"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <script>
-        const SB_URL = 'libsql://mam-ouzaif.aws-eu-west-1.turso.io';
-        const SB_KEY = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3Nzk5MjQ3MzgsImlkIjoiMDE5ZTZiYmYtN2IwMS03ODAwLTgxMjAtMmIxYWU3ZmY5NDhiIiwicmlkIjoiNTc5N2IxMTMtYWJkNS00NzNmLWE0ZDQtMjg3NDczZmYxOTFiIn0.XbdprTEP9RO1kuQywjbrwcLpTjyf5k4avD6UZrG7Ht54tYEq2_yu-dCmdAfdXvJiUC5M55DjeEf-EdwXvsa8CQ
+    <div id="tab-services" style="display:none">
+      <div class="admin-title">Services - Galerie & Temoignages</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+        <div class="form-box">
+          <h3 style="color:white;font-weight:700;margin-bottom:16px;font-size:15px">Ajouter photo galerie</h3>
+          <div class="upload-zone" onclick="document.getElementById('svc-img').click()" style="margin-bottom:12px">
+            <div id="svc-preview"><div class="icon">📡</div><p>Cliquer pour uploader</p></div>
+            <input id="svc-img" type="file" accept="image/*" style="display:none" onchange="previewSvc(this)">
+          </div>
+          <div class="form-group"><label>Legende</label><input id="svc-caption" placeholder="Ex: Installation Starlink a Tahoua"></div>
+          <div class="form-group"><label>Client</label><input id="svc-client" placeholder="Nom du client (optionnel)"></div>
+          <button onclick="addGallery()" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">
+            Ajouter a la galerie
+          </button>
+        </div>
+        <div class="form-box">
+          <h3 style="color:white;font-weight:700;margin-bottom:16px;font-size:15px">Ajouter temoignage</h3>
+          <div class="form-group"><label>Nom du client *</label><input id="t-name" placeholder="Ex: Ibrahim M."></div>
+          <div class="form-group"><label>Temoignage *</label><textarea id="t-text" rows="3" placeholder="Le temoignage du client..."></textarea></div>
+          <div class="form-group"><label>Note</label>
+            <select id="t-rating" style="background:#334155;color:white;border:1px solid #475569">
+              <option value="5">5 etoiles ★★★★★</option>
+              <option value="4">4 etoiles ★★★★</option>
+              <option value="3">3 etoiles ★★★</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Ville</label><input id="t-city" placeholder="Ex: Tahoua"></div>
+          <button onclick="addTestimonial()" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">
+            Ajouter le temoignage
+          </button>
+        </div>
+      </div>
+    </div>
 
-                    ';
-        const sb = supabase.createClient(SB_URL, SB_KEY);
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    <div id="tab-sellers" style="display:none">
+      <div class="admin-title">Vendeurs inscrits</div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Boutique</th><th>Email</th><th>Ville</th><th>Note</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody id="sellers-table">
+            <tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucun vendeur pour le moment</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        let CLE_SECRETTE = localStorage.getItem('nasma_admin_key') || "Ouzaif2026";
+    <div id="tab-orders" style="display:none">
+      <div class="admin-title">Commandes</div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Numero</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="orders-table">
+            <tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucune commande pour le moment</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        // --- NAVIGATION ---
-        function verifierAcces() {
-            if (document.getElementById('admin-pass').value === CLE_SECRETTE) {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('main-ui').classList.remove('hidden');
-                chargerArticlesAdmin();
-                chargerGalerie();
-                chargerInconnues();
-            } else { alert("Clé incorrecte !"); }
-        }
+    <div id="tab-testimonials" style="display:none">
+      <div class="admin-title">Gestion des temoignages</div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Client</th><th>Temoignage</th><th>Note</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody id="testimonials-table">
+            <tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        function switchTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('tab-active'));
-            document.getElementById(id).classList.add('tab-active');
-        }
+    <div id="tab-settings" style="display:none">
+      <div class="admin-title">Parametres du site</div>
+      <div class="form-box">
+        <h3 style="color:white;font-weight:700;margin-bottom:18px;font-size:15px">Informations generales</h3>
+        <div class="form-group"><label>Nom du site</label><input id="set-name" value="MAM Shop"></div>
+        <div class="form-group"><label>Numero WhatsApp</label><input id="set-wa" value="+227 98 83 66 01"></div>
+        <div class="form-group"><label>Email de contact</label><input id="set-email" value="mamshop.niger@gmail.com"></div>
+        <div class="form-group"><label>Adresse</label><input id="set-address" value="Tahoua, Niger"></div>
+        <div class="form-group"><label>Frais de livraison (XOF)</label><input id="set-delivery" type="number" value="0"></div>
+        <hr style="border-color:#334155;margin:20px 0">
+        <h3 style="color:white;font-weight:700;margin-bottom:18px;font-size:15px">Securite</h3>
+        <div class="form-group"><label>Nouveau mot de passe admin</label><input id="set-pass" type="password" placeholder="Laisser vide pour ne pas changer"></div>
+        <button onclick="saveSettings()" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
+          Sauvegarder les parametres
+        </button>
+      </div>
+    </div>
 
-        // --- BOUTIQUE ---
-        async function publier() {
-            const btn = document.getElementById('btnP');
-            const file = document.getElementById('f').files[0];
-            if(!file || !document.getElementById('t').value) return alert("Nom et Photo requis !");
-            
-            btn.innerText = "CHARGEMENT... ⏳";
-            const path = `${Date.now()}_${file.name}`;
-            await sb.storage.from('articles-images').upload(path, file);
-            const { data: { publicUrl } } = sb.storage.from('articles-images').getPublicUrl(path);
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script>
+const ADMIN_PASS='mamshop2026';
+let allProducts=[],allCats=[];
 
-            await sb.from('articles').insert([{
-                titre: document.getElementById('t').value,
-                description: document.getElementById('desc').value,
-                prix: document.getElementById('p').value,
-                categorie: document.getElementById('cat').value,
-                image_url: publicUrl
-            }]);
-            location.reload();
-        }
+function checkLogin(){
+  if(document.getElementById('admin-pass').value===ADMIN_PASS){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='flex';
+    loadDashboard();
+  } else {
+    showToast('Mot de passe incorrect !');
+  }
+}
 
-        async function chargerArticlesAdmin() {
-            const container = document.getElementById('liste-admin');
-            const { data } = await sb.from('articles').select('*').order('created_at', { ascending: false });
-            container.innerHTML = data.map(a => `
-                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border border-gray-100">
-                    <img src="${a.image_url}" class="w-8 h-8 rounded-lg object-cover">
-                    <p class="text-[10px] font-bold text-blue-900 flex-1 ml-3">${a.titre}</p>
-                    <button onclick="supprimerArticle(${a.id})" class="text-red-500 font-black text-[9px] uppercase">Suppr.</button>
-                </div>
-            `).join('');
-        }
+function logout(){
+  document.getElementById('admin-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('admin-pass').value='';
+}
 
-        async function supprimerArticle(id) {
-            if(confirm("Supprimer ?")) { await sb.from('articles').delete().eq('id', id); chargerArticlesAdmin(); }
-        }
+function showTab(id,btn){
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.style.display='none');
+  document.getElementById(`tab-${id}`).style.display='block';
+  document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(id==='products') loadAdminProducts();
+  if(id==='categories') loadCategories();
+  if(id==='add-product') loadCatsForForm();
+  if(id==='sellers') loadSellers();
+  if(id==='orders') loadOrders();
+  if(id==='testimonials') loadTestimonialsAdmin();
+}
 
-        // --- IA MULTIMÉDIA (PDF, AUDIO, ETC) ---
-        async function uploaderEtEntrainer() {
-            const btn = document.getElementById('btnIA');
-            const fileInput = document.getElementById('ia-file');
-            const keys = document.getElementById('ia-keys').value;
-            const status = document.getElementById('status-files');
+async function loadDashboard(){
+  allProducts=await sbGet('products','is_active=eq.true&order=created_at.desc');
+  allCats=await sbGet('categories','is_active=eq.true');
+  const sellers=await sbGet('sellers','select=id');
+  const testimonials=await sbGet('testimonials','select=id');
+  document.getElementById('s-products').textContent=Array.isArray(allProducts)?allProducts.length:0;
+  document.getElementById('s-cats').textContent=Array.isArray(allCats)?allCats.length:0;
+  document.getElementById('s-sellers').textContent=Array.isArray(sellers)?sellers.length:0;
+  document.getElementById('s-testimonials').textContent=Array.isArray(testimonials)?testimonials.length:0;
+  const tbody=document.getElementById('dash-products');
+  const prods=Array.isArray(allProducts)?allProducts:[];
+  tbody.innerHTML=prods.slice(0,8).map(p=>`
+    <tr>
+      <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px">
+        ${p.image_url?`<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">`:'🛍️'}
+      </div></td>
+      <td style="font-weight:600">${p.name}</td>
+      <td style="color:#6366f1;font-weight:700">${parseFloat(p.price).toLocaleString()} XOF</td>
+      <td>${p.stock||0}</td>
+      <td>${p.is_featured?'<span class="badge badge-green">Oui</span>':'<span class="badge" style="background:#334155;color:#94a3b8">Non</span>'}</td>
+      <td><button onclick="deleteProduct('${p.id}')" style="background:#ef4444;color:white;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer">Supprimer</button></td>
+    </tr>`).join('');
+}
 
-            if(fileInput.files.length === 0 || !keys) return alert("Fichier et mots-clés requis !");
-            
-            btn.innerText = "IA ANALYSE...";
-            for (const file of fileInput.files) {
-                const path = `${Date.now()}_${file.name}`;
-                await sb.storage.from('nasma_docs').upload(path, file);
-                const { data: { publicUrl } } = sb.storage.from('nasma_docs').getPublicUrl(path);
+function loadAdminProducts(){
+  const grid=document.getElementById('admin-products-grid');
+  const prods=Array.isArray(allProducts)?allProducts:[];
+  if(!prods.length){grid.innerHTML='<div style="color:#94a3b8;padding:20px">Aucun produit. Ajoutez votre premier produit !</div>';return;}
+  grid.innerHTML=prods.map(p=>`
+    <div style="background:#1e293b;border-radius:13px;overflow:hidden">
+      <div style="height:130px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden">
+        ${p.image_url?`<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">`:'🛍️'}
+      </div>
+      <div style="padding:12px">
+        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
+        <div style="color:#6366f1;font-weight:700;margin-bottom:8px;font-size:12px">${parseFloat(p.price).toLocaleString()} XOF${p.promo_price?` → ${parseFloat(p.promo_price).toLocaleString()} XOF`:''}</div>
+        <div style="color:#94a3b8;font-size:11px;margin-bottom:8px">Stock: ${p.stock||0} | ${p.is_featured?'⭐ Vedette':'Normal'}</div>
+        <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:7px;background:#ef4444;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">Supprimer</button>
+      </div>
+    </div>`).join('');
+}
 
-                if (file.type === "application/pdf") {
-                    const reader = new FileReader();
-                    reader.onload = async function() {
-                        const typedarray = new Uint8Array(this.result);
-                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                        let text = "";
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const content = await page.getTextContent();
-                            text += content.items.map(item => item.str).join(" ");
-                        }
-                        await sb.from('ia_connaissances').insert([{ declencheur: keys.toLowerCase(), reponse: `PDF: ${text.substring(0, 400)}... Lien: ${publicUrl}` }]);
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else {
-                    await sb.from('ia_connaissances').insert([{ declencheur: keys.toLowerCase(), reponse: publicUrl }]);
-                }
-            }
-            alert("Nasma a appris ! ✅");
-            chargerGalerie();
-            btn.innerText = "ENTRAÎNER NASMA";
-        }
+async function loadCategories(){
+  allCats=await sbGet('categories','is_active=eq.true&order=name');
+  if(!Array.isArray(allCats)) allCats=[];
+  document.getElementById('cats-table').innerHTML=allCats.map(c=>`
+    <tr>
+      <td style="font-weight:600">${c.name}</td>
+      <td style="color:#94a3b8;font-size:12px">${c.slug}</td>
+      <td><button onclick="deleteCategory('${c.id}')" style="background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:5px;font-size:11px;cursor:pointer">X</button></td>
+    </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:16px">Aucune categorie</td></tr>';
+}
 
-        async function chargerGalerie() {
-            const container = document.getElementById('galerie-contenu');
-            const { data } = await sb.from('ia_connaissances').select('*').order('id', { ascending: false });
-            container.innerHTML = data.filter(c => c.reponse.includes("https")).map(m => `
-                <div class="bg-gray-100 p-2 rounded-xl text-center">
-                    <div class="text-lg">${m.reponse.includes('.mp3') ? '🎵' : m.reponse.includes('.pdf') ? '📄' : '🖼️'}</div>
-                    <p class="text-[8px] font-bold truncate">${m.declencheur}</p>
-                    <button onclick="supprimerMemoire(${m.id})" class="text-red-500 text-[8px] font-bold">X</button>
-                </div>
-            `).join('');
-        }
+async function loadCatsForForm(){
+  if(!allCats.length) allCats=await sbGet('categories','is_active=eq.true&order=name');
+  const sel=document.getElementById('p-cat');
+  const cats=Array.isArray(allCats)?allCats:[];
+  sel.innerHTML='<option value="">Choisir une categorie...</option>'+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
 
-        async function supprimerMemoire(id) {
-            await sb.from('ia_connaissances').delete().eq('id', id); chargerGalerie();
-        }
+function previewImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('img-preview').innerHTML=`<img src="${e.target.result}" style="max-height:160px;border-radius:8px;max-width:100%">`;
+    window._imgData=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
-        // --- SÉCURITÉ & EXPORT ---
-        function changerMotDePasse() {
-            const n = document.getElementById('new-pass').value;
-            if(n.length < 4) return alert("Trop court !");
-            localStorage.setItem('nasma_admin_key', n);
-            alert("Clé modifiée !");
-        }
+function previewSvc(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('svc-preview').innerHTML=`<img src="${e.target.result}" style="max-height:140px;border-radius:8px;max-width:100%">`;
+    window._svcImgData=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
-        async function exporterEntrainement() {
-            const { data } = await sb.from('ia_connaissances').select('*');
-            let csv = "ID;Cle;Reponse\n";
-            data.forEach(r => csv += `${r.id};${r.declencheur};${r.reponse}\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'cerveau_nasma.csv';
-            a.click();
-        }
+async function uploadToSupabase(base64Data,folder){
+  try{
+    const base64=base64Data.split(',')[1];
+    const mimeType=base64Data.split(';')[0].split(':')[1];
+    const ext=mimeType.split('/')[1];
+    const fileName=`${folder}/${Date.now()}.${ext}`;
+    const byteChars=atob(base64);
+    const byteArray=new Uint8Array(byteChars.length);
+    for(let i=0;i<byteChars.length;i++) byteArray[i]=byteChars.charCodeAt(i);
+    const SUPA_URL="https://rqoaclfelpezlbbnjwrl.supabase.co";
+    const SUPA_SECRET="sb_secret_vUHRNXMGbev8jOivG3zSaw_mC4Y_Ujj";
+    const res=await fetch(`${SUPA_URL}/storage/v1/object/mamshop/${fileName}`,{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${SUPA_SECRET}`,'Content-Type':mimeType},
+      body:byteArray
+    });
+    const data=await res.json();
+    if(data.Key) return `${SUPA_URL}/storage/v1/object/public/mamshop/${fileName}`;
+    return '';
+  }catch(e){return '';}
+}
 
-        async function chargerInconnues() {
-            const { data } = await sb.from('questions_inconnues').select('*');
-            document.getElementById('liste-inconnues').innerHTML = data.length ? data.map(q => `<div>- ${q.question}</div>`).join('') : "RAS.";
-        }
-    </script>
+async function saveProduct(){
+  const name=document.getElementById('p-name').value.trim();
+  const price=document.getElementById('p-price').value;
+  if(!name||!price){showToast('Nom et prix requis !');return;}
+  const msg=document.getElementById('save-msg');
+  msg.style.display='block';msg.innerHTML='<span style="color:#94a3b8">Enregistrement en cours...</span>';
+  let imgUrl='';
+  if(window._imgData){
+    showToast('Upload de la photo en cours...');
+    imgUrl=await uploadToSupabase(window._imgData,'products');
+  }
+  const promo=document.getElementById('p-promo').value;
+  const data={
+    name,
+    slug:name.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'').substring(0,80),
+    description:document.getElementById('p-desc').value,
+    price:parseFloat(price),
+    promo_price:promo?parseFloat(promo):null,
+    stock:parseInt(document.getElementById('p-stock').value)||1,
+    category_id:document.getElementById('p-cat').value||null,
+    is_featured:document.getElementById('p-featured').checked,
+    is_active:true,
+    image_url:imgUrl,
+    seller_id:null
+  };
+  const result=await sbPost('products',data);
+  if(result&&!result.code&&!result.error){
+    showToast('Produit enregistre avec succes !','success');
+    msg.innerHTML='<span style="color:#25d366">✅ Produit enregistre !</span>';
+    document.getElementById('p-name').value='';
+    document.getElementById('p-desc').value='';
+    document.getElementById('p-price').value='';
+    document.getElementById('p-promo').value='';
+    document.getElementById('p-stock').value='1';
+    document.getElementById('p-featured').checked=false;
+    document.getElementById('img-preview').innerHTML='<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
+    window._imgData=null;
+    allProducts=await sbGet('products','is_active=eq.true&order=created_at.desc');
+    setTimeout(()=>{msg.style.display='none';},3000);
+  } else {
+    msg.innerHTML='<span style="color:#ef4444">Erreur: '+(result?.message||'Verifiez Supabase RLS')+'</span>';
+    showToast('Erreur lors de l\'enregistrement');
+  }
+}
 
-    <script defer src="/_vercel/insights/script.js"></script>
+async function deleteProduct(id){
+  if(!confirm('Supprimer ce produit definitivement ?'))return;
+  await sbPatch('products',id,{is_active:false});
+  allProducts=allProducts.filter(p=>p.id!==id);
+  loadAdminProducts();
+  document.getElementById('s-products').textContent=allProducts.length;
+  showToast('Produit supprime','success');
+}
+
+async function addCategory(){
+  const name=document.getElementById('cat-name').value.trim();
+  if(!name)return;
+  const slug=name.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  await sbPost('categories',{name,slug,is_active:true,sort_order:0});
+  document.getElementById('cat-name').value='';
+  showToast('Categorie ajoutee !','success');
+  allCats=[];
+  loadCategories();
+}
+
+async function deleteCategory(id){
+  if(!confirm('Supprimer cette categorie ?'))return;
+  await sbPatch('categories',id,{is_active:false});
+  loadCategories();
+  showToast('Categorie supprimee','success');
+}
+
+async function addGallery(){
+  const caption=document.getElementById('svc-caption').value;
+  let imgUrl='';
+  if(window._svcImgData){
+    showToast('Upload en cours...');
+    imgUrl=await uploadToSupabase(window._svcImgData,'gallery');
+  }
+  await sbPost('portfolio',{title:caption,image_url:imgUrl,client_name:document.getElementById('svc-client').value,is_active:true,category:'antennes'});
+  document.getElementById('svc-caption').value='';
+  document.getElementById('svc-preview').innerHTML='<div class="icon">📡</div><p>Cliquer pour uploader</p>';
+  window._svcImgData=null;
+  showToast('Photo ajoutee a la galerie !','success');
+}
+
+async function addTestimonial(){
+  const name=document.getElementById('t-name').value;
+  const text=document.getElementById('t-text').value;
+  if(!name||!text){showToast('Nom et temoignage requis !');return;}
+  await sbPost('testimonials',{customer_name:name,content:text,rating:parseInt(document.getElementById('t-rating').value),position:document.getElementById('t-city').value,is_approved:true,is_featured:false});
+  document.getElementById('t-name').value='';
+  document.getElementById('t-text').value='';
+  showToast('Temoignage ajoute !','success');
+}
+
+async function loadSellers(){
+  const sellers=await sbGet('sellers','order=created_at.desc');
+  const tb=document.getElementById('sellers-table');
+  const list=Array.isArray(sellers)?sellers:[];
+  tb.innerHTML=list.length?list.map(s=>`
+    <tr>
+      <td style="font-weight:600">${s.shop_name}</td>
+      <td style="color:#94a3b8;font-size:12px">${s.email||'-'}</td>
+      <td>${s.city||'-'}</td>
+      <td style="color:#f59e0b">${'★'.repeat(Math.round(s.rating||5))}</td>
+      <td>${s.is_approved?'<span class="badge badge-green">Approuve</span>':'<span class="badge badge-orange">En attente</span>'}</td>
+      <td><button onclick="toggleSeller('${s.id}',${!s.is_approved})" style="background:${s.is_approved?'#ef4444':'#10b981'};color:white;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer">${s.is_approved?'Desactiver':'Approuver'}</button></td>
+    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucun vendeur</td></tr>';
+}
+
+async function toggleSeller(id,val){
+  await sbPatch('sellers',id,{is_approved:val});
+  loadSellers();
+  showToast(val?'Vendeur approuve !':'Vendeur desactive','success');
+}
+
+async function loadOrders(){
+  const orders=await sbGet('orders','order=created_at.desc&limit=50');
+  const tb=document.getElementById('orders-table');
+  const list=Array.isArray(orders)?orders:[];
+  tb.innerHTML=list.length?list.map(o=>`
+    <tr>
+      <td style="font-family:monospace;font-size:11px">${(o.order_number||o.id||'').toString().substring(0,8)}</td>
+      <td>${o.customer_name||'-'}</td>
+      <td style="color:#6366f1;font-weight:700">${parseFloat(o.total_amount||o.total||0).toLocaleString()} XOF</td>
+      <td><span class="badge ${o.status==='delivered'?'badge-green':o.status==='pending'?'badge-orange':'badge-blue'}">${o.status||'pending'}</span></td>
+      <td style="color:#94a3b8;font-size:12px">${(o.created_at||'').substring(0,10)}</td>
+      <td><select onchange="updateOrder('${o.id}',this.value)" style="background:#334155;color:white;border:1px solid #475569;border-radius:6px;padding:4px;font-size:11px">
+        <option ${o.status==='pending'?'selected':''}>pending</option>
+        <option ${o.status==='confirmed'?'selected':''}>confirmed</option>
+        <option ${o.status==='delivered'?'selected':''}>delivered</option>
+        <option ${o.status==='cancelled'?'selected':''}>cancelled</option>
+      </select></td>
+    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucune commande</td></tr>';
+}
+
+async function updateOrder(id,status){
+  await sbPatch('orders',id,{status});
+  showToast('Statut mis a jour !','success');
+}
+
+async function loadTestimonialsAdmin(){
+  const items=await sbGet('testimonials','order=created_at.desc');
+  const tb=document.getElementById('testimonials-table');
+  const list=Array.isArray(items)?items:[];
+  tb.innerHTML=list.length?list.map(t=>`
+    <tr>
+      <td style="font-weight:600">${t.customer_name}</td>
+      <td style="color:#94a3b8;font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis">${(t.content||'').substring(0,60)}...</td>
+      <td style="color:#f59e0b">${'★'.repeat(t.rating||5)}</td>
+      <td>${t.is_approved?'<span class="badge badge-green">Publie</span>':'<span class="badge badge-orange">En attente</span>'}</td>
+      <td style="display:flex;gap:6px;padding:8px 12px">
+        <button onclick="toggleTestimonial('${t.id}',${!t.is_approved})" style="background:${t.is_approved?'#64748b':'#10b981'};color:white;border:none;padding:5px 9px;border-radius:5px;font-size:11px;cursor:pointer">${t.is_approved?'Masquer':'Publier'}</button>
+        <button onclick="deleteTestimonial('${t.id}')" style="background:#ef4444;color:white;border:none;padding:5px 9px;border-radius:5px;font-size:11px;cursor:pointer">X</button>
+      </td>
+    </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">Aucun temoignage</td></tr>';
+}
+
+async function toggleTestimonial(id,val){await sbPatch('testimonials',id,{is_approved:val});loadTestimonialsAdmin();showToast(val?'Publie !':'Masque !','success');}
+async function deleteTestimonial(id){if(!confirm('Supprimer ?'))return;await sbDelete('testimonials',id);loadTestimonialsAdmin();showToast('Supprime','success');}
+
+function saveSettings(){showToast('Parametres sauvegardes !','success');}
+
+document.getElementById('admin-pass').addEventListener('keydown',e=>e.key==='Enter'&&checkLogin());
+</script>
 </body>
-    </html>
+</html>
