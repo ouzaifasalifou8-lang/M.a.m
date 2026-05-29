@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin MAM Shop</title>
+    <title>Admin MAM Shop - Supabase + ImgBB</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; background: #0f172a; }
         
-        /* Layout */
         .admin-layout { display: flex; min-height: 100vh; }
         .sidebar {
             width: 280px;
@@ -51,7 +50,6 @@
             margin-bottom: 24px;
         }
         
-        /* Formulaires */
         .form-box {
             background: #1e293b;
             border-radius: 20px;
@@ -75,7 +73,6 @@
             font-size: 14px;
         }
         
-        /* Preview image */
         .image-preview {
             margin-top: 12px;
             position: relative;
@@ -101,7 +98,6 @@
             cursor: pointer;
         }
         
-        /* Grille produits */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -145,7 +141,6 @@
         .btn-edit { background: #3b82f6; color: white; }
         .btn-delete { background: #ef4444; color: white; }
         
-        /* Stats */
         .stat-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -161,7 +156,6 @@
         .stat-card .num { font-size: 32px; font-weight: 800; color: white; }
         .stat-card .lbl { color: #94a3b8; font-size: 13px; margin-top: 4px; }
         
-        /* Table */
         .table-box {
             background: #1e293b;
             border-radius: 16px;
@@ -187,8 +181,14 @@
             color: white;
             z-index: 9999;
         }
-        
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .upload-progress {
+            background: #3b82f6;
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 8px;
+            width: 0%;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -196,7 +196,7 @@
         <div class="sidebar">
             <div class="sidebar-logo">
                 <h2>🛍️ MAM Shop</h2>
-                <p>Administration</p>
+                <p>Supabase + ImgBB</p>
             </div>
             <button class="sidebar-btn active" data-tab="dashboard">📊 Dashboard</button>
             <button class="sidebar-btn" data-tab="products">🛍️ Produits</button>
@@ -218,13 +218,12 @@
                     </div>
                     <div class="table-box">
                         <table>
-                          <thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th></tr></thead>
+                            <thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th></tr></thead>
                             <tbody id="dashboard-products"></tbody>
                         </table>
                     </div>
                 </div>
-
-                <!-- Produits -->
+                 <!-- Produits -->
                 <div id="tab-products" class="tab-content" style="display:none">
                     <div class="admin-title">🛍️ Produits</div>
                     <div id="products-grid" class="products-grid"></div>
@@ -240,9 +239,10 @@
                         <div class="form-group"><label>Stock</label><input id="p-stock" type="number" value="0"></div>
                         <div class="form-group"><label>Catégorie</label><select id="p-category"></select></div>
                         <div class="form-group">
-                            <label>Photo</label>
+                            <label>Photo (ImgBB)</label>
                             <input type="file" id="p-image" accept="image/*">
                             <div id="image-preview" class="image-preview"></div>
+                            <div id="upload-progress" class="upload-progress"></div>
                         </div>
                         <div class="form-group"><label><input type="checkbox" id="p-featured"> ⭐ Produit vedette</label></div>
                         <button id="save-btn" style="width:100%;padding:14px;background:#3b82f6;color:white;border:none;border-radius:10px;cursor:pointer;">💾 Enregistrer</button>
@@ -265,14 +265,56 @@
     </div>
 
     <script>
+        // Configuration Supabase
         const SUPABASE_URL = 'https://rqoaclfelpezlbbnjwrl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Configuration ImgBB
+        const IMGBB_API_KEY = '541e798061e29de4fd3310ff37f3f557';
+        const IMGBB_API_URL = 'https://api.imgbb.com/1/upload';
         
         let products = [];
         let categories = [];
         let currentImageFile = null;
         let editId = null;
+        
+        // Upload image vers ImgBB
+        async function uploadToImgBB(file) {
+            const progressDiv = document.getElementById('upload-progress');
+            progressDiv.style.width = '30%';
+            
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    progressDiv.style.width = '60%';
+                    const base64 = e.target.result.split(',')[1];
+                    const formData = new FormData();
+                    formData.append('key', IMGBB_API_KEY);
+                    formData.append('image', base64);
+                    
+                    try {
+                        const response = await fetch(IMGBB_API_URL, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const result = await response.json();
+                        progressDiv.style.width = '100%';
+                        setTimeout(() => { progressDiv.style.width = '0%'; }, 500);
+                        
+                        if (result.success) {
+                            resolve(result.data.url);
+                        } else {
+                            reject(new Error(result.error?.message || 'Upload échoué'));
+                        }
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = () => reject(new Error('Erreur lecture fichier'));
+                reader.readAsDataURL(file);
+            });
+        }
         
         async function init() {
             await Promise.all([loadCategories(), loadProducts()]);
@@ -334,7 +376,6 @@
                 </div>
             `).join('');
         }
-        
         async function updateCategorySelect() {
             await loadCategories();
             const select = document.getElementById('p-category');
@@ -376,52 +417,61 @@
             document.getElementById('p-image').value = '';
         };
         
-        async function uploadImage(productId) {
-            if (!currentImageFile) return null;
-            const ext = currentImageFile.name.split('.').pop();
-            const fileName = `products/${productId}_${Date.now()}.${ext}`;
-            const { error } = await supabase.storage.from('product-images').upload(fileName, currentImageFile);
-            if (error) { showToast('Erreur upload: ' + error.message, 'error'); return null; }
-            const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
-            return data.publicUrl;
-        }
-        
         document.getElementById('save-btn').onclick = async () => {
             const name = document.getElementById('p-name').value.trim();
             const price = parseFloat(document.getElementById('p-price').value);
             const stock = parseInt(document.getElementById('p-stock').value) || 0;
             const categoryId = parseInt(document.getElementById('p-category').value);
             const is_featured = document.getElementById('p-featured').checked;
+            const description = document.getElementById('p-desc').value;
             
             if (!name || isNaN(price)) {
                 showToast('Nom et prix requis', 'error');
                 return;
             }
             
-            const productData = { name, price, stock, category_id: categoryId, is_featured, is_active: true };
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = '⏳ Enregistrement...';
             
-            let result;
-            if (editId) {
-                result = await supabase.from('products').update(productData).eq('id', editId);
-            } else {
-                result = await supabase.from('products').insert([productData]).select();
+            try {
+                let imageUrl = null;
+                if (currentImageFile) {
+                    showToast('📸 Upload vers ImgBB...', 'loading');
+                    imageUrl = await uploadToImgBB(currentImageFile);
+                    showToast('✅ Image uploadée sur ImgBB', 'success');
+                }
+                
+                const productData = {
+                    name, description, price, stock, 
+                    category_id: categoryId, 
+                    is_featured,
+                    is_active: true
+                };
+                
+                if (imageUrl) productData.image_url = imageUrl;
+                
+                let result;
+                if (editId) {
+                    result = await supabase.from('products').update(productData).eq('id', editId);
+                } else {
+                    result = await supabase.from('products').insert([productData]);
+                }
+                
+                if (result.error) throw new Error(result.error.message);
+                
+                showToast(editId ? '✅ Produit modifié' : '✅ Produit ajouté', 'success');
+                resetForm();
+                await loadProducts();
+                loadDashboard();
+                displayProducts();
+                
+            } catch (error) {
+                showToast('❌ Erreur: ' + error.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '💾 Enregistrer';
             }
-            
-            if (result.error) { showToast('Erreur: ' + result.error.message, 'error'); return; }
-            
-            let productId = editId;
-            if (!editId && result.data) productId = result.data[0].id;
-            
-            if (currentImageFile && productId) {
-                const imageUrl = await uploadImage(productId);
-                if (imageUrl) await supabase.from('products').update({ image_url: imageUrl }).eq('id', productId);
-            }
-            
-            showToast(editId ? 'Produit modifié' : 'Produit ajouté');
-            resetForm();
-            await loadProducts();
-            loadDashboard();
-            displayProducts();
         };
         
         window.editProduct = async (id) => {
@@ -435,7 +485,12 @@
             document.getElementById('p-category').value = p.category_id;
             document.getElementById('p-featured').checked = p.is_featured;
             if (p.image_url) {
-                document.getElementById('image-preview').innerHTML = `<div style="position:relative;"><img src="${p.image_url}" style="width:150px;"><button class="remove-image" onclick="clearImage()">✕</button></div>`;
+                document.getElementById('image-preview').innerHTML = `
+                    <div style="position:relative;">
+                        <img src="${p.image_url}" style="width:150px;height:150px;object-fit:cover;border-radius:12px;">
+                        <button class="remove-image" onclick="clearImage()">✕</button>
+                    </div>
+                `;
             }
             document.getElementById('save-btn').textContent = '✏️ Mettre à jour';
             document.querySelector('[data-tab="add-product"]').click();
@@ -447,7 +502,7 @@
             await loadProducts();
             loadDashboard();
             displayProducts();
-            showToast('Produit supprimé');
+            showToast('🗑️ Produit supprimé');
         };
         
         document.getElementById('add-cat-btn').onclick = async () => {
@@ -458,12 +513,12 @@
             await loadCategories();
             displayCategories();
             updateCategorySelect();
-            showToast('Catégorie ajoutée');
+            showToast('✅ Catégorie ajoutée');
         };
         
         window.deleteCategory = async (id) => {
             const used = products.some(p => p.category_id === id);
-            if (used) { showToast('Catégorie utilisée par des produits', 'error'); return; }
+            if (used) { showToast('⚠️ Catégorie utilisée par des produits', 'error'); return; }
             await supabase.from('categories').update({ is_active: false }).eq('id', id);
             await loadCategories();
             displayCategories();
@@ -487,7 +542,7 @@
         function showToast(msg, type = 'success') {
             const toast = document.createElement('div');
             toast.className = 'toast';
-            toast.style.borderLeftColor = type === 'error' ? '#ef4444' : '#10b981';
+            toast.style.borderLeftColor = type === 'error' ? '#ef4444' : (type === 'loading' ? '#3b82f6' : '#10b981');
             toast.innerHTML = msg;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
@@ -497,7 +552,7 @@
             document.querySelectorAll('.sidebar-btn').forEach(btn => {
                 btn.onclick = () => {
                     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-                  document.getElementById(`tab-${btn.dataset.tab}`).style.display = 'block';
+                    document.getElementById(`tab-${btn.dataset.tab}`).style.display = 'block';
                     document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     if (btn.dataset.tab === 'products') displayProducts();
