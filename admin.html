@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin - MAM Shop</title>
-<link rel="stylesheet" href="css/style.css">
 <style>
   /* Styles de base pour l'admin */
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,8 +39,7 @@
   .form-group label { display: block; color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
   .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; outline: none; transition: border 0.2s; }
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #3b82f6; }
-  
-  .upload-zone { background: #0f172a; border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
+   .upload-zone { background: #0f172a; border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
   .upload-zone:hover { border-color: #3b82f6; background: #1e293b; }
   .upload-zone .icon { font-size: 40px; margin-bottom: 8px; }
   
@@ -60,9 +58,8 @@
     <div style="font-size:42px;margin-bottom:14px">🔐</div>
     <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:22px">Admin MAM Shop</h2>
     <input id="admin-pass" type="password" placeholder="Mot de passe"
-      style="width:100%;padding:12px 15px;border-radius:9px;border:none;margin-bottom:14px;font-size:15px;outline:none"
-      onkeydown="if(event.key==='Enter')checkLogin()">
-    <button onclick="checkLogin()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
+      style="width:100%;padding:12px 15px;border-radius:9px;border:none;margin-bottom:14px;font-size:15px;outline:none">
+    <button id="login-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
       Connexion
     </button>
     <p style="color:#94a3b8;font-size:12px;margin-top:14px">Accès réservé à l'administrateur</p>
@@ -75,24 +72,24 @@
       <h2>MAM Shop</h2>
       <p>Interface Admin</p>
     </div>
-    <button class="sidebar-btn active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
-    <button class="sidebar-btn" onclick="showTab('products',this)">🛍️ Produits</button>
-    <button class="sidebar-btn" onclick="showTab('add-product',this)">➕ Ajouter produit</button>
-    <button class="sidebar-btn" onclick="showTab('categories',this)">📂 Catégories</button>
-    <button class="sidebar-btn" onclick="showTab('services',this)">📡 Services</button>
-    <button class="sidebar-btn" onclick="showTab('sellers',this)">🏪 Vendeurs</button>
-    <button class="sidebar-btn" onclick="showTab('orders',this)">📦 Commandes</button>
-    <button class="sidebar-btn" onclick="showTab('settings',this)">⚙️ Paramètres</button>
+    <button class="sidebar-btn active" data-tab="dashboard">📊 Dashboard</button>
+    <button class="sidebar-btn" data-tab="products">🛍️ Produits</button>
+    <button class="sidebar-btn" data-tab="add-product">➕ Ajouter produit</button>
+    <button class="sidebar-btn" data-tab="categories">📂 Catégories</button>
+    <button class="sidebar-btn" data-tab="services">📡 Services</button>
+    <button class="sidebar-btn" data-tab="sellers">🏪 Vendeurs</button>
+    <button class="sidebar-btn" data-tab="orders">📦 Commandes</button>
+    <button class="sidebar-btn" data-tab="settings">⚙️ Paramètres</button>
     <div style="padding:16px 20px;position:absolute;bottom:0;width:100%;border-top:1px solid #334155">
       <a href="index.html" style="color:#94a3b8;font-size:13px">Voir le site →</a><br>
-      <button onclick="logout()" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;margin-top:6px">Déconnexion</button>
+      <button id="logout-btn" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;margin-top:6px">Déconnexion</button>
     </div>
   </div>
 
   <div class="admin-content">
 
     <!-- Dashboard -->
-    <div id="tab-dashboard">
+    <div id="tab-dashboard" class="tab-content">
       <div class="admin-title">Tableau de bord</div>
       <div class="stat-cards">
         <div class="stat-card" style="border-color:#6366f1"><div class="num" id="s-products">-</div><div class="lbl">Produits actifs</div></div>
@@ -108,19 +105,18 @@
         </table>
       </div>
     </div>
-
-    <!-- Produits -->
-    <div id="tab-products" style="display:none">
+      <!-- Produits -->
+    <div id="tab-products" class="tab-content" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div class="admin-title" style="margin:0">Produits</div>
-        <button onclick="showTab('add-product',null)" style="background:#2563eb;color:white;padding:10px 18px;border-radius:9px;font-weight:700;border:none;cursor:pointer">+ Ajouter</button>
+        <button onclick="showTab('add-product')" style="background:#2563eb;color:white;padding:10px 18px;border-radius:9px;font-weight:700;border:none;cursor:pointer">+ Ajouter</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px" id="admin-products-grid"></div>
     </div>
 
     <!-- Ajouter produit -->
-    <div id="tab-add-product" style="display:none">
-      <div class="admin-title">Ajouter / Modifier un produit</div>
+    <div id="tab-add-product" class="tab-content" style="display:none">
+      <div class="admin-title">Ajouter un produit</div>
       <div class="form-box">
         <div class="upload-zone" onclick="document.getElementById('img-file').click()">
           <div id="img-preview"><div class="icon">📸</div><p>Cliquer pour uploader une photo</p></div>
@@ -144,31 +140,30 @@
             <input type="checkbox" id="p-featured" style="width:auto"> Produit vedette (page d'accueil)
           </label>
         </div>
-        <button onclick="saveProduct()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
+        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
           Enregistrer le produit
         </button>
       </div>
     </div>
 
     <!-- Catégories -->
-    <div id="tab-categories" style="display:none">
+    <div id="tab-categories" class="tab-content" style="display:none">
       <div class="admin-title">Catégories</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
         <div class="form-box">
           <h3 style="color:white;font-weight:700;margin-bottom:16px">Nouvelle catégorie</h3>
           <div class="form-group"><label>Nom *</label><input id="cat-name" placeholder="Ex: Mode & Vêtements"></div>
-          <button onclick="addCategory()" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
+          <button id="add-cat-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
         </div>
         <div class="table-box">
           <div style="padding:14px;color:white;font-weight:700">Catégories existantes</div>
           <table><thead><tr><th>Nom</th><th>Slug</th></tr></thead>
-          <tbody id="cats-table"></tbody></table>
-        </div>
+          <tbody id="cats-table"></tbody>
+        </table>
       </div>
-    </div>
-
-    <!-- Services -->
-    <div id="tab-services" style="display:none">
+      </div>
+        <!-- Services -->
+    <div id="tab-services" class="tab-content" style="display:none">
       <div class="admin-title">Services - Antennes & Starlink</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
         <div class="form-box">
@@ -178,7 +173,7 @@
             <input id="svc-img" type="file" accept="image/*" style="display:none">
           </div>
           <div class="form-group" style="margin-top:12px"><label>Légende</label><input id="svc-caption" placeholder="Ex: Installation Starlink à Tahoua"></div>
-          <button onclick="addServiceImage()" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter à la galerie</button>
+          <button id="add-service-img-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter à la galerie</button>
         </div>
         <div class="form-box">
           <h3 style="color:white;font-weight:700;margin-bottom:16px">Ajouter témoignage</h3>
@@ -187,16 +182,16 @@
           <div class="form-group"><label>Note (1-5)</label>
             <select id="t-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
           </div>
-          <button onclick="addTestimonial()" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter témoignage</button>
+          <button id="add-testimonial-btn" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter témoignage</button>
         </div>
       </div>
     </div>
 
     <!-- Vendeurs -->
-    <div id="tab-sellers" style="display:none">
+    <div id="tab-sellers" class="tab-content" style="display:none">
       <div class="admin-title">Vendeurs inscrits</div>
       <div class="table-box">
-        <table>
+        </table>
           <thead><tr><th>Boutique</th><th>Email</th><th>Note</th><th>Ventes</th><th>Statut</th><th>Action</th></tr></thead>
           <tbody id="sellers-table"><tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucun vendeur pour le moment</td></tr></tbody>
         </table>
@@ -204,7 +199,7 @@
     </div>
 
     <!-- Commandes -->
-    <div id="tab-orders" style="display:none">
+    <div id="tab-orders" class="tab-content" style="display:none">
       <div class="admin-title">Commandes</div>
       <div class="table-box">
         <table>
@@ -215,7 +210,7 @@
     </div>
 
     <!-- Paramètres -->
-    <div id="tab-settings" style="display:none">
+    <div id="tab-settings" class="tab-content" style="display:none">
       <div class="admin-title">Paramètres du site</div>
       <div class="form-box">
         <div class="form-group"><label>Nom du site</label><input id="site-name" value="MAM Shop"></div>
@@ -223,31 +218,28 @@
         <div class="form-group"><label>Email contact</label><input id="site-email" value="mamshop.niger@gmail.com"></div>
         <div class="form-group"><label>Adresse</label><input id="site-address" value="Tahoua, Niger"></div>
         <div class="form-group"><label>Nouveau mot de passe admin</label><input id="new-password" type="password" placeholder="Laisser vide pour ne pas changer"></div>
-        <button onclick="saveSettings()" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
+        <button id="save-settings-btn" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
           Sauvegarder
         </button>
       </div>
     </div>
 
   </div>
-</div>
-
-<script>
-// Base de données simulée avec localStorage
+  </div>
+  <script>
+// MOT DE PASSE ADMIN
 const ADMIN_PASS = 'mamshop2026';
+
+// Données globales
 let allProducts = [], allCats = [], allUsers = [], allSellers = [], allOrders = [];
 
 // Initialiser les données
 function initData() {
-  // Charger depuis localStorage ou créer des données par défaut
   const storedProducts = localStorage.getItem('mamshop_products');
   if (storedProducts) {
     allProducts = JSON.parse(storedProducts);
   } else {
-    allProducts = [
-      { id: 'prd_1', name: 'Qamis Premium Blanc', description: 'Qamis de qualité supérieure', price: '25000', compare_price: null, stock: 50, category_id: 'cat_1', is_featured: 1, image_url: '', created_at: new Date().toISOString() },
-      { id: 'prd_2', name: 'Boubou Cérémonie', description: 'Boubou traditionnel', price: '45000', compare_price: '55000', stock: 25, category_id: 'cat_1', is_featured: 1, image_url: '', created_at: new Date().toISOString() }
-    ];
+    allProducts = [];
     localStorage.setItem('mamshop_products', JSON.stringify(allProducts));
   }
   
@@ -287,11 +279,6 @@ function initData() {
   }
 }
 
-function dbQuery(sql) {
-  // Simulation de requête
-  return Promise.resolve([...allProducts.filter(p => !p.is_deleted)]);
-}
-
 function showToast(message, type = 'error') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
@@ -300,60 +287,322 @@ function showToast(message, type = 'error') {
   setTimeout(() => toast.remove(), 3000);
 }
 
+// CONNEXION
 function checkLogin() {
-  if (document.getElementById('admin-pass').value === ADMIN_PASS) {
+  const passInput = document.getElementById('admin-pass');
+  if (!passInput) return;
+  
+  if (passInput.value === ADMIN_PASS) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-screen').style.display = 'flex';
     loadDashboard();
-  } else showToast('Mot de passe incorrect !');
+    showToast('Connexion réussie !', 'success');
+  } else {
+    showToast('Mot de passe incorrect !');
+  }
 }
 
 function logout() {
   document.getElementById('admin-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-pass').value = '';
 }
 
-function showTab(id, btn) {
-  document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
-  document.getElementById(`tab-${id}`).style.display = 'block';
-  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  if (id === 'products') loadAdminProducts();
-  if (id === 'categories') loadCategories();
-  if (id === 'add-product') loadCatsForForm();
-  if (id === 'dashboard') loadDashboard();
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  const targetTab = document.getElementById(`tab-${tabId}`);
+  if (targetTab) targetTab.style.display = 'block';
+  
+  document.querySelectorAll('.sidebar-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('data-tab') === tabId) {
+      btn.classList.add('active');
+    }
+  });
+  
+  if (tabId === 'products') loadAdminProducts();
+  if (tabId === 'categories') loadCategories();
+  if (tabId === 'add-product') loadCatsForForm();
+  if (tabId === 'dashboard') loadDashboard();
 }
 
-async function loadDashboard() {
+function loadDashboard() {
   allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
   allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
   allSellers = JSON.parse(localStorage.getItem('mamshop_sellers') || '[]');
   allUsers = JSON.parse(localStorage.getItem('mamshop_users') || '[]');
   
-  document.getElementById('s-products').textContent = allProducts.filter(p => !p.is_deleted).length;
+  document.getElementById('s-products').textContent = allProducts.length;
   document.getElementById('s-cats').textContent = allCats.length;
   document.getElementById('s-sellers').textContent = allSellers.length;
   document.getElementById('s-users').textContent = allUsers.length;
   
   const tbody = document.getElementById('dash-products');
-  tbody.innerHTML = allProducts.filter(p => !p.is_deleted).slice(0,8).map(p => `
+  tbody.innerHTML = allProducts.slice(0,8).map(p => `
     <tr>
       <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px">
         ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
       </div></td>
-      <td>${p.name}</td>
-      <td style="color:#6366f1;font-weight:700">${parseFloat(p.price).toLocaleString()} XOF</td>
+      <td>${p.name || 'Sans nom'}</td>
+      <td style="color:#6366f1;font-weight:700">${parseFloat(p.price || 0).toLocaleString()} XOF</td>
       <td>${p.stock || 0}</td>
       <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge" style="background:#1e293b;color:#94a3b8">Non</span>'}</td>
     </tr>`).join('');
 }
-
-function loadAdminProducts() {
+    function loadAdminProducts() {
   allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
-  const activeProducts = allProducts.filter(p => !p.is_deleted);
   const grid = document.getElementById('admin-products-grid');
-  if (!activeProducts.length) { grid.innerHTML = '<div style="color:#94a3b8;padding:20px">Aucun produit</div>'; return; }
-  grid.innerHTML = activeProducts.map(p => `
+  if (!allProducts.length) { 
+    grid.innerHTML = '<div style="color:#94a3b8;padding:20px">Aucun produit</div>'; 
+    return; 
+  }
+  grid.innerHTML = allProducts.map(p => `
     <div style="background:#1e293b;border-radius:13px;overflow:hidden">
       <div style="height:130px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden">
-        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'
+        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
+      </div>
+      <div style="padding:12px">
+        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:4px">${p.name || 'Sans nom'}</div>
+        <div style="color:#6366f1;font-weight:700;margin-bottom:8px;font-size:13px">${parseFloat(p.price || 0).toLocaleString()} XOF</div>
+        <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:7px;background:#ef4444;color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">Supprimer</button>
+      </div>
+    </div>`).join('');
+}
+
+function loadCategories() {
+  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
+  document.getElementById('cats-table').innerHTML = allCats.map(c =>
+    `<tr><td>${c.name}</td><td style="color:#94a3b8">${c.slug}</td></tr>`).join('');
+}
+
+function loadCatsForForm() {
+  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
+  const sel = document.getElementById('p-cat');
+  sel.innerHTML = '<option value="">Choisir...</option>' + allCats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+function previewImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('img-preview').innerHTML = `<img src="${e.target.result}" style="max-height:160px;border-radius:8px;max-width:100%">`;
+    window._imgData = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProduct() {
+  const name = document.getElementById('p-name').value.trim();
+  const price = document.getElementById('p-price').value;
+  
+  if (!name || !price) { 
+    showToast('Nom et prix requis !'); 
+    return; 
+  }
+  
+  const desc = document.getElementById('p-desc').value;
+  const promo = document.getElementById('p-promo').value;
+  const stock = document.getElementById('p-stock').value || 0;
+  const cat = document.getElementById('p-cat').value;
+  const featured = document.getElementById('p-featured').checked ? 1 : 0;
+  let imgUrl = window._imgData || '';
+  
+  const pid = 'prd_' + Date.now();
+  
+  const newProduct = {
+    id: pid,
+    name: name,
+    description: desc,
+    price: parseFloat(price),
+    compare_price: promo ? parseFloat(promo) : null,
+    stock: parseInt(stock),
+    category_id: cat || allCats[0]?.id || '',
+    is_featured: featured,
+    image_url: imgUrl,
+    created_at: new Date().toISOString()
+  };
+  
+  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
+  allProducts.push(newProduct);
+  localStorage.setItem('mamshop_products', JSON.stringify(allProducts));
+  
+  showToast('Produit enregistré avec succès !', 'success');
+  
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-desc').value = '';
+  document.getElementById('p-price').value = '';
+  document.getElementById('p-promo').value = '';
+  document.getElementById('p-stock').value = '';
+  document.getElementById('p-featured').checked = false;
+  document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
+  window._imgData = null;
+  document.getElementById('img-file').value = '';
+  
+  loadDashboard();
+  loadAdminProducts();
+}
+
+function deleteProduct(id) {
+  if (!confirm('Supprimer ce produit ?')) return;
+  allProducts = JSON.parse(localStorage.getItem('mamshop_products') || '[]');
+  allProducts = allProducts.filter(p => p.id !== id);
+  localStorage.setItem('mamshop_products', JSON.stringify(allProducts));
+  showToast('Produit supprimé', 'success');
+  loadAdminProducts();
+  loadDashboard();
+}
+
+function addCategory() {
+  const name = document.getElementById('cat-name').value.trim();
+  if (!name) {
+    showToast('Nom de catégorie requis');
+    return;
+  }
+  const id = 'cat_' + Date.now();
+  const slug = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  
+  allCats = JSON.parse(localStorage.getItem('mamshop_categories') || '[]');
+  allCats.push({ id, name, slug });
+  localStorage.setItem('mamshop_categories', JSON.stringify(allCats));
+  
+  document.getElementById('cat-name').value = '';
+  showToast('Catégorie ajoutée !', 'success');
+  loadCategories();
+  loadCatsForForm();
+}
+
+function addServiceImage() {
+  const fileInput = document.getElementById('svc-img');
+  const caption = document.getElementById('svc-caption').value;
+  
+  if (!fileInput.files[0]) {
+    showToast('Veuillez sélectionner une image');
+    return;
+    }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let galleries = JSON.parse(localStorage.getItem('mamshop_galleries') || '[]');
+    galleries.push({
+      id: 'gal_' + Date.now(),
+      image: e.target.result,
+      caption: caption,
+      type: 'service',
+      date: new Date().toISOString()
+    });
+    localStorage.setItem('mamshop_galleries', JSON.stringify(galleries));
+    showToast('Image ajoutée à la galerie !', 'success');
+    document.getElementById('svc-img').value = '';
+    document.getElementById('svc-caption').value = '';
+  };
+  reader.readAsDataURL(fileInput.files[0]);
+}
+
+function addTestimonial() {
+  const name = document.getElementById('t-name').value.trim();
+  const text = document.getElementById('t-text').value.trim();
+  const rating = document.getElementById('t-rating').value;
+  
+  if (!name || !text) {
+    showToast('Nom et témoignage requis');
+    return;
+  }
+  
+  let testimonials = JSON.parse(localStorage.getItem('mamshop_testimonials') || '[]');
+  testimonials.push({
+    id: 'test_' + Date.now(),
+    name: name,
+    text: text,
+    rating: parseInt(rating),
+    date: new Date().toISOString()
+  });
+  localStorage.setItem('mamshop_testimonials', JSON.stringify(testimonials));
+  showToast('Témoignage ajouté !', 'success');
+  document.getElementById('t-name').value = '';
+  document.getElementById('t-text').value = '';
+}
+
+function saveSettings() {
+  const siteName = document.getElementById('site-name').value;
+  const whatsapp = document.getElementById('site-whatsapp').value;
+  const email = document.getElementById('site-email').value;
+  const address = document.getElementById('site-address').value;
+  const newPassword = document.getElementById('new-password').value;
+  
+  const settings = { siteName, whatsapp, email, address };
+  localStorage.setItem('mamshop_settings', JSON.stringify(settings));
+  
+  if (newPassword) {
+    showToast('Paramètres sauvegardés (mot de passe modifié)', 'success');
+  } else {
+    showToast('Paramètres sauvegardés', 'success');
+  }
+}
+
+// ATTACHER LES ÉVÉNEMENTS QUAND LE DOM EST CHARGÉ
+document.addEventListener('DOMContentLoaded', function() {
+  initData();
+  
+  // Bouton de connexion
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', checkLogin);
+  }
+  
+  // Mot de passe - touche Entrée
+  const passInput = document.getElementById('admin-pass');
+  if (passInput) {
+    passInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkLogin();
+    });
+  }
+  
+  // Boutons de la sidebar
+  document.querySelectorAll('.sidebar-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabId = this.getAttribute('data-tab');
+      if (tabId) showTab(tabId);
+    });
+  });
+  
+  // Bouton déconnexion
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', logout);
+  }
+  
+  // Bouton sauvegarde produit
+  const saveProductBtn = document.getElementById('save-product-btn');
+  if (saveProductBtn) {
+    saveProductBtn.addEventListener('click', saveProduct);
+  }
+  
+  // Bouton ajout catégorie
+  const addCatBtn = document.getElementById('add-cat-btn');
+  if (addCatBtn) {
+    addCatBtn.addEventListener('click', addCategory);
+  }
+  
+  // Bouton ajout image service
+  const addServiceBtn = document.getElementById('add-service-img-btn');
+  if (addServiceBtn) {
+    addServiceBtn.addEventListener('click', addServiceImage);
+  }
+  
+  // Bouton ajout témoignage
+  const addTestimonialBtn = document.getElementById('add-testimonial-btn');
+  if (addTestimonialBtn) {
+    addTestimonialBtn.addEventListener('click', addTestimonial);
+  }
+  
+  // Bouton sauvegarde paramètres
+  const saveSettingsBtn = document.getElementById('save-settings-btn');
+  if (saveSettingsBtn) {
+    saveSettingsBtn.addEventListener('click', saveSettings);
+  }
+});
+</script>
+</body>
+</html>
+    
+  
