@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin MAM Shop</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+        }
+        
+        /* Menu */
+        .menu {
+            background: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .menu button {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+        .menu button:hover {
+            background: #1e293b;
+        }
+        .menu button.active {
+            background: #1e293b;
+            color: #3b82f6;
+        }
+        
+        /* Contenu */
+        .content {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        
+        /* Formulaires */
+        .form-card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            color: #cbd5e1;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        /* Preview image */
+        .preview-img {
+            margin-top: 10px;
+        }
+        .preview-img img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .remove-img {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        /* Grille produits */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-card {
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .product-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #0f172a;
+        }
+        .product-card .info {
+            padding: 15px;
+        }
+        .product-card .name {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .product-card .price {
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 8px 0;
+        }
+        .product-card .stock {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .product-card button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #3b82f6;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+        .stat-card .label {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+            color: #e2e8f0;
+        }
+        th {
+            background: #0f172a;
+        }
+        
+        button {
+            cursor: pointer;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+            color: white;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu">
+    <button class="tab-btn active" data-page="dashboard">📊 Dashboard</button>
+    <button class="tab-btn" data-page="products">🛍️ Produits</button>
+    <button class="tab-btn" data-page="add">➕ Ajouter</button>
+    <button class="tab-btn" data-page="categories">📂 Catégories</button>
+</div>
+
+<div class="content">
+    <!-- Dashboard -->
+    <div id="dashboard" class="page active">
+        <h2 style="color:white; margin-bottom:20px;">Dashboard</h2>
+        <div class="stats">
+            <div class="stat-card"><div class="number" id="stat-products">0</div><div class="label">Produits</div></div>
+            <div class="stat-card"><div class="number" id="stat-categories">0</div><div class="label">Catégories</div></div>
+            <div class="stat-card"><div class="number" id="stat-featured">0</div><div class="label">Vedettes</div></div>
+        </div>
+        <h3 style="color:white; margin:20px 0 10px;">Derniers produits</h3>
+        <table id="latest-products">
+            <thead><tr><th>Image</th><th>Nom</th><th>Prix</th><th>Stock</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Liste produits -->
+    <div id="products" class="page">
+        <h2 style="color:white;">Tous les produits</h2>
+        <div id="products-list" class="products-grid"></div>
+    </div>
+
+    <!-- Ajouter produit -->
+    <div id="add" class="page">
+        <h2 style="color:white;">Ajouter un produit</h2>
+        <div class="form-card">
+            <div class="form-group">
+                <label>Nom *</label>
+                <input type="text" id="prod-name" placeholder="Ex: Smartphone">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="prod-desc" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Prix (FCFA) *</label>
+                <input type="number" id="prod-price" placeholder="15000">
+            </div>
+            <div class="form-group">
+                <label>Stock</label>
+                <input type="number" id="prod-stock" value="10">
+            </div>
+            <div class="form-group">
+                <label>Catégorie</label>
+                <select id="prod-category"></select>
+            </div>
+            <div class="form-group">
+                <label>Photo</label>
+                <input type="file" id="prod-image" accept="image/*">
+                <div id="image-preview" class="preview-img"></div>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" id="prod-featured"> ⭐ Produit vedette</label>
+            </div>
+            <button id="save-product" style="background:#3b82f6; color:white; padding:12px; border:none; border-radius:8px; width:100%;">💾 Enregistrer</button>
+        </div>
+    </div>
+        <!-- Catégories -->
+    <div id="categories" class="page">
+        <h2 style="color:white;">Catégories</h2>
+        <div class="form-card" style="margin-bottom:20px;">
+            <div class="form-group">
+                <label>Nouvelle catégorie</label>
+                <input type="text" id="new-cat-name" placeholder="Ex: Électronique">
+            </div>
+            <button id="add-category" style="background:#3b82f6; color:white; padding:10px; border:none; border-radius:8px;">Ajouter</button>
+        </div>
+        <table id="categories-table">
+            <thead><tr><th>Nom</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const SUPABASE_URL = 'https://rqoaclfelpezlbbnjwrl.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    const IMGBB_KEY = '541e798061e29de4fd3310ff37f3f557';
+    
+    let products = [];
+    let categories = [];
+    let editId = null;
+    let currentImageFile = null;
+    
+    // Upload image vers ImgBB
+    async function uploadToImgBB(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64 = e.target.result.split(',')[1];
+                const formData = new FormData();
+                formData.append('key', IMGBB_KEY);
+                formData.append('image', base64);
+                
+                try {
+                    const res = await fetch('https://api.imgbb.com/1/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        resolve(data.data.url);
+                    } else {
+                        reject(data.error?.message);
+                    }
+                } catch(err) {
+                    reject(err);
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    // Charger les catégories
+    async function loadCategories() {
+        const { data } = await supabase.from('categories').select('*').eq('is_active', true);
+        categories = data || [];
+        return categories;
+    }
+    
+    // Charger les produits
+    async function loadProducts() {
+        const { data } = await supabase.from('products').select('*, categories(name)').eq('is_active', true);
+        products = (data || []).map(p => ({...p, cat_name: p.categories?.name || 'Sans catégorie'}));
+        return products;
+    }
+    
+    // Afficher dashboard
+    async function showDashboard() {
+        document.getElementById('stat-products').textContent = products.length;
+        document.getElementById('stat-categories').textContent = categories.length;
+        document.getElementById('stat-featured').textContent = products.filter(p => p.is_featured).length;
+        
+        const tbody = document.querySelector('#latest-products tbody');
+        tbody.innerHTML = products.slice(0,5).map(p => `
+            <tr>
+                <td>${p.image_url ? `<img src="${p.image_url}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;">` : '📦'}</td>
+                <td>${escapeHtml(p.name)}</td>
+                <td>${p.price.toLocaleString()} FCFA</td>
+                <td>${p.stock || 0}</td>
+            </tr>
+        `).join('');
+    }
+    
+    // Afficher les produits
+    async function showProducts() {
+        const container = document.getElementById('products-list');
+        if (products.length === 0) {
+            container.innerHTML = '<p style="color:#64748b;">Aucun produit</p>';
+            return;
+        }
+        container.innerHTML = products.map(p => `
+            <div class="product-card">
+                ${p.image_url ? `<img src="${p.image_url}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23334155%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22%3E🛍️%3C/text%3E%3C/svg%3E'">` : '<div style="height:160px;background:#0f172a;display:flex;align-items:center;justify-content:center;font-size:48px;">🛍️</div>'}
+                <div class="info">
+                    <div class="name">${escapeHtml(p.name)}</div>
+                    <div class="price">${p.price.toLocaleString()} FCFA</div>
+                    <div class="stock">Stock: ${p.stock || 0}</div>
+                    <button class="btn-edit" onclick="editProduct(${p.id})">✏️ Modifier</button>
+                    <button class="btn-delete" onclick="deleteProduct(${p.id})">🗑️ Supprimer</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Afficher les catégories
+    async function showCategories() {
+        const tbody = document.querySelector('#categories-table tbody');
+        tbody.innerHTML = categories.map(c => `
+            <tr>
+                <td>${escapeHtml(c.name)}</td>
+                <td><button onclick="deleteCategory(${c.id})" style="background:#ef4444;color:white;border:none;padding:5px 10px;border-radius:4px;">Supprimer</button></td>
+            </tr>
+        `).join('');
+    }
+    
+    // Remplir select catégories
+    function fillCategorySelect() {
+        const select = document.getElementById('prod-category');
+        select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+    
+    // Preview image
+    document.getElementById('prod-image').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        currentImageFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById('image-preview').innerHTML = `
+                <div style="position:relative;display:inline-block;">
+                    <img src="${e.target.result}">
+                    <button class="remove-img" onclick="clearImage()">✕</button>
+                </div>
+            `;
+        };
+        reader.readAsDataURL(file);
+    };
+    
+    window.clearImage = () => {
+        currentImageFile = null;
+        document.getElementById('image-preview').innerHTML = '';
+        document.getElementById('prod-image').value = '';
+    };
+    
+    // Sauvegarder produit
+    document.getElementById('save-product').onclick = async () => {
+        const name = document.getElementById('prod-name').value.trim();
+        const price = parseFloat(document.getElementById('prod-price').value);
+        const stock = parseInt(document.getElementById('prod-stock').value) || 0;
+        const categoryId = parseInt(document.getElementById('prod-category').value);
+        const featured = document.getElementById('prod-featured').checked;
+        const desc = document.getElementById('prod-desc').value;
+        
+        if (!name || isNaN(price)) {
+            toast('Nom et prix requis', 'error');
+            return;
+        }
+        
+        const btn = document.getElementById('save-product');
+        btn.disabled = true;
+        btn.textContent = '⏳ Enregistrement...';
+        
+        try {
+            let imageUrl = null;
+            if (currentImageFile) {
+                toast('Upload image...', 'info');
+                imageUrl = await uploadToImgBB(currentImageFile);
+            }
+            
+            const data = {
+                name, price, stock, category_id: categoryId,
+                is_featured: featured, description: desc, is_active: true
+            };
+            if (imageUrl) data.image_url = imageUrl;
+            
+            let result;
+            if (editId) {
+                result = await supabase.from('products').update(data).eq('id', editId);
+            } else {
+                result = await supabase.from('products').insert([data]);
+            }
+            
+            if (result.error) throw new Error(result.error.message);
+            
+            toast(editId ? 'Produit modifié' : 'Produit ajouté');
+            resetForm();
+            await loadProducts();
+            await showDashboard();
+            await showProducts();
+            
+        } catch(err) {
+            toast('Erreur: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '💾 Enregistrer';
+        }
+    };
+    
+    // Modifier produit
+    window.editProduct = async (id) => {
+        const p = products.find(p => p.id === id);
+        if (!p) return;
+        
+        editId = id;
+        document.getElementById('prod-name').value = p.name;
+        document.getElementById('prod-desc').value = p.description || '';
+        document.getElementById('prod-price').value = p.price;
+        document.getElementById('prod-stock').value = p.stock;
+        document.getElementById('prod-category').value = p.category_id;
+        document.getElementById('prod-featured').checked = p.is_featured;
+        
+        if (p.image_url) {
+            document.getElementById('image-preview').innerHTML = `
+                <div style="position:relative;display:inline-block;">
+                    <img src="${p.image_url}">
+                    <button class="remove-img" onclick="clearImage()">✕</button>
+                </div>
+            `;
+        }
+        document.querySelector('.tab-btn[data-page="add"]').click();
+        toast('Modification en cours');
+    };
+    
+    // Supprimer produit
+    window.deleteProduct = async (id) => {
+        if (!confirm('Supprimer ce produit ?')) return;
+        await supabase.from('products').update({ is_active: false }).eq('id', id);
+        await loadProducts();
+        await showDashboard();
+        await showProducts();
+        toast('Produit supprimé');
+    };
+    
+    // Ajouter catégorie
+    document.getElementById('add-category').onclick = async () => {
+        const name = document.getElementById('new-cat-name').value.trim();
+        if (!name) return;
+        
+        await supabase.from('categories').insert([{
+            name, slug: name.toLowerCase().replace(/\s+/g, '-'), is_active: true
+        }]);
+        
+        document.getElementById('new-cat-name').value = '';
+        await loadCategories();
+        await showCategories();
+        fillCategorySelect();
+        toast('Catégorie ajoutée');
+    };
+    
+    // Supprimer catégorie
+    window.deleteCategory = async (id) => {
+        const used = products.some(p => p.category_id === id);
+        if (used) {
+            toast('Catégorie utilisée par des produits', 'error');
+            return;
+        }
+        if (!confirm('Supprimer cette catégorie ?')) return;
+        await supabase.from('categories').update({ is_active: false }).eq('id', id);
+        await loadCategories();
+        await showCategories();
+        fillCategorySelect();
+        toast('Catégorie supprimée');
+    };
+    
+    // Reset formulaire
+    function resetForm() {
+        document.getElementById('prod-name').value = '';
+        document.getElementById('prod-desc').value = '';
+        document.getElementById('prod-price').value = '';
+        document.getElementById('prod-stock').value = '10';
+        document.getElementById('prod-featured').checked = false;
+        clearImage();
+        editId = null;
+    }
+    
+    // Navigation
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(btn.dataset.page).classList.add('active');
+        };
+    });
+    
+    // Toast
+    function toast(msg, type = 'success') {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.style.borderLeftColor = type === 'error' ? '#ef4444' : '#10b981';
+        t.innerText = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+    }
+    
+    // Initialisation
+    async function init() {
+        await loadCategories();
+        await loadProducts();
+        fillCategorySelect();
+        await showDashboard();
+        await showProducts();
+        await showCategories();
+        toast('Admin chargé');
+    }
+    
+    init();
+</script>
+</body>
+</html>
