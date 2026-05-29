@@ -4,7 +4,70 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MAM Shop - Votre Marketplace au Niger</title>
-<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Styles complets */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; }
+  
+  nav { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .logo { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 800; color: #0f172a; text-decoration: none; }
+  .logo-icon { width: 36px; height: 36px; background: #2563eb; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a { text-decoration: none; color: #334155; font-weight: 500; font-size: 14px; transition: color 0.2s; }
+  .nav-links a:hover { color: #2563eb; }
+  .nav-actions { display: flex; gap: 12px; align-items: center; }
+  .cart-btn { background: #f1f5f9; padding: 8px 16px; border-radius: 40px; text-decoration: none; color: #1e293b; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  .btn-primary { background: #2563eb; color: white; padding: 8px 20px; border-radius: 40px; text-decoration: none; font-weight: 600; font-size: 13px; transition: background 0.2s; }
+  .btn-primary:hover { background: #1d4ed8; }
+  
+  .hero { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; text-align: center; padding: 70px 24px; }
+  .hero h1 { font-size: 48px; margin-bottom: 16px; }
+  .hero p { font-size: 18px; color: #94a3b8; margin-bottom: 28px; }
+  .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-wa { background: #25d366; color: white; }
+  .btn-wa:hover { background: #20b859; }
+  
+  .stats-bar { background: white; padding: 40px 24px; border-bottom: 1px solid #e2e8f0; }
+  .stats-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
+  .stat-num { font-size: 36px; font-weight: 800; color: #0f172a; }
+  .stat-label { color: #64748b; font-size: 13px; margin-top: 6px; }
+  
+  .section { padding: 60px 24px; }
+  .container { max-width: 1280px; margin: 0 auto; }
+  .section-title { font-size: 32px; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 12px; }
+  .section-sub { text-align: center; color: #64748b; margin-bottom: 40px; }
+  
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
+  .product-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+  .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+  .product-img { height: 200px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+  .product-img img { width: 100%; height: 100%; object-fit: cover; }
+  .product-info { padding: 16px; }
+  .product-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .product-price { font-size: 18px; font-weight: 800; color: #2563eb; }
+  .product-old-price { font-size: 12px; color: #94a3b8; text-decoration: line-through; margin-top: 4px; }
+  .btn-add-cart { width: 100%; margin-top: 12px; padding: 10px; background: #f1f5f9; border: none; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s; }
+  .btn-add-cart:hover { background: #e2e8f0; }
+  
+  .cta-wa { background: #075e54; color: white; text-align: center; padding: 60px 24px; }
+  .cta-wa h2 { font-size: 28px; margin-bottom: 12px; }
+  .cta-wa p { margin-bottom: 24px; opacity: 0.9; }
+  
+  footer { background: #0f172a; color: #94a3b8; padding: 48px 24px 24px; }
+  .footer-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
+  .footer-title { color: white; font-weight: 700; margin-bottom: 16px; font-size: 14px; }
+  .footer-link { display: block; color: #94a3b8; text-decoration: none; font-size: 13px; margin-bottom: 10px; }
+  .footer-link:hover { color: white; }
+  .footer-bottom { text-align: center; padding-top: 40px; margin-top: 40px; border-top: 1px solid #1e293b; font-size: 12px; }
+  
+  @media (max-width: 768px) {
+    .nav-inner { flex-direction: column; }
+    .nav-links { flex-wrap: wrap; justify-content: center; }
+    .hero h1 { font-size: 32px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
 </head>
 <body>
 
@@ -22,11 +85,8 @@
       <a href="a-propos.html">A propos</a>
     </div>
     <div class="nav-actions">
-      <a href="panier.html" class="cart-btn">
-        🛒 Panier
-        <span class="cart-count" style="display:none">0</span>
-      </a>
-      <a href="compte.html" class="btn btn-primary">Connexion</a>
+      <a href="panier.html" class="cart-btn">🛒 Panier</a>
+      <a href="compte.html" class="btn-primary">Connexion</a>
     </div>
   </div>
 </nav>
@@ -36,29 +96,29 @@
   <h1>Bienvenue sur <span style="color:#fbbf24">MAM Shop</span></h1>
   <p>Votre marketplace de confiance au Niger</p>
   <div class="hero-btns">
-    <a href="boutique.html" class="btn btn-primary" style="font-size:16px;padding:14px 28px">Voir la boutique</a>
-    <a href="https://wa.me/22798836601" class="btn btn-wa" style="font-size:16px;padding:14px 28px" target="_blank">Commander sur WhatsApp</a>
+    <a href="boutique.html" class="btn-primary" style="font-size:16px;padding:14px 28px">Voir la boutique</a>
+    <a href="https://wa.me/22798836601" class="btn-primary btn-wa" style="font-size:16px;padding:14px 28px" target="_blank">Commander sur WhatsApp</a>
   </div>
 </div>
 
 <div class="stats-bar">
   <div class="stats-grid">
     <div><div class="stat-num" id="nb-products">...</div><div class="stat-label">Produits</div></div>
-    <div><div class="stat-num" id="nb-categories">...</div><div class="stat-label">Categories</div></div>
-    <div><div class="stat-num">500+</div><div class="stat-label">Clients</div></div>
-    <div><div class="stat-num">98%</div><div class="stat-label">Satisfaction</div></div>
+    <div><div class="stat-num" id="nb-categories">...</div><div class="stat-label">Catégories</div></div>
+    <div><div class="stat-num" id="nb-orders">...</div><div class="stat-label">Commandes</div></div>
+    <div><div class="stat-num" id="nb-sellers">...</div><div class="stat-label">Vendeurs</div></div>
   </div>
 </div>
 
 <div class="section">
   <div class="container">
     <h2 class="section-title">Produits vedettes</h2>
-    <p class="section-sub">Selection du moment</p>
+    <p class="section-sub">Sélection du moment</p>
     <div class="grid-cards" id="featured-products">
       <div style="grid-column:1/-1;text-align:center;padding:40px;color:#64748b">Chargement...</div>
     </div>
     <div style="text-align:center;margin-top:36px">
-      <a href="boutique.html" class="btn btn-primary" style="font-size:15px;padding:13px 32px">Voir tous les produits</a>
+      <a href="boutique.html" class="btn-primary" style="font-size:15px;padding:13px 32px">Voir tous les produits</a>
     </div>
   </div>
 </div>
@@ -68,29 +128,29 @@
     <h2 class="section-title">Nos Services</h2>
     <p class="section-sub">Tout ce dont vous avez besoin</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px">
-      <div style="background:white;border-radius:16px;padding:28px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="background:white;border-radius:16px;padding:28px;text-align:center">
         <div style="font-size:44px;margin-bottom:12px">📡</div>
         <h3 style="font-weight:700;margin-bottom:8px">Antennes & Starlink</h3>
-        <p style="color:#64748b;font-size:14px;line-height:1.6">Installation professionnelle dans tout le Niger</p>
-        <a href="antennes.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600;font-size:13px">En savoir plus →</a>
+        <p style="color:#64748b;font-size:14px">Installation professionnelle</p>
+        <a href="antennes.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600">En savoir plus →</a>
       </div>
-      <div style="background:white;border-radius:16px;padding:28px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="background:white;border-radius:16px;padding:28px;text-align:center">
         <div style="font-size:44px;margin-bottom:12px">🛍️</div>
         <h3 style="font-weight:700;margin-bottom:8px">Boutique en ligne</h3>
-        <p style="color:#64748b;font-size:14px;line-height:1.6">Large catalogue au meilleur prix</p>
-        <a href="boutique.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600;font-size:13px">Voir la boutique →</a>
+        <p style="color:#64748b;font-size:14px">Large catalogue au meilleur prix</p>
+        <a href="boutique.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600">Voir la boutique →</a>
       </div>
-      <div style="background:white;border-radius:16px;padding:28px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="background:white;border-radius:16px;padding:28px;text-align:center">
         <div style="font-size:44px;margin-bottom:12px">🏪</div>
         <h3 style="font-weight:700;margin-bottom:8px">Marketplace</h3>
-        <p style="color:#64748b;font-size:14px;line-height:1.6">Vendez vos produits et touchez plus de clients</p>
-        <a href="marketplace.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600;font-size:13px">Rejoindre →</a>
+        <p style="color:#64748b;font-size:14px">Vendez vos produits</p>
+        <a href="marketplace.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600">Rejoindre →</a>
       </div>
-      <div style="background:white;border-radius:16px;padding:28px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="background:white;border-radius:16px;padding:28px;text-align:center">
         <div style="font-size:44px;margin-bottom:12px">🚀</div>
         <h3 style="font-weight:700;margin-bottom:8px">Livraison rapide</h3>
-        <p style="color:#64748b;font-size:14px;line-height:1.6">Livraison dans tout le Niger</p>
-        <a href="a-propos.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600;font-size:13px">En savoir plus →</a>
+        <p style="color:#64748b;font-size:14px">Dans tout le Niger</p>
+        <a href="a-propos.html" style="display:inline-block;margin-top:14px;color:#2563eb;font-weight:600">En savoir plus →</a>
       </div>
     </div>
   </div>
@@ -99,7 +159,7 @@
 <div class="cta-wa">
   <h2>Commandez directement sur WhatsApp !</h2>
   <p>Contactez-nous pour passer votre commande rapidement</p>
-  <a href="https://wa.me/22798836601" target="_blank" style="background:white;color:#25d366;padding:15px 40px;border-radius:50px;font-weight:900;font-size:17px;display:inline-block">
+  <a href="https://wa.me/22798836601" target="_blank" style="background:white;color:#25d366;padding:15px 40px;border-radius:50px;font-weight:900;font-size:17px;text-decoration:none">
     +227 98 83 66 01
   </a>
 </div>
@@ -108,8 +168,8 @@
   <div class="footer-grid">
     <div>
       <div style="color:white;font-weight:800;font-size:19px;margin-bottom:10px">MAM Shop</div>
-      <p style="font-size:13px;line-height:1.6">Votre marketplace de confiance au Niger. Produits de qualite.</p>
-      <a href="https://wa.me/22798836601" target="_blank" style="display:inline-block;margin-top:14px;background:#25d366;color:white;padding:8px 16px;border-radius:8px;font-weight:700;font-size:13px">WhatsApp</a>
+      <p style="font-size:13px">Votre marketplace de confiance au Niger</p>
+      <a href="https://wa.me/22798836601" target="_blank" style="display:inline-block;margin-top:14px;background:#25d366;color:white;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:13px">WhatsApp</a>
     </div>
     <div>
       <div class="footer-title">Navigation</div>
@@ -117,39 +177,60 @@
       <a class="footer-link" href="boutique.html">Boutique</a>
       <a class="footer-link" href="antennes.html">Services</a>
       <a class="footer-link" href="marketplace.html">Marketplace</a>
-      <a class="footer-link" href="a-propos.html">A propos</a>
     </div>
     <div>
       <div class="footer-title">Compte</div>
       <a class="footer-link" href="compte.html">Connexion</a>
       <a class="footer-link" href="inscription.html">Inscription</a>
       <a class="footer-link" href="vendeur.html">Espace vendeur</a>
-      <a class="footer-link" href="panier.html">Mon panier</a>
     </div>
     <div>
       <div class="footer-title">Contact</div>
-      <p style="font-size:13px;margin-bottom:6px">📍 Tahoua, Niger</p>
-      <a href="https://wa.me/22798836601" style="font-size:13px;color:#25d366;display:block;margin-bottom:6px">📞 +227 98 83 66 01</a>
+      <p style="font-size:13px">📍 Tahoua, Niger</p>
+      <a href="https://wa.me/22798836601" style="font-size:13px;color:#25d366;display:block">📞 +227 98 83 66 01</a>
       <p style="font-size:13px">✉️ mamshop.niger@gmail.com</p>
     </div>
   </div>
-  <div class="footer-bottom">© 2026 MAM Shop - Tous droits reserves | Tahoua, Niger</div>
+  <div class="footer-bottom">© 2026 MAM Shop - Tous droits réservés | Tahoua, Niger</div>
 </footer>
 
 <script src="js/api.js"></script>
 <script>
 async function loadHome() {
   try {
+    // Charger les produits vedettes
     const products = await dbQuery("SELECT * FROM products WHERE is_active=1 AND is_featured=1 ORDER BY created_at DESC LIMIT 8");
     renderProducts(products, 'featured-products');
-    const cats = await dbQuery("SELECT COUNT(*) as n FROM categories WHERE is_active=1");
-    const prods = await dbQuery("SELECT COUNT(*) as n FROM products WHERE is_active=1");
-    document.getElementById('nb-products').textContent = prods[0]?.n || '0';
-    document.getElementById('nb-categories').textContent = cats[0]?.n || '0';
+    
+    // Charger les statistiques
+    const prods = await dbQuery("SELECT COUNT(*) as count FROM products WHERE is_active=1");
+    const cats = await dbQuery("SELECT COUNT(*) as count FROM categories WHERE is_active=1");
+    const orders = await dbQuery("SELECT COUNT(*) as count FROM orders");
+    const sellers = await dbQuery("SELECT COUNT(*) as count FROM sellers WHERE is_active=1");
+    
+    document.getElementById('nb-products').textContent = prods[0]?.count || '0';
+    document.getElementById('nb-categories').textContent = cats[0]?.count || '0';
+    document.getElementById('nb-orders').textContent = orders[0]?.count || '0';
+    document.getElementById('nb-sellers').textContent = sellers[0]?.count || '0';
   } catch(e) {
+    console.error('Erreur chargement:', e);
     document.getElementById('featured-products').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#64748b">Aucun produit pour le moment</div>';
   }
 }
+
+// Fonction panier
+function addToCart(id, name, price) {
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(item => item.id === id);
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({ id, name, price, quantity: 1 });
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  alert(`${name} ajouté au panier !`);
+}
+
 loadHome();
 </script>
 </body>
