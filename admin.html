@@ -1,242 +1,242 @@
-<!DOCTYPE html>
+            <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Test Upload - MAM Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasma Admin Expert | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: system-ui, sans-serif;
-            background: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background: #1e293b;
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        h1 {
-            color: white;
-            margin-bottom: 30px;
-        }
-        .preview {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            background: #0f172a;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 2px dashed #334155;
-        }
-        .preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .preview span {
-            color: #64748b;
-            font-size: 48px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            color: white;
-            margin: 10px 0;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background: #2563eb;
-        }
-        .status {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
-        }
-        .success {
-            background: #10b98120;
-            color: #10b981;
-            border: 1px solid #10b981;
-        }
-        .error {
-            background: #ef444420;
-            color: #ef4444;
-            border: 1px solid #ef4444;
-        }
-        .loading {
-            background: #3b82f620;
-            color: #3b82f6;
-        }
-        .url-box {
-            margin-top: 20px;
-            padding: 12px;
-            background: #0f172a;
-            border-radius: 10px;
-            word-break: break-all;
-            font-size: 12px;
-            color: #94a3b8;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .tab-content { display: none; }
+        .tab-active { display: block; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>📸 Test Upload Photo</h1>
-        
-        <div class="preview" id="preview">
-            <span>🖼️</span>
+<body class="bg-gray-50 pb-24">
+
+    <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[32px] p-8 w-full max-w-md shadow-2xl">
+            <h1 class="text-2xl font-black mb-6 text-center italic text-blue-900">NASMA ACCESS</h1>
+            <input type="password" id="admin-pass" placeholder="Clé secrète" class="w-full p-4 bg-gray-50 rounded-xl outline-none ring-1 ring-gray-200 mb-4 text-center">
+            <button onclick="verifierAcces()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl">SE CONNECTER</button>
         </div>
-        
-        <input type="file" id="imageInput" accept="image/*">
-        <button id="uploadBtn">⬆️ Upload vers Supabase</button>
-        
-        <div id="status"></div>
-        <div id="urlResult" class="url-box" style="display:none;"></div>
+    </div>
+
+    <div id="main-ui" class="hidden">
+        <header class="bg-white p-6 shadow-sm sticky top-0 z-40">
+            <h1 class="text-xl font-black italic text-blue-900 text-center">NASMA SHOP HUB</h1>
+            <div class="flex gap-2 mt-4">
+                <button onclick="switchTab('tab-boutique')" class="flex-1 py-2 bg-blue-900 text-white rounded-lg text-[10px] font-bold">BOUTIQUE</button>
+                <button onclick="switchTab('tab-ia')" class="flex-1 py-2 bg-purple-600 text-white rounded-lg text-[10px] font-bold">IA CERVEAU</button>
+                <button onclick="switchTab('tab-securite')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg text-[10px] font-bold">SYSTÈME</button>
+            </div>
+        </header>
+
+        <main class="p-4 max-w-md mx-auto space-y-6">
+
+            <div id="tab-boutique" class="tab-content tab-active space-y-6">
+                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
+                    <h2 class="text-lg font-black mb-4 italic text-blue-900">NOUVEAU PRODUIT</h2>
+                    <div class="space-y-3">
+                        <input type="text" id="t" placeholder="Nom du produit" class="w-full p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 outline-none">
+                        <textarea id="desc" placeholder="Description..." class="w-full p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 h-20 text-sm outline-none"></textarea>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="p" placeholder="Prix CFA" class="p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 outline-none">
+                            <input type="number" id="r" placeholder="Promo %" class="p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 outline-none">
+                        </div>
+                        <select id="cat" class="w-full p-3 bg-gray-50 rounded-xl ring-1 ring-gray-100 text-sm font-bold text-blue-800">
+                            <option value="Yaourts">Yaourts 🍦</option>
+                            <option value="Jus">Jus Frais 🥤</option>
+                            <option value="Patisseries">Pâtisseries 🥐</option>
+                            <option value="Autres délices">Autres délices 😋</option>
+                            <option value="Autres articles">Autres articles 🎉💫</option>
+                        </select>
+                        <input type="file" id="f" class="text-[10px] block w-full text-gray-500">
+                        <button onclick="publier()" id="btnP" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg">METTRE EN LIGNE 🚀</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
+                    <h2 class="text-lg font-black mb-4 italic text-red-600">STOCKS</h2>
+                    <div id="liste-admin" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <div id="tab-ia" class="tab-content space-y-6">
+                <div class="bg-purple-600 rounded-[32px] p-6 shadow-xl text-white">
+                    <h2 class="text-lg font-black mb-2 italic">IA MULTIMÉDIA</h2>
+                    <p class="text-[10px] uppercase opacity-70 mb-4">Uploadez PDF, Audios ou Photos ici</p>
+                    <input type="file" id="ia-file" multiple class="text-[10px] mb-4">
+                    <textarea id="ia-keys" placeholder="Mots-clés (ex: prix livraison yaourt)" class="w-full p-3 bg-white/10 rounded-xl border border-white/20 outline-none mb-4 text-sm placeholder:text-white/40"></textarea>
+                    <button onclick="uploaderEtEntrainer()" id="btnIA" class="w-full bg-white text-purple-600 font-black py-4 rounded-xl uppercase text-xs">Entraîner Nasma</button>
+                    <div id="status-files" class="mt-2 text-[10px] italic">Prêt.</div>
+                </div>
+
+                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
+                    <h2 class="text-lg font-black mb-4 italic text-purple-900">GALERIE MÉMOIRE</h2>
+                    <div id="galerie-contenu" class="grid grid-cols-3 gap-2"></div>
+                </div>
+
+                <div class="bg-yellow-50 rounded-[32px] p-6 border border-yellow-200">
+                    <h2 class="text-sm font-black mb-3">QUESTIONS NON COMPRISES</h2>
+                    <div id="liste-inconnues" class="text-[11px] space-y-2"></div>
+                </div>
+            </div>
+
+            <div id="tab-securite" class="tab-content space-y-6">
+                <div class="bg-white rounded-[32px] p-6 shadow-xl border border-gray-100">
+                    <h2 class="text-lg font-black mb-4 italic">SYSTÈME</h2>
+                    <input type="password" id="new-pass" placeholder="Nouveau mot de passe" class="w-full p-4 bg-gray-50 rounded-xl outline-none ring-1 ring-gray-100 mb-4">
+                    <button onclick="changerMotDePasse()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-xl mb-2">CHANGER LA CLÉ</button>
+                    <button onclick="exporterEntrainement()" class="w-full border-2 border-blue-900 text-blue-900 font-bold py-4 rounded-xl">EXPORTER CSV 📥</button>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <script>
-        // Configuration Supabase
-        const SUPABASE_URL = 'https://rqoaclfelpezlbbnjwrl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        let selectedFile = null;
-        
-        // Preview de l'image
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
-        
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            selectedFile = file;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-            };
-            reader.readAsDataURL(file);
-        });
-        
-        // Upload
-        const uploadBtn = document.getElementById('uploadBtn');
-        const statusDiv = document.getElementById('status');
-        const urlResult = document.getElementById('urlResult');
-        
-        uploadBtn.addEventListener('click', async () => {
-            if (!selectedFile) {
-                showStatus('❌ Sélectionnez une image d\'abord', 'error');
-                return;
-            }
-            
-            // Générer un nom unique
-            const timestamp = Date.now();
-            const fileName = `test_${timestamp}_${selectedFile.name}`;
-            const filePath = `uploads/${fileName}`;
-            
-            showStatus('⏳ Upload en cours...', 'loading');
-            uploadBtn.disabled = true;
-            
-            try {
-                // Upload vers Supabase Storage
-                const { error: uploadError } = await supabase.storage
-                    .from('product-images')  // bucket name
-                    .upload(filePath, selectedFile);
-                
-                if (uploadError) {
-                    if (uploadError.message.includes('bucket')) {
-                        showStatus('❌ Le bucket "product-images" n\'existe pas. Créez-le dans Supabase Storage d\'abord.', 'error');
-                    } else {
-                        showStatus('❌ Erreur: ' + uploadError.message, 'error');
-                    }
-                    uploadBtn.disabled = false;
-                    return;
-                }
-                
-                // Obtenir l'URL publique
-                const { data } = supabase.storage
-                    .from('product-images')
-                    .getPublicUrl(filePath);
-                
-                const publicUrl = data.publicUrl;
-                
-                // Afficher le succès
-                showStatus('✅ Upload réussi !', 'success');
-                urlResult.style.display = 'block';
-                urlResult.innerHTML = `
-                    <strong>URL publique :</strong><br>
-                    <a href="${publicUrl}" target="_blank" style="color:#3b82f6;">${publicUrl}</a>
-                    <br><br>
-                    <button onclick="copyToClipboard('${publicUrl}')" style="background:#3b82f6;padding:8px 16px;margin-top:10px;width:auto;">📋 Copier URL</button>
-                `;
-                
-                console.log('URL:', publicUrl);
-                
-            } catch (error) {
-                showStatus('❌ Erreur: ' + error.message, 'error');
-            } finally {
-                uploadBtn.disabled = false;
-            }
-        });
-        
-        function showStatus(message, type) {
-            statusDiv.className = `status ${type}`;
-            statusDiv.textContent = message;
+        const SB_URL = 'https://rqoaclfelpezlbbnjwrl.supabase.co';
+        const SB_KEY = 'sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        let CLE_SECRETTE = localStorage.getItem('nasma_admin_key') || "Ouzaif2026";
+
+        // --- NAVIGATION ---
+        function verifierAcces() {
+            if (document.getElementById('admin-pass').value === CLE_SECRETTE) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-ui').classList.remove('hidden');
+                chargerArticlesAdmin();
+                chargerGalerie();
+                chargerInconnues();
+            } else { alert("Clé incorrecte !"); }
         }
-        
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-            showStatus('✅ URL copiée dans le presse-papier', 'success');
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('tab-active'));
+            document.getElementById(id).classList.add('tab-active');
         }
-        
-        // Test de connexion au chargement
-        async function testConnection() {
-            showStatus('🔌 Test de connexion à Supabase...', 'loading');
-            try {
-                const { data, error } = await supabase.storage.listBuckets();
-                if (error) {
-                    showStatus('⚠️ Connecté mais vérifiez le bucket "product-images"', 'error');
+
+        // --- BOUTIQUE ---
+        async function publier() {
+            const btn = document.getElementById('btnP');
+            const file = document.getElementById('f').files[0];
+            if(!file || !document.getElementById('t').value) return alert("Nom et Photo requis !");
+            
+            btn.innerText = "CHARGEMENT... ⏳";
+            const path = `${Date.now()}_${file.name}`;
+            await sb.storage.from('articles-images').upload(path, file);
+            const { data: { publicUrl } } = sb.storage.from('articles-images').getPublicUrl(path);
+
+            await sb.from('articles').insert([{
+                titre: document.getElementById('t').value,
+                description: document.getElementById('desc').value,
+                prix: document.getElementById('p').value,
+                categorie: document.getElementById('cat').value,
+                image_url: publicUrl
+            }]);
+            location.reload();
+        }
+
+        async function chargerArticlesAdmin() {
+            const container = document.getElementById('liste-admin');
+            const { data } = await sb.from('articles').select('*').order('created_at', { ascending: false });
+            container.innerHTML = data.map(a => `
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                    <img src="${a.image_url}" class="w-8 h-8 rounded-lg object-cover">
+                    <p class="text-[10px] font-bold text-blue-900 flex-1 ml-3">${a.titre}</p>
+                    <button onclick="supprimerArticle(${a.id})" class="text-red-500 font-black text-[9px] uppercase">Suppr.</button>
+                </div>
+            `).join('');
+        }
+
+        async function supprimerArticle(id) {
+            if(confirm("Supprimer ?")) { await sb.from('articles').delete().eq('id', id); chargerArticlesAdmin(); }
+        }
+
+        // --- IA MULTIMÉDIA (PDF, AUDIO, ETC) ---
+        async function uploaderEtEntrainer() {
+            const btn = document.getElementById('btnIA');
+            const fileInput = document.getElementById('ia-file');
+            const keys = document.getElementById('ia-keys').value;
+            const status = document.getElementById('status-files');
+
+            if(fileInput.files.length === 0 || !keys) return alert("Fichier et mots-clés requis !");
+            
+            btn.innerText = "IA ANALYSE...";
+            for (const file of fileInput.files) {
+                const path = `${Date.now()}_${file.name}`;
+                await sb.storage.from('nasma_docs').upload(path, file);
+                const { data: { publicUrl } } = sb.storage.from('nasma_docs').getPublicUrl(path);
+
+                if (file.type === "application/pdf") {
+                    const reader = new FileReader();
+                    reader.onload = async function() {
+                        const typedarray = new Uint8Array(this.result);
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let text = "";
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            text += content.items.map(item => item.str).join(" ");
+                        }
+                        await sb.from('ia_connaissances').insert([{ declencheur: keys.toLowerCase(), reponse: `PDF: ${text.substring(0, 400)}... Lien: ${publicUrl}` }]);
+                    };
+                    reader.readAsArrayBuffer(file);
                 } else {
-                    const bucketExists = data.some(b => b.name === 'product-images');
-                    if (bucketExists) {
-                        showStatus('✅ Connexion OK - Bucket "product-images" trouvé', 'success');
-                    } else {
-                        showStatus('⚠️ Connecté mais le bucket "product-images" n\'existe pas. Créez-le dans Storage.', 'error');
-                    }
+                    await sb.from('ia_connaissances').insert([{ declencheur: keys.toLowerCase(), reponse: publicUrl }]);
                 }
-            } catch (error) {
-                showStatus('❌ Erreur de connexion: ' + error.message, 'error');
             }
+            alert("Nasma a appris ! ✅");
+            chargerGalerie();
+            btn.innerText = "ENTRAÎNER NASMA";
         }
-        
-        testConnection();
+
+        async function chargerGalerie() {
+            const container = document.getElementById('galerie-contenu');
+            const { data } = await sb.from('ia_connaissances').select('*').order('id', { ascending: false });
+            container.innerHTML = data.filter(c => c.reponse.includes("https")).map(m => `
+                <div class="bg-gray-100 p-2 rounded-xl text-center">
+                    <div class="text-lg">${m.reponse.includes('.mp3') ? '🎵' : m.reponse.includes('.pdf') ? '📄' : '🖼️'}</div>
+                    <p class="text-[8px] font-bold truncate">${m.declencheur}</p>
+                    <button onclick="supprimerMemoire(${m.id})" class="text-red-500 text-[8px] font-bold">X</button>
+                </div>
+            `).join('');
+        }
+
+        async function supprimerMemoire(id) {
+            await sb.from('ia_connaissances').delete().eq('id', id); chargerGalerie();
+        }
+
+        // --- SÉCURITÉ & EXPORT ---
+        function changerMotDePasse() {
+            const n = document.getElementById('new-pass').value;
+            if(n.length < 4) return alert("Trop court !");
+            localStorage.setItem('nasma_admin_key', n);
+            alert("Clé modifiée !");
+        }
+
+        async function exporterEntrainement() {
+            const { data } = await sb.from('ia_connaissances').select('*');
+            let csv = "ID;Cle;Reponse\n";
+            data.forEach(r => csv += `${r.id};${r.declencheur};${r.reponse}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'cerveau_nasma.csv';
+            a.click();
+        }
+
+        async function chargerInconnues() {
+            const { data } = await sb.from('questions_inconnues').select('*');
+            document.getElementById('liste-inconnues').innerHTML = data.length ? data.map(q => `<div>- ${q.question}</div>`).join('') : "RAS.";
+        }
     </script>
+
+    <script defer src="/_vercel/insights/script.js"></script>
 </body>
-</html>
+    </html>
