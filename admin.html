@@ -263,9 +263,13 @@
 
 <script>
 // Configuration Supabase
+// Configuration Supabase corrigée
 const SUPA_URL = "https://rqoaclfelpezlbbnjwrl.supabase.co";
-const SUPA_KEY = "sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei";
-const SUPA_SECRET = "sb_secret_vUHRNXMGbev8jOivG3zSaw_mC4Y_Ujj";
+const SUPA_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxb2FjbGZlbHBlemxiYmpud3J sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU2MjQwMDAsImV4cCI6MjA1MTIwMDAwMH0.ta7Bz7xQZdQ2rB5l2kfM3nJxKpL9qR8sT1uVwXyZ4A"; // Remplace par ta vraie anon key
+const SUPA_SERVICE_ROLE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxb2FjbGZlbHBlemxiYmpud3JsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTYyNDAwMCwiZXhwIjoyMDUxMjAwMDAwfQ.abcdef1234567890"; // Remplace par ta vraie service_role key
+
+// Pour les opérations d'écriture (POST, PATCH, DELETE), utilise SERVICE_ROLE
+// Pour les lectures (GET), tu peux utiliser ANON_KEY
 const BUCKET = "products";
 
 let allProducts = [], allCats = [];
