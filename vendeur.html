@@ -10,16 +10,21 @@
 
 <div id="login-screen" class="login-page">
   <div class="login-box">
-    <div style="font-size:42px;margin-bottom:14px">🏪</div>
-    <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:6px">Espace Vendeur</h2>
-    <p style="color:#94a3b8;font-size:13px;margin-bottom:20px">MAM Shop Marketplace</p>
-    <input id="v-email" type="email" placeholder="Email" style="width:100%;padding:11px 14px;border-radius:9px;border:none;margin-bottom:10px;font-size:14px;outline:none">
-    <input id="v-pass" type="password" placeholder="Mot de passe" style="width:100%;padding:11px 14px;border-radius:9px;border:none;margin-bottom:14px;font-size:14px;outline:none"
+    <div style="font-size:44px;margin-bottom:14px">🏪</div>
+    <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:4px">Espace Vendeur</h2>
+    <p style="color:#94a3b8;font-size:12px;margin-bottom:22px">MAM Shop Marketplace</p>
+    <input id="v-email" type="email" placeholder="Email du vendeur"
+      style="width:100%;padding:11px 14px;border-radius:9px;border:none;margin-bottom:10px;font-size:14px;outline:none;background:#334155;color:white">
+    <input id="v-pass" type="password" placeholder="Mot de passe"
+      style="width:100%;padding:11px 14px;border-radius:9px;border:none;margin-bottom:14px;font-size:14px;outline:none;background:#334155;color:white"
       onkeydown="if(event.key==='Enter')vendeurLogin()">
     <button onclick="vendeurLogin()" style="width:100%;padding:13px;background:#7c3aed;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">
       Connexion
     </button>
-    <p style="color:#94a3b8;font-size:12px;margin-top:16px">Pas encore vendeur ? <a href="inscription-vendeur.html" style="color:#a78bfa">S'inscrire</a></p>
+    <p style="color:#94a3b8;font-size:12px;margin-top:16px">
+      Pas encore vendeur ?
+      <a href="inscription-vendeur.html" style="color:#a78bfa;font-weight:600">Faire une demande</a>
+    </p>
   </div>
 </div>
 
@@ -33,9 +38,9 @@
     <button class="sidebar-btn" onclick="vShowTab('v-add',this)">➕ Ajouter produit</button>
     <button class="sidebar-btn" onclick="vShowTab('v-products',this)">🛍️ Mes produits</button>
     <button class="sidebar-btn" onclick="vShowTab('v-profile',this)">👤 Mon profil</button>
-    <div style="padding:16px 20px;position:absolute;bottom:0;width:100%;border-top:1px solid #334155">
-      <a href="marketplace.html" style="color:#94a3b8;font-size:13px">Voir marketplace →</a><br>
-      <button onclick="vLogout()" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;margin-top:6px">Deconnexion</button>
+    <div style="padding:16px 20px;border-top:1px solid #334155;margin-top:20px">
+      <a href="marketplace.html" style="color:#94a3b8;font-size:13px;display:block;margin-bottom:8px">← Marketplace</a>
+      <button onclick="vLogout()" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer">Deconnexion</button>
     </div>
   </div>
 
@@ -43,31 +48,33 @@
     <div id="tab-v-dashboard">
       <div class="admin-title">Mon Dashboard</div>
       <div class="stat-cards">
-        <div class="stat-card" style="border-color:#6366f1"><div class="num" id="v-nb-products">-</div><div class="lbl">Mes produits</div></div>
+        <div class="stat-card" style="border-color:#6366f1"><div class="num" id="v-nb-products">0</div><div class="lbl">Mes produits</div></div>
         <div class="stat-card" style="border-color:#10b981"><div class="num">-</div><div class="lbl">Ventes ce mois</div></div>
-        <div class="stat-card" style="border-color:#f59e0b"><div class="num">-</div><div class="lbl">Revenu XOF</div></div>
-        <div class="stat-card" style="border-color:#ef4444"><div class="num">-</div><div class="lbl">Avis recus</div></div>
+        <div class="stat-card" style="border-color:#f59e0b"><div class="num">-</div><div class="lbl">Revenu total</div></div>
+        <div class="stat-card" style="border-color:#ef4444"><div class="num">-</div><div class="lbl">En attente</div></div>
       </div>
-      <div style="background:#1e293b;border-radius:13px;padding:20px;color:#94a3b8;text-align:center">
-        <div style="font-size:36px;margin-bottom:10px">📦</div>
-        <p>Tableau de bord vendeur en developpement.</p>
-        <p style="font-size:13px;margin-top:6px">Ajoutez vos produits pour commencer a vendre !</p>
+      <div style="background:#1e293b;border-radius:13px;padding:24px;text-align:center;color:#94a3b8">
+        <div style="font-size:40px;margin-bottom:12px">🚀</div>
+        <p style="margin-bottom:8px">Bienvenue dans votre espace vendeur !</p>
+        <p style="font-size:13px">Ajoutez vos produits pour commencer a vendre sur MAM Shop.</p>
+        <button onclick="vShowTab('v-add',null)" style="margin-top:16px;background:#7c3aed;color:white;border:none;padding:11px 24px;border-radius:9px;font-weight:700;cursor:pointer">
+          Ajouter mon premier produit
+        </button>
       </div>
     </div>
 
     <div id="tab-v-add" style="display:none">
-      <div class="admin-title">Ajouter un produit</div>
+      <div class="admin-title">Publier un produit</div>
       <div class="form-box">
-        <div class="upload-zone" onclick="document.getElementById('v-img-file').click()">
-          <div id="v-img-preview"><div class="icon">📸</div><p>Cliquer pour uploader une photo</p></div>
+        <div class="upload-zone" onclick="document.getElementById('v-img-file').click()" style="margin-bottom:16px">
+          <div id="v-img-preview"><div class="icon">📸</div><p>Cliquer pour ajouter une photo</p></div>
           <input id="v-img-file" type="file" accept="image/*" style="display:none" onchange="vPreviewImg(this)">
         </div>
-        <div style="height:12px"></div>
         <div class="form-group"><label>Nom du produit *</label><input id="vp-name" placeholder="Nom de votre produit"></div>
-        <div class="form-group"><label>Description</label><textarea id="vp-desc" rows="3"></textarea></div>
+        <div class="form-group"><label>Description</label><textarea id="vp-desc" rows="3" placeholder="Decrivez votre produit..."></textarea></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="form-group"><label>Prix (XOF) *</label><input id="vp-price" type="number" placeholder="Prix"></div>
-          <div class="form-group"><label>Stock</label><input id="vp-stock" type="number" placeholder="Quantite"></div>
+          <div class="form-group"><label>Prix (XOF) *</label><input id="vp-price" type="number" placeholder="Prix de vente"></div>
+          <div class="form-group"><label>Stock</label><input id="vp-stock" type="number" placeholder="Quantite" value="1"></div>
         </div>
         <div class="form-group"><label>Categorie</label>
           <select id="vp-cat"><option value="">Choisir...</option></select>
@@ -89,10 +96,11 @@
       <div class="admin-title">Mon profil vendeur</div>
       <div class="form-box">
         <div class="form-group"><label>Nom de la boutique</label><input id="vp-shopname" placeholder="Nom de votre boutique"></div>
-        <div class="form-group"><label>Description</label><textarea id="vp-shopdesc" rows="3" placeholder="Decrivez votre boutique..."></textarea></div>
+        <div class="form-group"><label>Description de la boutique</label><textarea id="vp-shopdesc" rows="3" placeholder="Decrivez votre boutique..."></textarea></div>
         <div class="form-group"><label>Telephone</label><input id="vp-phone" placeholder="+227 XX XX XX XX"></div>
+        <div class="form-group"><label>Ville</label><input id="vp-city" placeholder="Ex: Tahoua"></div>
         <button style="width:100%;padding:13px;background:#7c3aed;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
-          Sauvegarder
+          Sauvegarder le profil
         </button>
       </div>
     </div>
@@ -101,94 +109,102 @@
 
 <script src="js/api.js"></script>
 <script>
-let currentSeller = null;
+let currentSeller=null,currentSellerId=null;
 
-async function vendeurLogin() {
-  const email = document.getElementById('v-email').value;
-  const pass = document.getElementById('v-pass').value;
-  if (!email || !pass) { showToast('Email et mot de passe requis !'); return; }
-  const users = await dbQuery(`SELECT * FROM users WHERE email='${email}' AND role='seller'`);
-  if (users.length) {
-    currentSeller = users[0];
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('vendor-screen').style.display = 'flex';
-    const sellers = await dbQuery(`SELECT * FROM sellers WHERE user_id='${currentSeller.id}'`);
-    if (sellers.length) document.getElementById('v-shop-name').textContent = sellers[0].shop_name;
+async function vendeurLogin(){
+  const email=document.getElementById('v-email').value;
+  if(!email){showToast('Email requis !');return;}
+  const users=await sbGet('sellers',`email=eq.${encodeURIComponent(email)}&is_approved=eq.true`);
+  if(Array.isArray(users)&&users.length){
+    currentSeller=users[0];
+    currentSellerId=users[0].id;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('vendor-screen').style.display='flex';
+    document.getElementById('v-shop-name').textContent=users[0].shop_name||'Ma Boutique';
     loadVendorProducts();
     loadCatsVendor();
-  } else showToast('Compte vendeur introuvable !');
+  } else {
+    showToast('Compte vendeur introuvable ou non approuve !');
+  }
 }
 
-function vLogout() {
-  currentSeller = null;
-  document.getElementById('vendor-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
+function vLogout(){
+  currentSeller=null;currentSellerId=null;
+  document.getElementById('vendor-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
 }
 
-function vShowTab(id, btn) {
-  document.querySelectorAll('[id^="tab-v-"]').forEach(el => el.style.display = 'none');
-  document.getElementById(`tab-${id}`).style.display = 'block';
-  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  if (id === 'v-products') loadVendorProducts();
+function vShowTab(id,btn){
+  document.querySelectorAll('[id^="tab-v-"]').forEach(el=>el.style.display='none');
+  document.getElementById(`tab-${id}`).style.display='block';
+  document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(id==='v-products') loadVendorProducts();
 }
 
-async function loadVendorProducts() {
-  if (!currentSeller) return;
-  const sellers = await dbQuery(`SELECT * FROM sellers WHERE user_id='${currentSeller.id}'`);
-  if (!sellers.length) return;
-  const products = await dbQuery(`SELECT * FROM products WHERE seller_id='${sellers[0].id}' AND is_active=1`);
-  document.getElementById('v-nb-products').textContent = products.length;
-  const grid = document.getElementById('v-products-grid');
-  if (!products.length) { grid.innerHTML = '<div style="color:#94a3b8;padding:20px;grid-column:1/-1">Aucun produit. Ajoutez votre premier produit !</div>'; return; }
-  grid.innerHTML = products.map(p => `
+async function loadVendorProducts(){
+  if(!currentSellerId)return;
+  const products=await sbGet('products',`seller_id=eq.${currentSellerId}&is_active=eq.true&order=created_at.desc`);
+  const list=Array.isArray(products)?products:[];
+  document.getElementById('v-nb-products').textContent=list.length;
+  const grid=document.getElementById('v-products-grid');
+  if(!list.length){grid.innerHTML='<div style="color:#94a3b8;padding:20px;grid-column:1/-1">Aucun produit. Ajoutez votre premier produit !</div>';return;}
+  grid.innerHTML=list.map(p=>`
     <div style="background:#1e293b;border-radius:13px;overflow:hidden">
       <div style="height:130px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden">
-        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
+        ${p.image_url?`<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">`:'🛍️'}
       </div>
       <div style="padding:12px">
         <div style="color:white;font-weight:700;font-size:13px;margin-bottom:4px">${p.name}</div>
-        <div style="color:#a78bfa;font-weight:700;font-size:13px">${parseFloat(p.price).toLocaleString()} XOF</div>
+        <div style="color:#a78bfa;font-weight:700;font-size:12px;margin-bottom:8px">${parseFloat(p.price).toLocaleString()} XOF</div>
+        <div style="color:#94a3b8;font-size:11px">Stock: ${p.stock||0}</div>
       </div>
     </div>`).join('');
 }
 
-async function loadCatsVendor() {
-  const cats = await dbQuery("SELECT * FROM categories WHERE is_active=1");
-  const sel = document.getElementById('vp-cat');
-  sel.innerHTML = '<option value="">Choisir...</option>' + cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+async function loadCatsVendor(){
+  const cats=await sbGet('categories','is_active=eq.true&order=name');
+  const sel=document.getElementById('vp-cat');
+  const list=Array.isArray(cats)?cats:[];
+  sel.innerHTML='<option value="">Choisir...</option>'+list.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
 }
 
-function vPreviewImg(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('v-img-preview').innerHTML = `<img src="${e.target.result}" style="max-height:150px;border-radius:8px;max-width:100%">`;
-    window._vImgData = e.target.result;
+function vPreviewImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('v-img-preview').innerHTML=`<img src="${e.target.result}" style="max-height:150px;border-radius:8px;max-width:100%">`;
+    window._vImgData=e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-async function vSaveProduct() {
-  if (!currentSeller) return;
-  const name = document.getElementById('vp-name').value;
-  const price = document.getElementById('vp-price').value;
-  if (!name || !price) { showToast('Nom et prix requis !'); return; }
-  const sellers = await dbQuery(`SELECT * FROM sellers WHERE user_id='${currentSeller.id}'`);
-  const sellerId = sellers.length ? sellers[0].id : 'unknown';
-  const pid = 'prd_' + Date.now();
-  const slug = name.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-  const cat = document.getElementById('vp-cat').value;
-  const stock = document.getElementById('vp-stock').value || 0;
-  const desc = document.getElementById('vp-desc').value;
-  await dbExec(`INSERT INTO products (id,seller_id,category_id,name,slug,description,price,compare_price,stock,is_active,is_featured,image_url,created_at,updated_at) VALUES ('${pid}','${sellerId}','${cat||'cat_001'}','${name.replace(/'/g,"\\'")}','${slug}','${desc.replace(/'/g,"\\'")}',${price},NULL,${stock},1,0,'',datetime('now'),datetime('now'))`);
-  showToast('Produit publie avec succes !', 'success');
-  document.getElementById('vp-name').value = '';
-  document.getElementById('vp-price').value = '';
-  document.getElementById('vp-desc').value = '';
+async function vSaveProduct(){
+  if(!currentSellerId){showToast('Erreur: non connecte');return;}
+  const name=document.getElementById('vp-name').value.trim();
+  const price=document.getElementById('vp-price').value;
+  if(!name||!price){showToast('Nom et prix requis !');return;}
+  const data={
+    name,
+    slug:name.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'').substring(0,80),
+    description:document.getElementById('vp-desc').value,
+    price:parseFloat(price),
+    stock:parseInt(document.getElementById('vp-stock').value)||1,
+    category_id:document.getElementById('vp-cat').value||null,
+    seller_id:currentSellerId,
+    is_active:true,
+    is_featured:false,
+    image_url:''
+  };
+  await sbPost('products',data);
+  showToast('Produit publie !','success');
+  document.getElementById('vp-name').value='';
+  document.getElementById('vp-price').value='';
+  document.getElementById('vp-desc').value='';
   loadVendorProducts();
 }
 </script>
 </body>
-</html>
+  </html>
+  
+                                                                    </html>
