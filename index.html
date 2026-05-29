@@ -2,264 +2,222 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Test Upload - MAM Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="j2sAgspQ0q2Bp1h6NTBg9kTs3ymiBjw0cPZ_rhhQRuc" />
+    <title>Nasma Shop | Boutique Intelligente & Yaourts à Niamey</title>
+    <meta name="description" content="Bienvenue chez Nasma Shop à Tahoua. Découvrez nos yaourts onctueux et nos produits. Discutez en direct avec Nasma, notre IA conseillère.">
+    <meta name="keywords" content="Nasma Shop, Niamey, Niger, Yaourt, Boutique en ligne, IA Niger, Tahoua">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: system-ui, sans-serif;
-            background: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            background: #1e293b;
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        h1 {
-            color: white;
-            margin-bottom: 30px;
-        }
-        .preview {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            background: #0f172a;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 2px dashed #334155;
-        }
-        .preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .preview span {
-            color: #64748b;
-            font-size: 48px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            color: white;
-            margin: 10px 0;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background: #2563eb;
-        }
-        button:disabled {
-            background: #64748b;
-            cursor: not-allowed;
-        }
-        .status {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
-        }
-        .success {
-            background: #10b98120;
-            color: #10b981;
-            border: 1px solid #10b981;
-        }
-        .error {
-            background: #ef444420;
-            color: #ef4444;
-            border: 1px solid #ef4444;
-        }
-        .loading {
-            background: #3b82f620;
-            color: #3b82f6;
-        }
-        .url-box {
-            margin-top: 20px;
-            padding: 12px;
-            background: #0f172a;
-            border-radius: 10px;
-            word-break: break-all;
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        .copy-btn {
-            background: #3b82f6;
-            padding: 8px 16px;
-            margin-top: 10px;
-            width: auto;
-            display: inline-block;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .product-card { transition: transform 0.3s ease; }
+        .product-card:active { transform: scale(0.98); }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        #chat-box::-webkit-scrollbar { width: 4px; }
+        #chat-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>📸 Test Upload Photo</h1>
+<body class="bg-gray-50 text-[#1a3a5f] pb-20">
+
+    <header class="p-6 text-center bg-white border-b border-gray-100 flex flex-col items-center sticky top-0 z-50 glass">
+        <img src="https://i.ibb.co/LXzBrqcM/image.png" alt="Logo Nasma Shop" class="h-16 mb-2 object-contain">
+        <h1 class="text-2xl font-black tracking-tighter italic uppercase text-blue-900">NASMA SHOP</h1>
+        <p class="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-bold">La saveur Unique</p>
+    </header>
+
+    <main class="p-6 max-w-lg mx-auto space-y-12">
         
-        <div class="preview" id="preview">
-            <span>🖼️</span>
+        <div class="relative h-44 rounded-[40px] overflow-hidden shadow-2xl bg-gradient-to-br from-blue-700 to-blue-900 flex items-center p-8 text-white">
+            <div class="relative z-10">
+                <h2 class="text-3xl font-black italic leading-tight">LE GOÛT DU<br>NIGER 🍦</h2>
+                <p class="text-[10px] uppercase font-bold opacity-70 mt-3 tracking-widest">De la bonne qualité & Livraison Partout</p>
+            </div>
+            <div class="absolute right-[-20px] bottom-[-20px] opacity-10 text-[150px]">✨</div>
         </div>
-        
-        <input type="file" id="imageInput" accept="image/*">
-        <button id="uploadBtn">⬆️ Upload vers Supabase</button>
-        
-        <div id="status"></div>
-        <div id="urlResult" class="url-box" style="display:none;"></div>
+
+        <section id="notre-carte">
+            <div class="flex justify-between items-end mb-6">
+                <h3 class="text-xl font-black italic uppercase tracking-tighter">Nos Délices</h3>
+                <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Niamey</span>
+            </div>
+            <div id="grille-produits" class="grid grid-cols-1 gap-8">
+                <p class="text-center text-gray-400 italic py-10">Préparation de vos délices... ⏳</p>
+            </div>
+        </section>
+
+        <section id="a-propos" class="bg-blue-900 text-white rounded-[40px] p-8 shadow-xl">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-2xl">✨</span>
+                <h3 class="text-lg font-black italic uppercase">À propos de nous</h3>
+            </div>
+            <p class="text-sm leading-relaxed opacity-90 font-medium">
+                Bienvenue chez <span class="font-bold text-blue-300">Nasma Shop</span>. Nous croyons que la fraîcheur est un droit, pas un luxe. 
+                Basés à Niamey, nous confectionnons chaque jour des yaourts onctueux, des jus naturels et des pâtisseries avec des ingrédients de premier choix.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3">
+                <div class="bg-blue-800 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest">💯 100% Naturel</div>
+                <div class="bg-blue-800 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest">🚀 Livraison Rapide</div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-10 mb-28 p-8 text-center border-t border-gray-100">
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-4 font-bold">
+            &copy; 2026 - by Ouzaif
+        </p>
+        <a href="https://wa.me/22787662430" 
+           class="inline-block opacity-10 hover:opacity-100 transition-all grayscale hover:grayscale-0 p-3 bg-gray-100 rounded-full">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="Contact" class="w-5 h-5 mx-auto opacity-60">
+        </a>
+    </footer>
+
+    <!-- ✅ PANIER FLOTTANT -->
+    <div id="panier-flottant" class="fixed bottom-24 right-6 z-40 hidden max-w-[80vw]">
+        <div class="bg-white p-4 rounded-[32px] shadow-2xl border-4 border-green-500">
+            <h4 class="font-black text-xs uppercase mb-2 text-blue-900">Panier :</h4>
+            <div id="liste-panier" class="text-sm font-bold mb-3 space-y-1 text-blue-900"></div>
+            <button onclick="commanderPanier()" class="w-full bg-green-600 text-white py-3 rounded-xl font-black uppercase text-xs">Commander WhatsApp 🚀</button>
+        </div>
+    </div>
+
+    <!-- Bouton IA -->
+    <button onclick="ouvrirIA()" class="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 rounded-full shadow-2xl flex items-center justify-center animate-bounce z-40 border-4 border-white">
+        <span class="text-2xl">😊</span>
+    </button>
+
+    <!-- Modal IA -->
+    <div id="modal-ia" class="hidden fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-[60] backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-md rounded-[32px] p-6 shadow-2xl flex flex-col h-[80vh] relative">
+            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">🍦</div>
+                    <div>
+                        <h3 class="font-black italic text-lg text-blue-900">Nasma IA</h3>
+                        <p class="text-[9px] text-blue-500 font-bold uppercase tracking-widest">Conseillère en ligne</p>
+                    </div>
+                </div>
+                <button onclick="fermerIA()" class="text-gray-300 text-3xl hover:text-red-500">&times;</button>
+            </div>
+            <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 p-2 text-sm bg-gray-50/50 rounded-2xl">
+                <div class="bg-blue-600 text-white p-4 rounded-2xl rounded-tl-none mr-10 shadow-md">
+                    Barka ! Je suis Nasma. Comment puis-je vous aider ? 😊
+                </div>
+            </div>
+            <div class="mt-4 flex gap-2 bg-white p-2 rounded-2xl border-2 border-blue-50 shadow-inner">
+                <input type="text" id="user-input" onkeypress="handleKey(event)" placeholder="Votre message..." class="flex-1 p-3 bg-transparent outline-none text-sm font-medium">
+                <button onclick="envoyerMessage()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase shadow-lg active:scale-95 transition-all">OK</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Configuration Supabase
-        const SUPABASE_URL = 'https://rqoaclfelpezlbbnjwrl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        let selectedFile = null;
-        
-        // Récupérer les éléments
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const statusDiv = document.getElementById('status');
-        const urlResult = document.getElementById('urlResult');
-        
-        // Preview de l'image
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            selectedFile = file;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-            };
-            reader.readAsDataURL(file);
-            
-            // Cacher le résultat précédent
-            urlResult.style.display = 'none';
-            statusDiv.innerHTML = '';
-        });
-        
-        // Upload
-        uploadBtn.addEventListener('click', async function() {
-            if (!selectedFile) {
-                showStatus('❌ Sélectionnez une image d\'abord', 'error');
-                return;
-            }
-            
-            // Générer un nom unique
-            const timestamp = Date.now();
-            const fileName = `uploads/test_${timestamp}_${selectedFile.name}`;
-            
-            showStatus('⏳ Upload en cours...', 'loading');
-            uploadBtn.disabled = true;
-            
-            try {
-                // Upload vers Supabase Storage
-                const { error: uploadError } = await supabase.storage
-                    .from('product-images')
-                    .upload(fileName, selectedFile);
-                
-                if (uploadError) {
-                    if (uploadError.message.includes('bucket')) {
-                        showStatus('❌ Le bucket "product-images" n\'existe pas. Créez-le dans Supabase Storage d\'abord.', 'error');
-                    } else {
-                        showStatus('❌ Erreur: ' + uploadError.message, 'error');
-                    }
-                    uploadBtn.disabled = false;
-                    return;
-                }
-                
-                // Obtenir l'URL publique
-                const { data } = supabase.storage
-                    .from('product-images')
-                    .getPublicUrl(fileName);
-                
-                const publicUrl = data.publicUrl;
-                
-                // Afficher le succès
-                showStatus('✅ Upload réussi !', 'success');
-                urlResult.style.display = 'block';
-                urlResult.innerHTML = `
-                    <strong>URL publique :</strong><br>
-                    <a href="${publicUrl}" target="_blank" style="color:#3b82f6;">${publicUrl}</a>
-                    <br><br>
-                    <button class="copy-btn" onclick="copyToClipboard('${publicUrl}')">📋 Copier URL</button>
-                `;
-                
-                console.log('URL:', publicUrl);
-                
-                // Réinitialiser
-                selectedFile = null;
-                imageInput.value = '';
-                preview.innerHTML = '<span>🖼️</span>';
-                
-            } catch (error) {
-                showStatus('❌ Erreur: ' + error.message, 'error');
-            } finally {
-                uploadBtn.disabled = false;
-            }
-        });
-        
-        function showStatus(message, type) {
-            statusDiv.className = `status ${type}`;
-            statusDiv.innerHTML = message;
+        const SB_URL = 'https://rqoaclfelpezlbbnjwrl.supabase.co';
+        const SB_KEY = 'sb_publishable_DkkNbLwrx_k_JItaGhYzgw_JBWeflei';
+        const WHATSAPP_NUM = '22788198822';
+
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        // ✅ LOGIQUE PANIER
+        let panier = JSON.parse(localStorage.getItem('panier')) || [];
+
+        function ajouterAuPanier(titre) {
+            panier.push(titre);
+            localStorage.setItem('panier', JSON.stringify(panier));
+            miseAJourUI();
         }
-        
-        // Fonction copy globale
-        window.copyToClipboard = function(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                showStatus('✅ URL copiée dans le presse-papier', 'success');
-            }).catch(function() {
-                showStatus('❌ Erreur lors de la copie', 'error');
-            });
-        };
-        
-        // Test de connexion au chargement
-        async function testConnection() {
-            showStatus('🔌 Test de connexion à Supabase...', 'loading');
+
+        function supprimerDuPanier(index) {
+            panier.splice(index, 1);
+            localStorage.setItem('panier', JSON.stringify(panier));
+            miseAJourUI();
+        }
+
+        function miseAJourUI() {
+            const liste = document.getElementById('liste-panier');
+            liste.innerHTML = panier.map((p, i) => `
+                <div class="flex justify-between items-center bg-gray-100 px-2 py-1 rounded">
+                    <span>${p}</span>
+                    <button onclick="supprimerDuPanier(${i})" class="text-red-500 font-black ml-2">×</button>
+                </div>
+            `).join('');
+            document.getElementById('panier-flottant').classList.toggle('hidden', panier.length === 0);
+        }
+
+        function commanderPanier() {
+            window.open(`https://wa.me/${WHATSAPP_NUM}?text=Bonjour, je commande : ${panier.join(', ')}`);
+        }
+
+        // ✅ CHARGEMENT PRODUITS avec bouton panier
+        async function chargerProduits() {
+            const container = document.getElementById('grille-produits');
             try {
-                const { data, error } = await supabase.storage.listBuckets();
-                if (error) {
-                    showStatus('⚠️ Connecté mais vérifiez le bucket "product-images"', 'error');
-                } else {
-                    const bucketExists = data.some(b => b.name === 'product-images');
-                    if (bucketExists) {
-                        showStatus('✅ Connexion OK - Bucket "product-images" trouvé', 'success');
-                    } else {
-                        showStatus('⚠️ Connecté mais le bucket "product-images" n\'existe pas. Créez-le dans Storage.', 'error');
-                    }
-                }
-            } catch (error) {
-                showStatus('❌ Erreur de connexion: ' + error.message, 'error');
+                const { data: articles, error } = await sb.from('articles').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+                container.innerHTML = articles.map(a => `
+                    <div class="product-card bg-white rounded-[40px] overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative">
+                            <img src="${a.image_url}" class="w-full h-80 object-cover">
+                            <div class="absolute top-6 right-6 bg-white/95 px-5 py-2 rounded-full font-black text-sm shadow-xl text-blue-900 border border-blue-50">${a.prix} CFA</div>
+                            ${a.remise_pct > 0 ? `<div class="absolute top-6 left-6 bg-red-500 text-white px-4 py-2 rounded-full font-black text-[10px] uppercase animate-pulse">-${a.remise_pct}%</div>` : ''}
+                        </div>
+                        <div class="p-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="text-2xl font-black text-blue-900 leading-tight">${a.titre}</h2>
+                                    <p class="text-[10px] text-blue-500 font-bold uppercase tracking-[0.2em] mt-1">${a.categorie || 'FRAÎCHEUR'}</p>
+                                </div>
+                                <!-- ✅ Bouton Ajouter au Panier -->
+                                <button onclick="ajouterAuPanier('${a.titre}')" class="bg-blue-900 px-5 py-3 rounded-[24px] shadow-xl hover:bg-blue-700 transition-colors animate-pulse flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    <span class="text-white font-black text-xs uppercase tracking-wider">Acheter</span>
+                                </button>
+                            </div>
+                            <p class="text-gray-500 text-xs leading-relaxed italic line-clamp-2">${a.description || 'Délicatesse fraîchement préparée.'}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { 
+                container.innerHTML = "<p class='text-center text-red-400'>Erreur de chargement.</p>"; 
             }
         }
-        
-        testConnection();
+
+        function ouvrirIA() { document.getElementById('modal-ia').classList.remove('hidden'); }
+        function fermerIA() { document.getElementById('modal-ia').classList.add('hidden'); }
+        function handleKey(e) { if(e.key === "Enter") envoyerMessage(); }
+
+        async function envoyerMessage() {
+            const input = document.getElementById('user-input');
+            const box = document.getElementById('chat-box');
+            const msg = input.value.trim().toLowerCase();
+            if(!msg) return;
+            box.innerHTML += `<div class="bg-white p-4 rounded-2xl rounded-tr-none ml-10 text-right shadow-sm border border-gray-100 font-medium">${msg}</div>`;
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+
+            const { data } = await sb.from('ia_connaissances').select('*');
+            let reponseTrouvee = "Désolée, je n'ai pas cette info. Contactez-nous sur WhatsApp ! 😊";
+            if(data) {
+                for (let c of data) {
+                    let declencheur = (c.declencheur || c.instruction || "").toLowerCase();
+                    if (declencheur && msg.includes(declencheur)) {
+                        reponseTrouvee = c.reponse || c.instruction;
+                        break;
+                    }
+                }
+            }
+            setTimeout(() => {
+                box.innerHTML += `<div class="bg-blue-100 p-4 rounded-2xl rounded-tl-none mr-10 shadow-md border border-blue-200">${reponseTrouvee}</div>`;
+                box.scrollTop = box.scrollHeight;
+            }, 600);
+        }
+
+        chargerProduits();
+        miseAJourUI(); // Restaure le panier au chargement
     </script>
+
+    <script defer src="/_vercel/insights/script.js"></script>
 </body>
-</html>
+    </html>
