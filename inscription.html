@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inscription - MAM Shop</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><div class="logo-icon">M</div>MAM Shop</a>
+    <div class="nav-links"><a href="index.html">Accueil</a><a href="boutique.html">Boutique</a></div>
+  </div>
+</nav>
+
+<div style="max-width:480px;margin:48px auto;padding:0 20px">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:52px;margin-bottom:12px">✨</div>
+    <h1 style="font-size:26px;font-weight:800;margin-bottom:6px">Creer un compte</h1>
+    <p style="color:#64748b;font-size:14px">Rejoignez la communaute MAM Shop</p>
+  </div>
+
+  <div style="background:white;padding:28px;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Nom complet *</label>
+      <input id="r-name" placeholder="Votre nom et prenom" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Email *</label>
+      <input id="r-email" type="email" placeholder="votre@email.com" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Telephone</label>
+      <input id="r-phone" type="tel" placeholder="+227 XX XX XX XX" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px">Mot de passe *</label>
+      <input id="r-pass" type="password" placeholder="Minimum 6 caracteres" style="width:100%;padding:11px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none">
+    </div>
+    <button onclick="doRegister()" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:11px;font-weight:800;font-size:15px;cursor:pointer">
+      Creer mon compte
+    </button>
+    <div style="text-align:center;margin-top:16px;font-size:14px;color:#64748b">
+      Deja un compte ? <a href="compte.html" style="color:#2563eb;font-weight:600">Se connecter</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom" style="padding:20px">© 2026 MAM Shop - Tous droits reserves</div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+function doRegister(){
+  const name=document.getElementById('r-name').value;
+  const email=document.getElementById('r-email').value;
+  if(!name||!email){showToast('Nom et email requis !');return;}
+  showToast('Compte cree avec succes !','success');
+  setTimeout(()=>{location.href='compte.html';},2000);
+}
+</script>
+</body>
+</html>
