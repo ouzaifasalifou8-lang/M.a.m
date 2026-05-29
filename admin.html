@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin - MAM Shop</title>
 <style>
-  /* Styles */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #0f172a; }
   
+  /* Login */
   .login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
   .login-box { background: #1e293b; padding: 32px 28px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid #334155; }
+  .login-box input { width: 100%; padding: 12px 15px; border-radius: 9px; border: none; margin-bottom: 14px; font-size: 15px; outline: none; background: #0f172a; color: white; }
+  .login-box button { width: 100%; padding: 13px; background: #2563eb; color: white; border: none; border-radius: 9px; font-weight: 700; font-size: 15px; cursor: pointer; }
   
+  /* Admin Layout */
   .admin-layout { display: flex; min-height: 100vh; }
   .sidebar { width: 260px; background: #0f172a; border-right: 1px solid #1e293b; position: fixed; height: 100vh; overflow-y: auto; }
   .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #1e293b; }
@@ -37,7 +40,7 @@
   .form-box { background: #1e293b; border-radius: 20px; padding: 24px; max-width: 700px; }
   .form-group { margin-bottom: 18px; }
   .form-group label { display: block; color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; outline: none; transition: border 0.2s; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; outline: none; }
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #3b82f6; }
   
   .upload-zone { background: #0f172a; border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
@@ -47,28 +50,42 @@
   .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
   .badge-green { background: #065f46; color: #34d399; }
   
-  .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 12px; font-size: 13px; z-index: 9999; border-left: 4px solid #3b82f6; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .product-card { background: #1e293b; border-radius: 12px; overflow: hidden; }
+  .product-card .product-img { height: 140px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+  .product-card .product-info { padding: 12px; }
+  .product-card .product-name { color: white; font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .product-card .product-price { color: #3b82f6; font-weight: 700; font-size: 14px; }
+  .product-card button { width: 100%; margin-top: 8px; padding: 6px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 12px; font-size: 13px; z-index: 9999; border-left: 4px solid #3b82f6; }
   .toast.success { border-left-color: #10b981; }
   .toast.error { border-left-color: #ef4444; }
   
-  .loading { display: inline-block; width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid white; border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   
-  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  @media (max-width: 768px) {
+    .sidebar { width: 200px; }
+    .admin-content { margin-left: 200px; padding: 16px; }
+  }
 </style>
 </head>
 <body>
 
+<!-- Login Screen -->
 <div id="login-screen" class="login-page">
   <div class="login-box">
     <div style="font-size:42px;margin-bottom:14px">🔐</div>
     <h2 style="color:white;font-size:20px;font-weight:800;margin-bottom:22px">Admin MAM Shop</h2>
-    <input id="admin-pass" type="password" placeholder="Mot de passe" style="width:100%;padding:12px 15px;border-radius:9px;border:none;margin-bottom:14px;font-size:15px;outline:none">
-    <button id="login-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer">Connexion</button>
+    <input id="admin-pass" type="password" placeholder="Mot de passe">
+    <button id="login-btn">Connexion</button>
     <p style="color:#94a3b8;font-size:12px;margin-top:14px">Accès réservé à l'administrateur</p>
   </div>
 </div>
 
+<!-- Admin Screen -->
 <div id="admin-screen" class="admin-layout" style="display:none">
   <div class="sidebar">
     <div class="sidebar-logo">
@@ -79,10 +96,6 @@
     <button class="sidebar-btn" data-tab="products">🛍️ Produits</button>
     <button class="sidebar-btn" data-tab="add-product">➕ Ajouter produit</button>
     <button class="sidebar-btn" data-tab="categories">📂 Catégories</button>
-    <button class="sidebar-btn" data-tab="services">📡 Services</button>
-    <button class="sidebar-btn" data-tab="sellers">🏪 Vendeurs</button>
-    <button class="sidebar-btn" data-tab="orders">📦 Commandes</button>
-    <button class="sidebar-btn" data-tab="settings">⚙️ Paramètres</button>
     <div style="padding:16px 20px;position:absolute;bottom:0;width:100%;border-top:1px solid #334155">
       <a href="index.html" style="color:#94a3b8;font-size:13px">Voir le site →</a><br>
       <button id="logout-btn" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;margin-top:6px">Déconnexion</button>
@@ -112,9 +125,9 @@
     <div id="tab-products" class="tab-content" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div class="admin-title" style="margin:0">Produits</div>
-        <button onclick="showTab('add-product')" style="background:#2563eb;color:white;padding:10px 18px;border-radius:9px;font-weight:700;border:none;cursor:pointer">+ Ajouter</button>
+        <button onclick="showTab('add-product')" style="background:#2563eb;color:white;padding:10px 18px;border-radius:9px;border:none;cursor:pointer">+ Ajouter</button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px" id="admin-products-grid"></div>
+      <div id="admin-products-grid" class="products-grid"></div>
     </div>
 
     <!-- Ajouter produit -->
@@ -126,87 +139,33 @@
           <input id="img-file" type="file" accept="image/*" style="display:none" onchange="previewImg(this)">
         </div>
         <div class="form-group"><label>Nom du produit *</label><input id="p-name" placeholder="Ex: Qamis blanc premium"></div>
-        <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3" placeholder="Description du produit..."></textarea></div>
+        <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3" placeholder="Description..."></textarea></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="form-group"><label>Prix (XOF) *</label><input id="p-price" type="number" placeholder="15000"></div>
-          <div class="form-group"><label>Prix promo (XOF)</label><input id="p-promo" type="number" placeholder="Optionnel"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label>Prix (FCFA) *</label><input id="p-price" type="number" placeholder="15000"></div>
           <div class="form-group"><label>Stock</label><input id="p-stock" type="number" placeholder="100"></div>
-          <div class="form-group"><label>Catégorie</label><select id="p-cat"><option value="">Choisir...</option></select></div>
         </div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
             <input type="checkbox" id="p-featured" style="width:auto"> Produit vedette
           </label>
         </div>
-        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">Enregistrer le produit</button>
+        <button id="save-product-btn" style="width:100%;padding:13px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:800;cursor:pointer">Enregistrer le produit</button>
       </div>
-  </div>
-  <!-- Catégories -->
+    </div>
+
+    <!-- Catégories -->
     <div id="tab-categories" class="tab-content" style="display:none">
       <div class="admin-title">Catégories</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
         <div class="form-box">
           <h3 style="color:white;font-weight:700;margin-bottom:16px">Nouvelle catégorie</h3>
           <div class="form-group"><label>Nom *</label><input id="cat-name" placeholder="Ex: Mode & Vêtements"></div>
-          <button id="add-cat-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
+          <button id="add-cat-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;cursor:pointer">Ajouter</button>
         </div>
         <div class="table-box">
           <div style="padding:14px;color:white;font-weight:700">Catégories existantes</div>
-          <table><thead><tr><th>Nom</th><th>Slug</th></tr></thead><tbody id="cats-table"></tbody></table>
+          <table style="width:100%"><thead><tr><th>Nom</th><th>Slug</th></tr></thead><tbody id="cats-table"></tbody></table>
         </div>
-      </div>
-    </div>
-
-    <!-- Services -->
-    <div id="tab-services" class="tab-content" style="display:none">
-      <div class="admin-title">Services - Antennes & Starlink</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
-        <div class="form-box">
-          <h3 style="color:white;font-weight:700;margin-bottom:16px">Ajouter photo galerie</h3>
-          <div class="upload-zone" onclick="document.getElementById('svc-img').click()">
-            <div class="icon">📡</div><p>Cliquer pour uploader</p>
-            <input id="svc-img" type="file" accept="image/*" style="display:none">
-          </div>
-          <div class="form-group" style="margin-top:12px"><label>Légende</label><input id="svc-caption" placeholder="Ex: Installation Starlink"></div>
-          <button id="add-service-img-btn" style="width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
-        </div>
-        <div class="form-box">
-          <h3 style="color:white;font-weight:700;margin-bottom:16px">Ajouter témoignage</h3>
-          <div class="form-group"><label>Nom</label><input id="t-name" placeholder="Ex: Ibrahim M."></div>
-          <div class="form-group"><label>Témoignage</label><textarea id="t-text" rows="3"></textarea></div>
-          <div class="form-group"><label>Note</label><select id="t-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
-          <button id="add-testimonial-btn" style="width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:9px;font-weight:700;cursor:pointer">Ajouter</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Vendeurs -->
-    <div id="tab-sellers" class="tab-content" style="display:none">
-      <div class="admin-title">Vendeurs inscrits</div>
-      <div class="table-box">
-        <table><thead><tr><th>Boutique</th><th>Email</th><th>Note</th><th>Ventes</th><th>Statut</th></tr></thead><tbody id="sellers-table"></tbody></table>
-      </div>
-    </div>
-
-    <!-- Commandes -->
-    <div id="tab-orders" class="tab-content" style="display:none">
-      <div class="admin-title">Commandes</div>
-      <div class="table-box">
-        <table><thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="orders-table"></tbody></table>
-      </div>
-    </div>
-
-    <!-- Paramètres -->
-    <div id="tab-settings" class="tab-content" style="display:none">
-      <div class="admin-title">Paramètres</div>
-      <div class="form-box">
-        <div class="form-group"><label>Nom du site</label><input id="site-name" value="MAM Shop"></div>
-        <div class="form-group"><label>WhatsApp</label><input id="site-whatsapp" value="+227 98 83 66 01"></div>
-        <div class="form-group"><label>Email</label><input id="site-email" value="mamshop.niger@gmail.com"></div>
-        <div class="form-group"><label>Adresse</label><input id="site-address" value="Tahoua, Niger"></div>
-        <button id="save-settings-btn" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;cursor:pointer">Sauvegarder</button>
       </div>
     </div>
   </div>
@@ -217,379 +176,301 @@
 const TURSO_URL = 'https://mam-ouzaif.aws-eu-west-1.turso.io';
 const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3Nzk5MjQ3MzgsImlkIjoiMDE5ZTZiYmYtN2IwMS03ODAwLTgxMjAtMmIxYWU3ZmY5NDhiIiwicmlkIjoiNTc5N2IxMTMtYWJkNS00NzNmLWE0ZDQtMjg3NDczZmYxOTFiIn0.XbdprTEP9RO1kuQywjbrwcLpTjyf5k4avD6UZrG7Ht54tYEq2_yu-dCmdAfdXvJiUC5M55DjeEf-EdwXvsa8CQ';
 
-// Mot de passe admin local
+// Mot de passe admin
 const ADMIN_PASS = 'mamshop2026';
 
-async function queryTurso(sql) {
-  try {
-    const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${TURSO_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        requests: [{ type: "execute", stmt: { sql: sql } }]
-      })
-    });
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    return data.results?.[0]?.response?.result || { rows: [] };
-  } catch (error) {
-    console.error('Turso error:', error);
-    throw error;
-  }
+// Fonction pour exécuter des requêtes SQL
+async function dbQuery(sql) {
+    try {
+        const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${TURSO_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ requests: [{ type: "execute", stmt: { sql: sql } }] })
+        });
+        
+        const data = await response.json();
+        const result = data.results?.[0]?.response?.result;
+        
+        if (!result || !result.rows) return [];
+        
+        const cols = result.cols?.map(c => c.name) || [];
+        const rows = result.rows || [];
+        
+        return rows.map(row => {
+            const obj = {};
+            cols.forEach((col, idx) => {
+                obj[col] = row[idx]?.value;
+            });
+            return obj;
+        });
+    } catch (error) {
+        console.error('Erreur:', error);
+        return [];
+    }
 }
 
+async function dbExec(sql) {
+    try {
+        const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${TURSO_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ requests: [{ type: "execute", stmt: { sql: sql } }] })
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Erreur exec:', error);
+        throw error;
+    }
+}
+
+// Initialisation de la base
 async function initDatabase() {
-  const tables = [
-    `CREATE TABLE IF NOT EXISTS products (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      description TEXT,
-      price REAL NOT NULL,
-      compare_price REAL,
-      stock INTEGER DEFAULT 0,
-      category_id TEXT,
-      is_featured INTEGER DEFAULT 0,
-      image_url TEXT,
-      created_at TEXT
-    )`,
-    `CREATE TABLE IF NOT EXISTS categories (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      slug TEXT UNIQUE
-    )`,
-    `CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      name TEXT,
-      email TEXT,
-      phone TEXT
-    )`,
-    `CREATE TABLE IF NOT EXISTS sellers (
-      id TEXT PRIMARY KEY,
-      shop_name TEXT,
-      email TEXT,
-      rating REAL DEFAULT 0,
-      sales INTEGER DEFAULT 0
-    )`,
-    `CREATE TABLE IF NOT EXISTS orders (
-      id TEXT PRIMARY KEY,
-      user_id TEXT,
-      total REAL,
-      status TEXT,
-      created_at TEXT
-    )`,
-    `CREATE TABLE IF NOT EXISTS galleries (
-      id TEXT PRIMARY KEY,
-      image TEXT,
-      caption TEXT,
-      type TEXT,
-      created_at TEXT
-    )`,
-    `CREATE TABLE IF NOT EXISTS testimonials (
-      id TEXT PRIMARY KEY,
-      name TEXT,
-      text TEXT,
-      rating INTEGER,
-      created_at TEXT
-    )`,
-    `CREATE TABLE IF NOT EXISTS settings (
-      key TEXT PRIMARY KEY,
-      value TEXT
-    )`
-  ];
-  
-  for (const sql of tables) {
-    try { await queryTurso(sql); } catch(e) { console.log('Table exists or error:', e); }
-  }
-  
-  // Insert default categories if empty
-  const cats = await queryTurso("SELECT COUNT(*) as count FROM categories");
-  if (cats.rows?.[0]?.count === 0) {
-    await queryTurso("INSERT INTO categories (id, name, slug) VALUES ('cat_1', 'Mode & Vêtements', 'mode-vetements')");
-    await queryTurso("INSERT INTO categories (id, name, slug) VALUES ('cat_2', 'Accessoires', 'accessoires')");
-    await queryTurso("INSERT INTO categories (id, name, slug) VALUES ('cat_3', 'Électronique', 'electronique')");
-  }
+    // Créer la table products si elle n'existe pas
+    await dbExec(`CREATE TABLE IF NOT EXISTS products (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        price REAL NOT NULL,
+        stock INTEGER DEFAULT 0,
+        category_id TEXT,
+        is_featured INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        image_url TEXT,
+        created_at TEXT
+    )`);
+    
+    // Créer la table categories
+    await dbExec(`CREATE TABLE IF NOT EXISTS categories (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        slug TEXT UNIQUE
+    )`);
+    
+    // Ajouter des catégories par défaut si vide
+    const cats = await dbQuery("SELECT COUNT(*) as count FROM categories");
+    if (cats.length === 0 || cats[0].count == 0) {
+        await dbExec("INSERT INTO categories (id, name, slug) VALUES ('cat_1', 'Mode & Vêtements', 'mode-vetements')");
+        await dbExec("INSERT INTO categories (id, name, slug) VALUES ('cat_2', 'Électronique', 'electronique')");
+        await dbExec("INSERT INTO categories (id, name, slug) VALUES ('cat_3', 'Maison', 'maison')");
+    }
+    
+    // Ajouter des produits par défaut si vide
+    const prods = await dbQuery("SELECT COUNT(*) as count FROM products");
+    if (prods.length === 0 || prods[0].count == 0) {
+        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) VALUES 
+            ('prd_1', 'Qamis Blanc Premium', 'Superbe qamis en coton de haute qualité', 25000, 50, 1, 1, datetime('now'))`);
+        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) VALUES 
+            ('prd_2', 'Boubou Cérémonie', 'Boubou traditionnel pour grandes occasions', 45000, 25, 1, 1, datetime('now'))`);
+        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) VALUES 
+            ('prd_3', 'Montre Connectée', 'Montre intelligente', 35000, 30, 1, 1, datetime('now'))`);
+    }
+    
+    console.log('Base initialisée');
 }
 
-function showToast(message, type = 'error') {
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+// Utilitaires
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
-function checkLogin() {
-  const passInput = document.getElementById('admin-pass');
-  if (passInput.value === ADMIN_PASS) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'flex';
-    initDatabase().then(() => {
-      loadDashboard();
-      showToast('Connexion réussie !', 'success');
-    });
-  } else {
-    showToast('Mot de passe incorrect !');
-  }
-}
+// Connexion
+document.getElementById('login-btn').onclick = async () => {
+    const pass = document.getElementById('admin-pass').value;
+    if (pass === ADMIN_PASS) {
+        await initDatabase();
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'flex';
+        await loadDashboard();
+        showToast('Connexion réussie !', 'success');
+    } else {
+        showToast('Mot de passe incorrect !', 'error');
+    }
+};
 
-function logout() {
-  document.getElementById('admin-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('admin-pass').value = '';
-}
+document.getElementById('admin-pass').onkeypress = (e) => {
+    if (e.key === 'Enter') document.getElementById('login-btn').click();
+};
 
+document.getElementById('logout-btn').onclick = () => {
+    document.getElementById('admin-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-pass').value = '';
+};
+
+// Navigation
 function showTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  const targetTab = document.getElementById(`tab-${tabId}`);
-  if (targetTab) targetTab.style.display = 'block';
-  
-  document.querySelectorAll('.sidebar-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.getAttribute('data-tab') === tabId) btn.classList.add('active');
-  });
-  
-  if (tabId === 'products') loadAdminProducts();
-  if (tabId === 'categories') loadCategories();
-  if (tabId === 'add-product') loadCatsForForm();
-  if (tabId === 'dashboard') loadDashboard();
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById(`tab-${tabId}`).style.display = 'block';
+    document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.tab === tabId) btn.classList.add('active');
+    });
+    
+    if (tabId === 'products') loadProducts();
+    if (tabId === 'categories') loadCategories();
+    if (tabId === 'dashboard') loadDashboard();
 }
 
+document.querySelectorAll('.sidebar-btn').forEach(btn => {
+    btn.onclick = () => showTab(btn.dataset.tab);
+});
+
+// Dashboard
 async function loadDashboard() {
-  const products = await queryTurso("SELECT * FROM products ORDER BY created_at DESC LIMIT 10");
-  const cats = await queryTurso("SELECT COUNT(*) as count FROM categories");
-  const sellers = await queryTurso("SELECT COUNT(*) as count FROM sellers");
-  const users = await queryTurso("SELECT COUNT(*) as count FROM users");
-  
-  document.getElementById('s-products').textContent = products.rows?.length || 0;
-  document.getElementById('s-cats').textContent = cats.rows?.[0]?.count || 0;
-  document.getElementById('s-sellers').textContent = sellers.rows?.[0]?.count || 0;
-  document.getElementById('s-users').textContent = users.rows?.[0]?.count || 0;
-  
-  const tbody = document.getElementById('dash-products');
-  if (products.rows?.length) {
-    tbody.innerHTML = products.rows.map(p => `
-      <tr>
-        <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px">${p.image_url ? '📷' : '🛍️'}</div></td>
-        <td>${p.name}</td>
-        <td style="color:#6366f1">${(p.price || 0).toLocaleString()} XOF</td>
-        <td>${p.stock || 0}</td>
-        <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge">Non</span>'}</td>
-      </tr>`).join('');
-  } else {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Aucun produit</td></tr>';
-  }
-}
-  async function loadAdminProducts() {
-  const result = await queryTurso("SELECT * FROM products ORDER BY created_at DESC");
-  const products = result.rows || [];
-  const grid = document.getElementById('admin-products-grid');
-  
-  if (!products.length) {
-    grid.innerHTML = '<div style="color:#94a3b8;padding:20px">Aucun produit</div>';
-    return;
-  }
-  
-  grid.innerHTML = products.map(p => `
-    <div style="background:#1e293b;border-radius:13px;overflow:hidden">
-      <div style="height:130px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:30px">
-        ${p.image_url ? '📷' : '🛍️'}
-      </div>
-      <div style="padding:12px">
-        <div style="color:white;font-weight:700;font-size:13px">${p.name}</div>
-        <div style="color:#6366f1;font-weight:700;margin:8px 0">${(p.price || 0).toLocaleString()} XOF</div>
-        <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:7px;background:#ef4444;color:white;border:none;border-radius:7px;cursor:pointer">Supprimer</button>
-      </div>
-    </div>`).join('');
+    const products = await dbQuery("SELECT * FROM products WHERE is_active = 1 ORDER BY created_at DESC LIMIT 5");
+    const cats = await dbQuery("SELECT COUNT(*) as count FROM categories");
+    const sellers = await dbQuery("SELECT COUNT(*) as count FROM sellers");
+    const users = await dbQuery("SELECT COUNT(*) as count FROM users");
+    
+    document.getElementById('s-products').textContent = (await dbQuery("SELECT COUNT(*) as count FROM products WHERE is_active=1"))[0]?.count || 0;
+    document.getElementById('s-cats').textContent = cats[0]?.count || 0;
+    document.getElementById('s-sellers').textContent = sellers[0]?.count || 0;
+    document.getElementById('s-users').textContent = users[0]?.count || 0;
+    
+    const tbody = document.getElementById('dash-products');
+    if (products.length > 0) {
+        tbody.innerHTML = products.map(p => `
+            <tr>
+                <td><div style="width:40px;height:40px;background:#334155;border-radius:7px;display:flex;align-items:center;justify-content:center">🛍️</div></td>
+                <td>${p.name}</td>
+                <td style="color:#3b82f6">${(p.price || 0).toLocaleString()} FCFA</td>
+                <td>${p.stock || 0}</td>
+                <td>${p.is_featured ? '<span class="badge badge-green">Oui</span>' : '<span class="badge">Non</span>'}</td>
+            </tr>
+        `).join('');
+    } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Aucun produit</td></tr>';
+    }
 }
 
-async function loadCategories() {
-  const result = await queryTurso("SELECT * FROM categories ORDER BY name");
-  const cats = result.rows || [];
-  document.getElementById('cats-table').innerHTML = cats.map(c =>
-    `<tr><td>${c.name}</td><td style="color:#94a3b8">${c.slug}</td></tr>`).join('');
-}
-
-async function loadCatsForForm() {
-  const result = await queryTurso("SELECT * FROM categories ORDER BY name");
-  const cats = result.rows || [];
-  const sel = document.getElementById('p-cat');
-  sel.innerHTML = '<option value="">Choisir...</option>' + cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-}
-
-function previewImg(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('img-preview').innerHTML = `<img src="${e.target.result}" style="max-height:160px;border-radius:8px;max-width:100%">`;
-    window._imgData = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-async function saveProduct() {
-  const name = document.getElementById('p-name').value.trim();
-  const price = document.getElementById('p-price').value;
-  
-  if (!name || !price) {
-    showToast('Nom et prix requis !');
-    return;
-  }
-  
-  const btn = document.getElementById('save-product-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading"></span> Enregistrement...';
-  
-  try {
-    const id = 'prd_' + Date.now();
-    const desc = document.getElementById('p-desc').value;
-    const promo = document.getElementById('p-promo').value;
-    const stock = document.getElementById('p-stock').value || 0;
-    const catId = document.getElementById('p-cat').value || 'cat_1';
-    const featured = document.getElementById('p-featured').checked ? 1 : 0;
-    const imageUrl = window._imgData || '';
+// Produits
+async function loadProducts() {
+    const products = await dbQuery("SELECT * FROM products WHERE is_active = 1 ORDER BY created_at DESC");
+    const grid = document.getElementById('admin-products-grid');
     
-    const sql = `INSERT INTO products (id, name, description, price, compare_price, stock, category_id, is_featured, image_url, created_at) 
-                 VALUES ('${id}', '${name.replace(/'/g, "''")}', '${desc.replace(/'/g, "''")}', ${price}, ${promo || 'NULL'}, ${stock}, '${catId}', ${featured}, '${imageUrl.replace(/'/g, "''")}', datetime('now'))`;
+    if (products.length === 0) {
+        grid.innerHTML = '<div style="color:#94a3b8;padding:20px;text-align:center">Aucun produit</div>';
+        return;
+    }
     
-    await queryTurso(sql);
-    showToast('Produit enregistré avec succès !', 'success');
-    
-    // Reset form
-    document.getElementById('p-name').value = '';
-    document.getElementById('p-desc').value = '';
-    document.getElementById('p-price').value = '';
-    document.getElementById('p-promo').value = '';
-    document.getElementById('p-stock').value = '';
-    document.getElementById('p-featured').checked = false;
-    document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
-    window._imgData = null;
-    document.getElementById('img-file').value = '';
-    
-    await loadDashboard();
-    await loadAdminProducts();
-  } catch (error) {
-    showToast('Erreur: ' + error.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = 'Enregistrer le produit';
-  }
+    grid.innerHTML = products.map(p => `
+        <div class="product-card">
+            <div class="product-img">${p.image_url ? '📷' : '🛍️'}</div>
+            <div class="product-info">
+                <div class="product-name">${p.name}</div>
+                <div class="product-price">${(p.price || 0).toLocaleString()} FCFA</div>
+                <button onclick="deleteProduct('${p.id}')">🗑 Supprimer</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 async function deleteProduct(id) {
-  if (!confirm('Supprimer ce produit ?')) return;
-  try {
-    await queryTurso(`DELETE FROM products WHERE id = '${id}'`);
+    if (!confirm('Supprimer ce produit ?')) return;
+    await dbExec(`DELETE FROM products WHERE id = '${id}'`);
     showToast('Produit supprimé', 'success');
-    await loadAdminProducts();
+    await loadProducts();
     await loadDashboard();
-  } catch (error) {
-    showToast('Erreur: ' + error.message);
-  }
 }
 
-async function addCategory() {
-  const name = document.getElementById('cat-name').value.trim();
-  if (!name) {
-    showToast('Nom de catégorie requis');
-    return;
-  }
-  
-  const id = 'cat_' + Date.now();
-  const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  
-  try {
-    await queryTurso(`INSERT INTO categories (id, name, slug) VALUES ('${id}', '${name}', '${slug}')`);
-    document.getElementById('cat-name').value = '';
-    showToast('Catégorie ajoutée !', 'success');
-    await loadCategories();
-    await loadCatsForForm();
-  } catch (error) {
-    showToast('Erreur: ' + error.message);
-  }
+// Ajout produit
+let currentImageData = null;
+
+function previewImg(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('img-preview').innerHTML = `<img src="${e.target.result}" style="max-height:160px;border-radius:8px;max-width:100%">`;
+        currentImageData = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
-async function addServiceImage() {
-  const fileInput = document.getElementById('svc-img');
-  const caption = document.getElementById('svc-caption').value;
-  
-  if (!fileInput.files[0]) {
-    showToast('Veuillez sélectionner une image');
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    try {
-      const id = 'gal_' + Date.now();
-      const sql = `INSERT INTO galleries (id, image, caption, type, created_at) 
-                   VALUES ('${id}', '${e.target.result.replace(/'/g, "''")}', '${caption.replace(/'/g, "''")}', 'service', datetime('now'))`;
-      await queryTurso(sql);
-      showToast('Image ajoutée !', 'success');
-      document.getElementById('svc-img').value = '';
-      document.getElementById('svc-caption').value = '';
-    } catch (error) {
-      showToast('Erreur: ' + error.message);
+document.getElementById('save-product-btn').onclick = async () => {
+    const name = document.getElementById('p-name').value.trim();
+    const price = document.getElementById('p-price').value;
+    
+    if (!name || !price) {
+        showToast('Nom et prix requis !', 'error');
+        return;
     }
-  };
-  reader.readAsDataURL(fileInput.files[0]);
+    
+    const btn = document.getElementById('save-product-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span> Enregistrement...';
+    
+    try {
+        const id = 'prod_' + Date.now();
+        const desc = document.getElementById('p-desc').value;
+        const stock = document.getElementById('p-stock').value || 0;
+        const featured = document.getElementById('p-featured').checked ? 1 : 0;
+        
+        await dbExec(`INSERT INTO products (id, name, description, price, stock, is_featured, is_active, created_at) 
+            VALUES ('${id}', '${name.replace(/'/g, "''")}', '${desc.replace(/'/g, "''")}', ${price}, ${stock}, ${featured}, 1, datetime('now'))`);
+        
+        showToast('Produit ajouté avec succès !', 'success');
+        
+        // Reset form
+        document.getElementById('p-name').value = '';
+        document.getElementById('p-desc').value = '';
+        document.getElementById('p-price').value = '';
+        document.getElementById('p-stock').value = '';
+        document.getElementById('p-featured').checked = false;
+        document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour uploader une photo</p>';
+        currentImageData = null;
+        
+        await loadProducts();
+        await loadDashboard();
+    } catch (error) {
+        showToast('Erreur: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Enregistrer le produit';
+    }
+};
+
+// Catégories
+async function loadCategories() {
+    const cats = await dbQuery("SELECT * FROM categories ORDER BY name");
+    document.getElementById('cats-table').innerHTML = cats.map(c => `
+        <tr><td>${c.name}</td><td style="color:#94a3b8">${c.slug}</td></tr>
+    `).join('');
 }
 
-async function addTestimonial() {
-  const name = document.getElementById('t-name').value.trim();
-  const text = document.getElementById('t-text').value.trim();
-  const rating = document.getElementById('t-rating').value;
-  
-  if (!name || !text) {
-    showToast('Nom et témoignage requis');
-    return;
-  }
-  
-  try {
-    const id = 'test_' + Date.now();
-    await queryTurso(`INSERT INTO testimonials (id, name, text, rating, created_at) 
-                     VALUES ('${id}', '${name.replace(/'/g, "''")}', '${text.replace(/'/g, "''")}', ${rating}, datetime('now'))`);
-    showToast('Témoignage ajouté !', 'success');
-    document.getElementById('t-name').value = '';
-    document.getElementById('t-text').value = '';
-  } catch (error) {
-    showToast('Erreur: ' + error.message);
-  }
-}
+document.getElementById('add-cat-btn').onclick = async () => {
+    const name = document.getElementById('cat-name').value.trim();
+    if (!name) {
+        showToast('Nom de catégorie requis', 'error');
+        return;
+    }
+    
+    const id = 'cat_' + Date.now();
+    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    
+    try {
+        await dbExec(`INSERT INTO categories (id, name, slug) VALUES ('${id}', '${name}', '${slug}')`);
+        document.getElementById('cat-name').value = '';
+        showToast('Catégorie ajoutée !', 'success');
+        await loadCategories();
+    } catch (error) {
+        showToast('Erreur: ' + error.message, 'error');
+    }
+};
 
-async function saveSettings() {
-  const settings = {
-    site_name: document.getElementById('site-name').value,
-    whatsapp: document.getElementById('site-whatsapp').value,
-    email: document.getElementById('site-email').value,
-    address: document.getElementById('site-address').value
-  };
-  
-  for (const [key, value] of Object.entries(settings)) {
-    await queryTurso(`INSERT OR REPLACE INTO settings (key, value) VALUES ('${key}', '${value.replace(/'/g, "''")}')`);
-  }
-  showToast('Paramètres sauvegardés !', 'success');
-}
-
-// Event listeners
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('login-btn').addEventListener('click', checkLogin);
-  document.getElementById('admin-pass').addEventListener('keypress', e => e.key === 'Enter' && checkLogin());
-  document.getElementById('logout-btn').addEventListener('click', logout);
-  document.getElementById('save-product-btn').addEventListener('click', saveProduct);
-  document.getElementById('add-cat-btn').addEventListener('click', addCategory);
-  document.getElementById('add-service-img-btn').addEventListener('click', addServiceImage);
-  document.getElementById('add-testimonial-btn').addEventListener('click', addTestimonial);
-  document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
-  
-  document.querySelectorAll('.sidebar-btn').forEach(btn => {
-    btn.addEventListener('click', () => showTab(btn.getAttribute('data-tab')));
-  });
-});
+// Raccourci showTab global
+window.showTab = showTab;
+window.deleteProduct = deleteProduct;
 </script>
 </body>
 </html>
