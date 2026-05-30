@@ -76,13 +76,14 @@ th { background: #0f172a; color: #94a3b8; }
       </div>
       <div class="table-box">
         <div style="padding:16px;color:white;font-weight:700;font-size:15px;border-bottom:1px solid #334155">Derniers produits</div>
-        <table>
+        </table>
           <thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th><th>Vedette</th><th>Action</th></tr></thead>
           <tbody id="dash-products"></tbody>
         </table>
       </div>
     </div>
-     <!-- Produits -->
+
+    <!-- Produits -->
     <div id="tab-products" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div class="admin-title" style="margin:0">Tous les produits</div>
@@ -197,15 +198,13 @@ th { background: #0f172a; color: #94a3b8; }
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- Vendeurs -->
+          <!-- Vendeurs -->
     <div id="tab-sellers" style="display:none">
       <div class="admin-title">Vendeurs inscrits</div>
       <div class="table-box">
         <table>
           <thead><tr><th>Boutique</th><th>Email</th><th>Ville</th><th>Note</th><th>Statut</th><th>Action</th></tr></thead>
-          <tbody id="sellers-table"><tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucun vendeur</td></tr></tbody>
+          <tbody id="sellers-table"><tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucun vendeur</td></tbody>
         </table>
       </div>
     </div>
@@ -216,7 +215,7 @@ th { background: #0f172a; color: #94a3b8; }
       <div class="table-box">
         <table>
           <thead><tr><th>Numero</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead>
-          <tbody id="orders-table"><tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucune commande</td></tr></tbody>
+          <tbody id="orders-table"><tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">Aucune commande</td></tbody>
         </table>
       </div>
     </div>
@@ -250,10 +249,9 @@ th { background: #0f172a; color: #94a3b8; }
 </div>
 
 <script>
-// ===== CONFIG =====
+// ===== CONFIGURATION CORRECTE =====
 const SUPA_URL = "https://rqoaclfelpezlbbnjwrl.supabase.co";
-const SUPA_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxb2FjbGZlbHBlemxiYm5qd3JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMDEwNzksImV4cCI6MjA5NTU3NzA3OX0.2LHr09b1L4wkxAQEartGMUF7BYS1YJ4GGiQpi6MNVUY";
-const SUPA_SECRET = "sb_secret_nIRAauBppOlnFJosHqNokg_9xXd3UWw";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxb2FjbGZlbHBlemxiYm5qd3JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwMDEwNzksImV4cCI6MjA5NTU3NzA3OX0.2LHr09b1L4wkxAQEartGMUF7BYS1YJ4GGiQpi6MNVUY";
 const IMGBB_KEY = "541e798061e29de4fd3310ff37f3f557";
 
 let allProducts = [], allCats = [];
@@ -262,8 +260,16 @@ let uploadedImgUrl = '';
 // ===== HELPERS SUPABASE =====
 async function supaGet(table, params = '') {
   const res = await fetch(`${SUPA_URL}/rest/v1/${table}?${params}`, {
-    headers: { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${SUPA_ANON}` }
+    headers: { 
+      'apikey': SUPA_KEY, 
+      'Authorization': `Bearer ${SUPA_KEY}`,
+      'Content-Type': 'application/json'
+    }
   });
+  if (!res.ok) {
+    console.error(`Erreur ${res.status}:`, await res.text());
+    return [];
+  }
   return res.json();
 }
 
@@ -271,8 +277,8 @@ async function supaPost(table, data) {
   const res = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
     method: 'POST',
     headers: {
-      'apikey': SUPA_ANON,
-      'Authorization': `Bearer ${SUPA_SECRET}`,
+      'apikey': SUPA_KEY,
+      'Authorization': `Bearer ${SUPA_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     },
@@ -285,8 +291,8 @@ async function supaPatch(table, id, data) {
   const res = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
     method: 'PATCH',
     headers: {
-      'apikey': SUPA_ANON,
-      'Authorization': `Bearer ${SUPA_SECRET}`,
+      'apikey': SUPA_KEY,
+      'Authorization': `Bearer ${SUPA_KEY}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
@@ -297,7 +303,10 @@ async function supaPatch(table, id, data) {
 async function supaDelete(table, id) {
   return fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
     method: 'DELETE',
-    headers: { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${SUPA_SECRET}` }
+    headers: { 
+      'apikey': SUPA_KEY, 
+      'Authorization': `Bearer ${SUPA_KEY}`
+    }
   });
 }
 
@@ -401,21 +410,19 @@ async function loadDashboard() {
   if (!Array.isArray(allProducts)) allProducts = [];
   if (!Array.isArray(allCats)) allCats = [];
 
-  document.getElementById('s-products').textContent = allProducts.length;
-  document.getElementById('s-cats').textContent = Array.isArray(allCats) ? allCats.length : 0;
-  document.getElementById('s-sellers').textContent = Array.isArray(sellers) ? sellers.length : 0;
-  document.getElementById('s-testimonials').textContent = Array.isArray(testimonials) ? testimonials.length : 0;
+  document.getElementById('s-products').innerHTML = allProducts.length;
+  document.getElementById('s-cats').innerHTML = Array.isArray(allCats) ? allCats.length : 0;
+  document.getElementById('s-sellers').innerHTML = Array.isArray(sellers) ? sellers.length : 0;
+  document.getElementById('s-testimonials').innerHTML = Array.isArray(testimonials) ? testimonials.length : 0;
 
   document.getElementById('dash-products').innerHTML = allProducts.slice(0, 8).map(p => `
     <tr>
       <td>
         <div style="width:48px;height:48px;background:#334155;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px">
-          ${p.image_url
-            ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='🛍️'">`
-            : '🛍️'}
+          ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='🛍️'">` : '🛍️'}
         </div>
       </td>
-      <td style="font-weight:600;color:white">${p.name}</td>
+      <td style="font-weight:600;color:white">${escapeHtml(p.name)}</td>
       <td style="color:#6366f1;font-weight:700">${parseFloat(p.price).toLocaleString()} XOF</td>
       <td style="color:#94a3b8">${p.stock || 0}</td>
       <td>${p.is_featured ? '<span class="badge badge-green">⭐ Oui</span>' : '<span class="badge" style="background:#334155;color:#64748b">Non</span>'}</td>
@@ -425,9 +432,13 @@ async function loadDashboard() {
           🗑️ Supprimer
         </button>
       </td>
-    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8">Aucun produit</td></tr>';
+    </tr>`).join('');
+  if (allProducts.length === 0) {
+    document.getElementById('dash-products').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8">Aucun produit</td></tr>';
+  }
 }
-  // ===== PRODUITS =====
+
+// ===== PRODUITS =====
 function loadAdminProducts() {
   const grid = document.getElementById('admin-products-grid');
   if (!allProducts.length) {
@@ -437,13 +448,11 @@ function loadAdminProducts() {
   grid.innerHTML = allProducts.map(p => `
     <div style="background:#1e293b;border-radius:13px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.3)">
       <div style="height:150px;background:#334155;display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;position:relative">
-        ${p.image_url
-          ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.innerHTML+='🛍️'">`
-          : '🛍️'}
+        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.innerHTML+='🛍️'">` : '🛍️'}
         ${p.is_featured ? '<div style="position:absolute;top:6px;right:6px;background:#f59e0b;color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">⭐ VEDETTE</div>' : ''}
       </div>
       <div style="padding:13px">
-        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.name}">${p.name}</div>
+        <div style="color:white;font-weight:700;font-size:13px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
         <div style="margin-bottom:5px">
           <span style="color:#6366f1;font-weight:800;font-size:14px">${parseFloat(p.price).toLocaleString()} XOF</span>
           ${p.promo_price ? `<span style="color:#10b981;font-size:11px;margin-left:5px">→ ${parseFloat(p.promo_price).toLocaleString()}</span>` : ''}
@@ -456,28 +465,16 @@ function loadAdminProducts() {
       </div>
     </div>`).join('');
 }
-
-async function deleteProduct(id) {
+  async function deleteProduct(id) {
   if (!confirm('Supprimer ce produit definitivement ?')) return;
   const res = await supaPatch('products', id, { is_active: false });
   if (res.ok) {
-    allProducts = allProducts.filter(p => p.id !== id);
+    allProducts = allProducts.filter(p => p.id != id);
     loadAdminProducts();
-    document.getElementById('s-products').textContent = allProducts.length;
-    document.getElementById('dash-products').innerHTML = allProducts.slice(0, 8).map(p => `
-      <tr>
-        <td><div style="width:48px;height:48px;background:#334155;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px">
-          ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
-        </div></td>
-        <td style="font-weight:600;color:white">${p.name}</td>
-        <td style="color:#6366f1;font-weight:700">${parseFloat(p.price).toLocaleString()} XOF</td>
-        <td style="color:#94a3b8">${p.stock || 0}</td>
-        <td>${p.is_featured ? '<span class="badge badge-green">⭐ Oui</span>' : '<span class="badge" style="background:#334155;color:#64748b">Non</span>'}</td>
-        <td><button onclick="deleteProduct('${p.id}')" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:700">🗑️ Supprimer</button></td>
-      </tr>`).join('');
+    loadDashboard();
     showToast('Produit supprime !', 'success');
   } else {
-    showToast('Erreur suppression !');
+    showToast('Erreur suppression !', 'error');
   }
 }
 
@@ -492,10 +489,10 @@ function previewImg(input) {
     document.getElementById('img-preview').innerHTML = `
       <img src="${e.target.result}" style="max-height:180px;border-radius:10px;max-width:100%;object-fit:contain">
       <p style="color:#94a3b8;font-size:11px;margin-top:6px">${file.name} — ${(file.size/1024).toFixed(0)} KB</p>`;
-    showToast('Upload de la photo en cours...', 'success');
+    showToast('Upload de la photo en cours...', 'info');
     uploadedImgUrl = await uploadToImgBB(file);
     if (uploadedImgUrl) showToast('Photo uploadee avec succes !', 'success');
-    else showToast('Erreur upload, produit sauvegarde sans photo');
+    else showToast('Erreur upload, produit sauvegarde sans photo', 'error');
   };
   reader.readAsDataURL(file);
 }
@@ -504,7 +501,7 @@ function previewImg(input) {
 async function saveProduct() {
   const name = document.getElementById('p-name').value.trim();
   const price = document.getElementById('p-price').value;
-  if (!name || !price) { showToast('Nom et prix sont obligatoires !'); return; }
+  if (!name || !price) { showToast('Nom et prix sont obligatoires !', 'error'); return; }
 
   const btn = document.getElementById('save-btn');
   const msg = document.getElementById('save-msg');
@@ -514,9 +511,7 @@ async function saveProduct() {
   msg.style.display = 'none';
 
   const promo = document.getElementById('p-promo').value;
-  const slug = name.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').substring(0, 80);
+  const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').substring(0, 80);
 
   const productData = {
     name,
@@ -544,7 +539,10 @@ async function saveProduct() {
     msg.style.color = '#6ee7b7';
     msg.textContent = '✅ Produit enregistre avec succes !';
     showToast('Produit ajoute !', 'success');
-    ['p-name','p-desc','p-price','p-promo'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-desc').value = '';
+    document.getElementById('p-price').value = '';
+    document.getElementById('p-promo').value = '';
     document.getElementById('p-stock').value = '1';
     document.getElementById('p-featured').checked = false;
     document.getElementById('p-cat').value = '';
@@ -553,15 +551,15 @@ async function saveProduct() {
     uploadedImgUrl = '';
     allProducts = await supaGet('products', 'is_active=eq.true&order=created_at.desc');
     if (!Array.isArray(allProducts)) allProducts = [];
-    document.getElementById('s-products').textContent = allProducts.length;
+    loadDashboard();
     setTimeout(() => { msg.style.display = 'none'; }, 4000);
   } else {
-    const err = await res.json().catch(() => ({}));
+    const err = await res.text();
     msg.style.display = 'block';
     msg.style.background = '#450a0a';
     msg.style.color = '#fca5a5';
-    msg.textContent = '❌ Erreur: ' + (err.message || err.code || 'Verifiez Supabase');
-    showToast('Erreur enregistrement !');
+    msg.textContent = '❌ Erreur: ' + err.substring(0, 100);
+    showToast('Erreur enregistrement !', 'error');
   }
 }
 
@@ -571,7 +569,7 @@ async function loadCategories() {
   if (!Array.isArray(allCats)) allCats = [];
   document.getElementById('cats-table').innerHTML = allCats.map(c => `
     <tr>
-      <td style="font-weight:600;color:white">${c.name}</td>
+      <td style="font-weight:600;color:white">${escapeHtml(c.name)}</td>
       <td style="color:#64748b;font-size:12px">${c.slug}</td>
       <td>
         <button onclick="deleteCategory('${c.id}')"
@@ -579,20 +577,21 @@ async function loadCategories() {
           Suppr.
         </button>
       </td>
-    </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:16px">Aucune categorie</td></tr>';
+    </tr>`).join('');
+  if (allCats.length === 0) {
+    document.getElementById('cats-table').innerHTML = '<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:16px">Aucune categorie</td></tr>';
+  }
 }
 
 async function loadCatsForForm() {
   if (!allCats.length) allCats = await supaGet('categories', 'is_active=eq.true&order=name');
   const cats = Array.isArray(allCats) ? allCats : [];
-  document.getElementById('p-cat').innerHTML =
-    '<option value="">Choisir une categorie...</option>' +
-    cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('p-cat').innerHTML = '<option value="">Choisir une categorie...</option>' + cats.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
 }
 
 async function addCategory() {
   const name = document.getElementById('cat-name').value.trim();
-  if (!name) { showToast('Nom requis !'); return; }
+  if (!name) { showToast('Nom requis !', 'error'); return; }
   const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const res = await supaPost('categories', { name, slug, is_active: true, sort_order: 0 });
   if (res.ok) {
@@ -600,7 +599,8 @@ async function addCategory() {
     showToast('Categorie ajoutee !', 'success');
     allCats = [];
     loadCategories();
-  } else showToast('Erreur ajout categorie');
+    loadCatsForForm();
+  } else showToast('Erreur ajout categorie', 'error');
 }
 
 async function deleteCategory(id) {
@@ -608,8 +608,10 @@ async function deleteCategory(id) {
   await supaPatch('categories', id, { is_active: false });
   showToast('Supprimee !', 'success');
   loadCategories();
-  }
-  // ===== GALERIE =====
+  loadCatsForForm();
+}
+
+// ===== GALERIE =====
 function previewSvc(input) {
   const file = input.files[0];
   if (!file) return;
@@ -624,7 +626,7 @@ function previewSvc(input) {
 async function addGallery() {
   let imgUrl = '';
   if (window._svcFile) {
-    showToast('Upload galerie en cours...');
+    showToast('Upload galerie en cours...', 'info');
     imgUrl = await uploadSvcToImgBB(window._svcFile);
   }
   const res = await supaPost('portfolio', {
@@ -640,14 +642,14 @@ async function addGallery() {
     document.getElementById('svc-preview').innerHTML = '<div class="icon">📡</div><p>Cliquer pour uploader</p>';
     window._svcFile = null;
     showToast('Photo ajoutee a la galerie !', 'success');
-  } else showToast('Erreur ajout galerie');
+  } else showToast('Erreur ajout galerie', 'error');
 }
 
 // ===== TEMOIGNAGES =====
 async function addTestimonial() {
   const name = document.getElementById('t-name').value;
   const text = document.getElementById('t-text').value;
-  if (!name || !text) { showToast('Nom et temoignage requis !'); return; }
+  if (!name || !text) { showToast('Nom et temoignage requis !', 'error'); return; }
   const res = await supaPost('testimonials', {
     customer_name: name,
     content: text,
@@ -660,7 +662,7 @@ async function addTestimonial() {
     document.getElementById('t-name').value = '';
     document.getElementById('t-text').value = '';
     showToast('Temoignage ajoute !', 'success');
-  } else showToast('Erreur');
+  } else showToast('Erreur', 'error');
 }
 
 async function loadTestimonialsAdmin() {
@@ -668,7 +670,7 @@ async function loadTestimonialsAdmin() {
   const list = Array.isArray(items) ? items : [];
   document.getElementById('testimonials-table').innerHTML = list.length ? list.map(t => `
     <tr>
-      <td style="font-weight:600;color:white">${t.customer_name}</td>
+      <td style="font-weight:600;color:white">${escapeHtml(t.customer_name)}</td>
       <td style="color:#64748b;font-size:12px">${(t.content || '').substring(0, 50)}...</td>
       <td style="color:#f59e0b">${'★'.repeat(t.rating || 5)}</td>
       <td>${t.is_approved ? '<span class="badge badge-green">Publie</span>' : '<span class="badge badge-orange">Cache</span>'}</td>
@@ -704,7 +706,7 @@ async function loadSellers() {
   const list = Array.isArray(sellers) ? sellers : [];
   document.getElementById('sellers-table').innerHTML = list.length ? list.map(s => `
     <tr>
-      <td style="font-weight:600;color:white">${s.shop_name}</td>
+      <td style="font-weight:600;color:white">${escapeHtml(s.shop_name)}</td>
       <td style="color:#64748b;font-size:12px">${s.email || '-'}</td>
       <td style="color:#94a3b8">${s.city || '-'}</td>
       <td style="color:#f59e0b">${'★'.repeat(Math.round(s.rating || 5))}</td>
@@ -776,11 +778,23 @@ function loadSettings() {
   }
 }
 
-// ===== TOAST =====
+// ===== UTILS =====
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.style.borderLeftColor = type === 'error' ? '#ef4444' : '#10b981';
+  if (type === 'error') toast.style.borderLeftColor = '#ef4444';
+  else if (type === 'info') toast.style.borderLeftColor = '#3b82f6';
+  else toast.style.borderLeftColor = '#10b981';
   toast.textContent = message;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
@@ -792,3 +806,4 @@ loadSettings();
 </script>
 </body>
 </html>
+                                                       </div>
