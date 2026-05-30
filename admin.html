@@ -4,11 +4,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin - MAM Shop</title>
-<link rel="stylesheet" href="css/style.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; background: #0f172a; }
+
+.admin-layout { display: flex; min-height: 100vh; }
+.sidebar { width: 280px; background: #0f172a; border-right: 1px solid #1e293b; position: fixed; height: 100vh; overflow-y: auto; }
+.sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #1e293b; }
+.sidebar-logo h2 { color: white; font-size: 20px; }
+.sidebar-logo p { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+.sidebar-btn { width: 100%; padding: 12px 20px; text-align: left; background: none; border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.sidebar-btn:hover { background: #1e293b; }
+.sidebar-btn.active { background: #1e293b; color: #3b82f6; border-left: 3px solid #3b82f6; }
+.admin-content { margin-left: 280px; flex: 1; padding: 24px 32px; }
+.admin-title { font-size: 24px; font-weight: 800; color: white; margin-bottom: 24px; }
+.form-box { background: #1e293b; border-radius: 20px; padding: 24px; max-width: 600px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; color: #cbd5e1; margin-bottom: 8px; font-size: 14px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 14px; }
+.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px; }
+.stat-card { background: #1e293b; border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6; }
+.stat-card .num { font-size: 32px; font-weight: 800; color: white; }
+.stat-card .lbl { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+.table-box { background: #1e293b; border-radius: 16px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #334155; color: #e2e8f0; }
+th { background: #0f172a; color: #94a3b8; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+.badge-green { background: #10b98120; color: #10b981; }
+.badge-orange { background: #f59e0b20; color: #f59e0b; }
+.badge-blue { background: #3b82f620; color: #3b82f6; }
+.upload-zone { border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; background: #0f172a; transition: 0.2s; }
+.upload-zone:hover { border-color: #3b82f6; background: #1e293b; }
+.icon { font-size: 32px; margin-bottom: 8px; }
+.toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 12px 24px; border-radius: 12px; border-left: 4px solid #10b981; color: white; z-index: 9999; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+</style>
 </head>
 <body>
 
-<div id="admin-screen" class="admin-layout" style="display:none">
+<div class="admin-layout">
   <div class="sidebar">
     <div class="sidebar-logo">
       <h2>MAM Shop</h2>
@@ -47,8 +82,7 @@
         </table>
       </div>
     </div>
-
-    <!-- Produits -->
+     <!-- Produits -->
     <div id="tab-products" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div class="admin-title" style="margin:0">Tous les produits</div>
@@ -62,7 +96,6 @@
       <div class="admin-title">Ajouter un produit</div>
       <div class="form-box">
 
-        <!-- Zone upload image -->
         <div style="margin-bottom:16px">
           <label style="color:#94a3b8;font-size:12px;font-weight:600;display:block;margin-bottom:8px">Photo du produit</label>
           <div class="upload-zone" onclick="document.getElementById('img-file').click()" id="upload-zone">
@@ -73,16 +106,12 @@
             </div>
             <input id="img-file" type="file" accept="image/*" style="display:none" onchange="previewImg(this)">
           </div>
-
-          <!-- Barre de progression -->
           <div id="upload-progress" style="display:none;margin-top:10px">
             <div style="background:#334155;border-radius:6px;height:8px;overflow:hidden">
               <div id="upload-bar" style="background:linear-gradient(90deg,#2563eb,#7c3aed);height:100%;width:0%;transition:width .4s;border-radius:6px"></div>
             </div>
             <p id="upload-status" style="color:#94a3b8;font-size:11px;margin-top:6px;text-align:center">Upload en cours...</p>
           </div>
-
-          <!-- URL image finale -->
           <div id="img-url-box" style="display:none;margin-top:8px;padding:8px 12px;background:#334155;border-radius:8px">
             <p style="color:#10b981;font-size:11px;font-weight:600">✅ Image uploadee sur ImgBB !</p>
             <p id="img-url-display" style="color:#94a3b8;font-size:10px;word-break:break-all;margin-top:2px"></p>
@@ -191,6 +220,7 @@
         </table>
       </div>
     </div>
+
     <!-- Temoignages -->
     <div id="tab-testimonials" style="display:none">
       <div class="admin-title">Gestion des temoignages</div>
@@ -206,11 +236,11 @@
     <div id="tab-settings" style="display:none">
       <div class="admin-title">Parametres du site</div>
       <div class="form-box">
-        <div class="form-group"><label>Nom du site</label><input value="MAM Shop"></div>
-        <div class="form-group"><label>Numero WhatsApp</label><input value="+227 98 83 66 01"></div>
-        <div class="form-group"><label>Email</label><input value="mamshop.niger@gmail.com"></div>
-        <div class="form-group"><label>Adresse</label><input value="Tahoua, Niger"></div>
-        <button onclick="showToast('Parametres sauvegardes !','success')" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
+        <div class="form-group"><label>Nom du site</label><input id="site-name" value="MAM Shop"></div>
+        <div class="form-group"><label>Numero WhatsApp</label><input id="site-whatsapp" value="+227 98 83 66 01"></div>
+        <div class="form-group"><label>Email</label><input id="site-email" value="mamshop.niger@gmail.com"></div>
+        <div class="form-group"><label>Adresse</label><input id="site-address" value="Tahoua, Niger"></div>
+        <button onclick="saveSettings()" style="width:100%;padding:13px;background:#10b981;color:white;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer">
           Sauvegarder
         </button>
       </div>
@@ -219,7 +249,6 @@
   </div>
 </div>
 
-<script src="js/api.js"></script>
 <script>
 // ===== CONFIG =====
 const SUPA_URL = "https://rqoaclfelpezlbbnjwrl.supabase.co";
@@ -286,7 +315,6 @@ async function uploadToImgBB(file) {
   status.textContent = 'Lecture du fichier...';
 
   try {
-    // Lire le fichier en base64
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = e => resolve(e.target.result.split(',')[1]);
@@ -297,7 +325,6 @@ async function uploadToImgBB(file) {
     bar.style.width = '40%';
     status.textContent = 'Upload vers ImgBB...';
 
-    // Envoyer a ImgBB
     const formData = new FormData();
     formData.append('key', IMGBB_KEY);
     formData.append('image', base64);
@@ -350,13 +377,6 @@ async function uploadSvcToImgBB(file) {
   return data.success ? data.data.url : '';
 }
 
-// ===== AUTH =====
-function checkLogin() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'flex';
-  loadDashboard();
-}
-
 // ===== TABS =====
 function showTab(id, btn) {
   document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
@@ -407,8 +427,7 @@ async function loadDashboard() {
       </td>
     </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8">Aucun produit</td></tr>';
 }
-
-// ===== PRODUITS =====
+  // ===== PRODUITS =====
 function loadAdminProducts() {
   const grid = document.getElementById('admin-products-grid');
   if (!allProducts.length) {
@@ -445,7 +464,6 @@ async function deleteProduct(id) {
     allProducts = allProducts.filter(p => p.id !== id);
     loadAdminProducts();
     document.getElementById('s-products').textContent = allProducts.length;
-    // Mettre a jour le tableau du dashboard
     document.getElementById('dash-products').innerHTML = allProducts.slice(0, 8).map(p => `
       <tr>
         <td><div style="width:48px;height:48px;background:#334155;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px">
@@ -462,7 +480,8 @@ async function deleteProduct(id) {
     showToast('Erreur suppression !');
   }
 }
-    // ===== PREVIEW IMAGE =====
+
+// ===== PREVIEW IMAGE =====
 function previewImg(input) {
   const file = input.files[0];
   if (!file) return;
@@ -473,7 +492,6 @@ function previewImg(input) {
     document.getElementById('img-preview').innerHTML = `
       <img src="${e.target.result}" style="max-height:180px;border-radius:10px;max-width:100%;object-fit:contain">
       <p style="color:#94a3b8;font-size:11px;margin-top:6px">${file.name} — ${(file.size/1024).toFixed(0)} KB</p>`;
-    // Lancer l'upload automatiquement
     showToast('Upload de la photo en cours...', 'success');
     uploadedImgUrl = await uploadToImgBB(file);
     if (uploadedImgUrl) showToast('Photo uploadee avec succes !', 'success');
@@ -526,7 +544,6 @@ async function saveProduct() {
     msg.style.color = '#6ee7b7';
     msg.textContent = '✅ Produit enregistre avec succes !';
     showToast('Produit ajoute !', 'success');
-    // Reset form
     ['p-name','p-desc','p-price','p-promo'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('p-stock').value = '1';
     document.getElementById('p-featured').checked = false;
@@ -534,7 +551,6 @@ async function saveProduct() {
     document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour choisir une photo</p>';
     document.getElementById('img-url-box').style.display = 'none';
     uploadedImgUrl = '';
-    // Refresh
     allProducts = await supaGet('products', 'is_active=eq.true&order=created_at.desc');
     if (!Array.isArray(allProducts)) allProducts = [];
     document.getElementById('s-products').textContent = allProducts.length;
@@ -592,9 +608,8 @@ async function deleteCategory(id) {
   await supaPatch('categories', id, { is_active: false });
   showToast('Supprimee !', 'success');
   loadCategories();
-}
-
-// ===== GALERIE =====
+  }
+  // ===== GALERIE =====
 function previewSvc(input) {
   const file = input.files[0];
   if (!file) return;
@@ -737,6 +752,43 @@ async function updateOrder(id, status) {
   await supaPatch('orders', id, { status });
   showToast('Statut mis a jour !', 'success');
 }
+
+// ===== SETTINGS =====
+function saveSettings() {
+  const settings = {
+    site_name: document.getElementById('site-name').value,
+    whatsapp: document.getElementById('site-whatsapp').value,
+    email: document.getElementById('site-email').value,
+    address: document.getElementById('site-address').value
+  };
+  localStorage.setItem('mamshop_settings', JSON.stringify(settings));
+  showToast('Parametres sauvegardes !', 'success');
+}
+
+function loadSettings() {
+  const saved = localStorage.getItem('mamshop_settings');
+  if (saved) {
+    const s = JSON.parse(saved);
+    if (document.getElementById('site-name')) document.getElementById('site-name').value = s.site_name || 'MAM Shop';
+    if (document.getElementById('site-whatsapp')) document.getElementById('site-whatsapp').value = s.whatsapp || '+227 98 83 66 01';
+    if (document.getElementById('site-email')) document.getElementById('site-email').value = s.email || 'mamshop.niger@gmail.com';
+    if (document.getElementById('site-address')) document.getElementById('site-address').value = s.address || 'Tahoua, Niger';
+  }
+}
+
+// ===== TOAST =====
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.borderLeftColor = type === 'error' ? '#ef4444' : '#10b981';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ===== INIT =====
+loadDashboard();
+loadSettings();
 </script>
 </body>
 </html>
