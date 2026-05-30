@@ -37,7 +37,7 @@ th { background: #0f172a; color: #94a3b8; }
 .upload-zone { border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; background: #0f172a; transition: 0.2s; }
 .upload-zone:hover { border-color: #3b82f6; background: #1e293b; }
 .icon { font-size: 32px; margin-bottom: 8px; }
-.toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 12px 24px; border-radius: 12px; border-left: 4px solid #10b981; color: white; z-index: 9999; animation: slideIn 0.3s ease; }
+.toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; padding: 12px 24px; border-radius: 12px; border-left: 4px solid #10b981; color: white; z-index: 9999; animation: slideIn 0.3s ease; z-index: 10000; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
@@ -54,12 +54,16 @@ th { background: #0f172a; color: #94a3b8; }
 .btn-edit { background: #3b82f6; color: white; }
 .btn-delete { background: #ef4444; color: white; }
 .btn-save { background: #3b82f6; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 700; font-size: 16px; }
+.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
 .gallery-item { background: #1e293b; border-radius: 12px; overflow: hidden; }
 .gallery-item img { width: 100%; height: 150px; object-fit: cover; }
 .gallery-item .info { padding: 12px; }
 .gallery-item .title { color: white; font-size: 13px; margin-bottom: 8px; }
 .gallery-item button { background: #ef4444; color: white; border: none; padding: 6px; border-radius: 6px; cursor: pointer; width: 100%; }
+.progress-bar { background: #334155; border-radius: 6px; height: 6px; overflow: hidden; margin-top: 10px; }
+.progress-fill { background: linear-gradient(90deg, #3b82f6, #8b5cf6); width: 0%; height: 6px; transition: width 0.3s; border-radius: 6px; }
+.progress-text { color: #94a3b8; font-size: 11px; margin-top: 6px; text-align: center; }
 </style>
 </head>
 <body>
@@ -93,9 +97,7 @@ th { background: #0f172a; color: #94a3b8; }
         <div class="admin-title">📊 Tableau de bord</div>
         <div class="stat-cards" id="stats-container"></div>
         <div class="admin-title" style="font-size:18px;margin-top:20px;">📦 Derniers produits</div>
-        <div class="table-box">
-          <table><thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th><th>Vedette</th><th>Action</th></tr></thead><tbody id="dash-products"></tbody></table>
-        </div>
+        <div class="table-box"><table><thead><tr><th>Photo</th><th>Nom</th><th>Prix</th><th>Stock</th><th>Vedette</th><th>Action</th></tr></thead><tbody id="dash-products"></tbody></table></div>
       </div>
 
       <!-- Produits -->
@@ -111,12 +113,13 @@ th { background: #0f172a; color: #94a3b8; }
       <div id="tab-add-product" class="tab-pane" style="display:none">
         <div class="admin-title" id="form-title">➕ Ajouter un produit</div>
         <div class="form-box">
-          <div class="form-group"><label>📷 Photo</label>
+          <div class="form-group">
+            <label>📷 Photo</label>
             <div class="upload-zone" onclick="document.getElementById('img-file').click()">
               <div id="img-preview"><div class="icon">📸</div><p>Cliquer pour choisir une photo</p></div>
               <input id="img-file" type="file" accept="image/*" style="display:none" onchange="previewProductImage(this)">
             </div>
-            <div id="upload-progress" style="display:none;margin-top:10px"><div style="background:#334155;border-radius:6px;height:6px"><div id="upload-bar" style="background:#3b82f6;width:0%;height:6px;border-radius:6px"></div></div></div>
+            <div id="product-progress" style="display:none"><div class="progress-bar"><div id="product-progress-fill" class="progress-fill"></div></div><div id="product-progress-text" class="progress-text"></div></div>
           </div>
           <div class="form-group"><label>Nom *</label><input id="p-name" placeholder="Nom du produit"></div>
           <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3"></textarea></div>
@@ -140,9 +143,7 @@ th { background: #0f172a; color: #94a3b8; }
             <div class="form-group"><label>Nom</label><input id="cat-name" placeholder="Ex: Électronique"></div>
             <button onclick="addCategory()" style="background:#2563eb;color:white;padding:12px;border:none;border-radius:8px;cursor:pointer;width:100%">➕ Ajouter</button>
           </div>
-          <div class="table-box">
-            <table><thead><tr><th>Nom</th><th>Slug</th><th>Action</th></tr></thead><tbody id="cats-list"></tbody></table>
-          </div>
+          <div class="table-box"><table><thead><tr><th>Nom</th><th>Slug</th><th>Action</th></tr></thead><tbody id="cats-list"></tbody></table></div>
         </div>
       </div>
 
@@ -150,34 +151,30 @@ th { background: #0f172a; color: #94a3b8; }
       <div id="tab-gallery" class="tab-pane" style="display:none">
         <div class="admin-title">📸 Galerie photos</div>
         <div class="form-box" style="margin-bottom:24px">
-          <div class="form-group"><label>Ajouter une photo</label>
+          <div class="form-group">
+            <label>Ajouter une photo</label>
             <div class="upload-zone" onclick="document.getElementById('gallery-file').click()">
               <div id="gallery-preview"><div class="icon">📷</div><p>Cliquer pour choisir une photo</p></div>
               <input id="gallery-file" type="file" accept="image/*" style="display:none" onchange="previewGalleryImage(this)">
             </div>
+            <div id="gallery-progress" style="display:none"><div class="progress-bar"><div id="gallery-progress-fill" class="progress-fill"></div></div><div id="gallery-progress-text" class="progress-text"></div></div>
           </div>
           <div class="form-group"><label>Titre / Légende</label><input id="gallery-title" placeholder="Ex: Installation Starlink"></div>
-          <div class="form-group"><label>Catégorie</label>
-            <select id="gallery-cat"><option value="antennes">Antennes & Starlink</option><option value="installations">Installations</option><option value="evenements">Événements</option></select>
-          </div>
-          <button onclick="addGalleryImage()" style="background:#2563eb;color:white;padding:12px;border:none;border-radius:8px;cursor:pointer;width:100%">📤 Ajouter à la galerie</button>
+          <div class="form-group"><label>Catégorie</label><select id="gallery-cat"><option value="antennes">Antennes & Starlink</option><option value="installations">Installations</option><option value="evenements">Événements</option></select></div>
+          <button onclick="addGalleryImage()" id="gallery-btn" style="background:#2563eb;color:white;padding:12px;border:none;border-radius:8px;cursor:pointer;width:100%">📤 Ajouter à la galerie</button>
         </div>
         <div id="gallery-list" class="gallery-grid"></div>
-      </div>
-
-      <!-- Vendeurs -->
+  </div>
+       <!-- Vendeurs -->
       <div id="tab-sellers" class="tab-pane" style="display:none">
         <div class="admin-title">🏪 Vendeurs inscrits</div>
-        <div class="table-box">
-          <table><thead><tr><th>Boutique</th><th>Email</th><th>Ville</th><th>Note</th><th>Statut</th><th>Action</th></tr></thead><tbody id="sellers-list"></tbody></table>
-        </div>
+        <div class="table-box"><table><thead><tr><th>Boutique</th><th>Email</th><th>Ville</th><th>Note</th><th>Statut</th><th>Action</th></tr></thead><tbody id="sellers-list"></tbody></table></div>
       </div>
-          <!-- Commandes -->
+
+      <!-- Commandes -->
       <div id="tab-orders" class="tab-pane" style="display:none">
         <div class="admin-title">📦 Commandes</div>
-        <div class="table-box">
-          <table><thead><tr><th>N°</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead><tbody id="orders-list"></tbody></table>
-        </div>
+        <div class="table-box"><table><thead><tr><th>N°</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead><tbody id="orders-list"></tbody></table></div>
       </div>
 
       <!-- Témoignages -->
@@ -186,13 +183,11 @@ th { background: #0f172a; color: #94a3b8; }
         <div class="form-box" style="margin-bottom:24px">
           <div class="form-group"><label>Nom client *</label><input id="testi-name" placeholder="Ex: Ibrahim M."></div>
           <div class="form-group"><label>Témoignage *</label><textarea id="testi-text" rows="3" placeholder="Son avis..."></textarea></div>
-          <div class="form-group"><label>Note</label><select id="testi-rating"><option value="5">★★★★★ (5)</option><option value="4">★★★★ (4)</option><option value="3">★★★ (3)</option></select></div>
+          <div class="form-group"><label>Note</label><select id="testi-rating"><option value="5">★★★★★ (5)</option><option value="4">★★★★ (4)</option><option value="3">★★★ (3)</option><option value="2">★★ (2)</option><option value="1">★ (1)</option></select></div>
           <div class="form-group"><label>Ville</label><input id="testi-city" placeholder="Ex: Tahoua"></div>
-          <button onclick="addTestimonial()" style="background:#10b981;color:white;padding:12px;border:none;border-radius:8px;cursor:pointer;width:100%">➕ Ajouter le témoignage</button>
+          <button onclick="addTestimonial()" id="testi-btn" style="background:#10b981;color:white;padding:12px;border:none;border-radius:8px;cursor:pointer;width:100%">➕ Ajouter le témoignage</button>
         </div>
-        <div class="table-box">
-          <table><thead><tr><th>Client</th><th>Témoignage</th><th>Note</th><th>Statut</th><th>Action</th></tr></thead><tbody id="testimonials-list"></tbody></table>
-        </div>
+        <div class="table-box"><table><thead><tr><th>Client</th><th>Témoignage</th><th>Note</th><th>Statut</th><th>Action</th></tr></thead><tbody id="testimonials-list"></tbody></table></div>
       </div>
 
       <!-- Paramètres -->
@@ -218,16 +213,17 @@ const IMGBB_KEY = "541e798061e29de4fd3310ff37f3f557";
 
 let allProducts = [], allCategories = [], allGallery = [], allTestimonials = [], allSellers = [], allOrders = [];
 let currentImageFile = null, currentGalleryFile = null;
-let editMode = false;
-let editProductId = null;
+let editMode = false, editProductId = null;
 
 // Helper Supabase
 async function fetchData(table, params = '') {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-  });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch(e) { return []; }
 }
 
 async function insertData(table, data) {
@@ -253,18 +249,37 @@ async function deleteData(table, id) {
   });
 }
 
-// Upload ImgBB
-async function uploadToImgBB(file) {
+// Upload ImgBB avec progression
+async function uploadToImgBB(file, progressElementId, textElementId) {
+  const progressFill = document.getElementById(progressElementId);
+  const progressText = document.getElementById(textElementId);
+  
+  if (progressFill) progressFill.style.width = '10%';
+  if (progressText) progressText.textContent = 'Lecture du fichier...';
+  
   const base64 = await new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = e => resolve(e.target.result.split(',')[1]);
     reader.readAsDataURL(file);
   });
+  
+  if (progressFill) progressFill.style.width = '30%';
+  if (progressText) progressText.textContent = 'Upload vers ImgBB...';
+  
   const formData = new FormData();
   formData.append('key', IMGBB_KEY);
   formData.append('image', base64);
+  
   const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
   const data = await res.json();
+  
+  if (progressFill) progressFill.style.width = '100%';
+  if (progressText) progressText.textContent = 'Upload terminé !';
+  
+  setTimeout(() => {
+    if (progressFill) progressFill.style.width = '0%';
+  }, 1000);
+  
   return data.success ? data.data.url : null;
 }
 
@@ -277,7 +292,7 @@ function showTab(tabId) {
   
   if (tabId === 'dashboard') loadDashboard();
   if (tabId === 'products') loadProducts();
-  if (tabId === 'categories') loadCategories();
+  if (tabId === 'categories') { loadCategories(); loadCategorySelect(); }
   if (tabId === 'gallery') loadGallery();
   if (tabId === 'sellers') loadSellers();
   if (tabId === 'orders') loadOrders();
@@ -312,9 +327,7 @@ async function loadProducts() {
   allProducts = await fetchData('products', 'is_active=eq.true&order=created_at.desc');
   document.getElementById('products-grid').innerHTML = allProducts.map(p => `
     <div class="product-card">
-      <div class="product-img">
-        ${p.image_url ? `<img src="${p.image_url}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23334155%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22%3E🛍️%3C/text%3E%3C/svg%3E'">` : '<span style="font-size:48px">🛍️</span>'}
-      </div>
+      <div class="product-img">${p.image_url ? `<img src="${p.image_url}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23334155%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22%3E🛍️%3C/text%3E%3C/svg%3E'">` : '<span style="font-size:48px">🛍️</span>'}</div>
       <div class="product-info">
         <div class="product-name">${escapeHtml(p.name)}</div>
         <div class="product-price">${p.price.toLocaleString()} FCFA</div>
@@ -335,8 +348,7 @@ window.deleteProduct = async (id) => {
   await loadDashboard();
   showToast('✅ Produit supprimé');
 };
-
-// Éditer produit
+  // Éditer produit
 window.editProduct = async (id) => {
   const product = allProducts.find(p => p.id == id);
   if (!product) return;
@@ -360,28 +372,18 @@ window.editProduct = async (id) => {
   }
   
   await loadCategorySelect();
-  if (product.category_id) {
-    document.getElementById('p-cat').value = product.category_id;
-  }
+  if (product.category_id) document.getElementById('p-cat').value = product.category_id;
   
   showTab('add-product');
   showToast('✏️ Modification en cours...');
 };
 
-function cancelEdit() {
-  resetForm();
-  showTab('products');
-}
-
+function cancelEdit() { resetForm(); showTab('products'); }
 function resetForm() {
-  editMode = false;
-  editProductId = null;
-  currentImageFile = null;
-  
+  editMode = false; editProductId = null; currentImageFile = null;
   document.getElementById('form-title').innerHTML = '➕ Ajouter un produit';
   document.getElementById('save-btn').innerHTML = '💾 Enregistrer';
   document.getElementById('cancel-btn').style.display = 'none';
-  
   document.getElementById('p-name').value = '';
   document.getElementById('p-desc').value = '';
   document.getElementById('p-price').value = '';
@@ -389,7 +391,6 @@ function resetForm() {
   document.getElementById('p-stock').value = '1';
   document.getElementById('p-featured').checked = false;
   document.getElementById('img-preview').innerHTML = '<div class="icon">📸</div><p>Cliquer pour choisir une photo</p>';
-  document.getElementById('save-msg').style.display = 'none';
 }
 
 // Catégories
@@ -406,7 +407,7 @@ window.deleteCategory = async (id) => {
   await updateData('categories', id, { is_active: false });
   await loadCategories();
   await loadCategorySelect();
-  showToast('Catégorie supprimée');
+  showToast('✅ Catégorie supprimée');
 };
 
 async function addCategory() {
@@ -424,7 +425,8 @@ async function loadCategorySelect() {
   const cats = await fetchData('categories', 'is_active=eq.true&order=name');
   document.getElementById('p-cat').innerHTML = '<option value="">Choisir...</option>' + cats.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
 }
-  // Preview image produit
+
+// Preview image produit
 function previewProductImage(input) {
   const file = input.files[0];
   if (!file) return;
@@ -434,30 +436,33 @@ function previewProductImage(input) {
   reader.readAsDataURL(file);
 }
 
-// Sauvegarder produit (ajout ou modification)
+// Sauvegarder produit
 async function saveProduct() {
   const name = document.getElementById('p-name').value.trim();
   const price = parseFloat(document.getElementById('p-price').value);
   if (!name || !price) { showToast('Nom et prix requis', 'error'); return; }
   
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Enregistrement...';
+  
+  const progressDiv = document.getElementById('product-progress');
   let imageUrl = null;
+  
   if (currentImageFile) {
-    showToast('📸 Upload image...', 'info');
-    imageUrl = await uploadToImgBB(currentImageFile);
-    if (!imageUrl) { showToast('Erreur upload', 'error'); return; }
+    progressDiv.style.display = 'block';
+    imageUrl = await uploadToImgBB(currentImageFile, 'product-progress-fill', 'product-progress-text');
+    if (!imageUrl) { showToast('Erreur upload image', 'error'); btn.disabled = false; btn.textContent = '💾 Enregistrer'; return; }
   }
   
   const data = {
-    name,
-    price,
-    stock: parseInt(document.getElementById('p-stock').value) || 1,
+    name, price, stock: parseInt(document.getElementById('p-stock').value) || 1,
     description: document.getElementById('p-desc').value,
     promo_price: document.getElementById('p-promo').value || null,
     category_id: document.getElementById('p-cat').value || null,
     is_featured: document.getElementById('p-featured').checked,
     is_active: true
   };
-  
   if (imageUrl) data.image_url = imageUrl;
   
   let res;
@@ -468,6 +473,10 @@ async function saveProduct() {
     res = await insertData('products', data);
     if (res.ok) showToast('✅ Produit ajouté !');
   }
+  
+  progressDiv.style.display = 'none';
+  btn.disabled = false;
+  btn.textContent = editMode ? '✏️ Mettre à jour' : '💾 Enregistrer';
   
   if (res && res.ok) {
     resetForm();
@@ -502,19 +511,31 @@ function previewGalleryImage(input) {
 
 async function addGalleryImage() {
   if (!currentGalleryFile) { showToast('Choisissez une photo', 'error'); return; }
-  showToast('📸 Upload...', 'info');
-  const imageUrl = await uploadToImgBB(currentGalleryFile);
-  if (!imageUrl) { showToast('Erreur upload', 'error'); return; }
+  
+  const btn = document.getElementById('gallery-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Upload...';
+  
+  const progressDiv = document.getElementById('gallery-progress');
+  progressDiv.style.display = 'block';
+  
+  const imageUrl = await uploadToImgBB(currentGalleryFile, 'gallery-progress-fill', 'gallery-progress-text');
+  if (!imageUrl) { showToast('Erreur upload', 'error'); btn.disabled = false; btn.textContent = '📤 Ajouter à la galerie'; return; }
   
   await insertData('portfolio', {
     title: document.getElementById('gallery-title').value,
     image_url: imageUrl,
     category: document.getElementById('gallery-cat').value,
-    is_active: true  });
+    is_active: true
+  });
   
   document.getElementById('gallery-title').value = '';
   document.getElementById('gallery-preview').innerHTML = '<div class="icon">📷</div><p>Cliquer pour choisir une photo</p>';
   currentGalleryFile = null;
+  progressDiv.style.display = 'none';
+  btn.disabled = false;
+  btn.textContent = '📤 Ajouter à la galerie';
+  
   await loadGallery();
   showToast('✅ Photo ajoutée à la galerie !');
 }
@@ -523,7 +544,7 @@ window.deleteGalleryImage = async (id) => {
   if (!confirm('Supprimer cette photo ?')) return;
   await updateData('portfolio', id, { is_active: false });
   await loadGallery();
-  showToast('Photo supprimée');
+  showToast('✅ Photo supprimée');
 };
 
 // Témoignages
@@ -546,6 +567,10 @@ async function addTestimonial() {
   const text = document.getElementById('testi-text').value.trim();
   if (!name || !text) { showToast('Nom et témoignage requis', 'error'); return; }
   
+  const btn = document.getElementById('testi-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Ajout...';
+  
   await insertData('testimonials', {
     customer_name: name, content: text,
     rating: parseInt(document.getElementById('testi-rating').value),
@@ -556,6 +581,10 @@ async function addTestimonial() {
   document.getElementById('testi-name').value = '';
   document.getElementById('testi-text').value = '';
   document.getElementById('testi-city').value = '';
+  
+  btn.disabled = false;
+  btn.textContent = '➕ Ajouter le témoignage';
+  
   await loadTestimonials();
   showToast('✅ Témoignage ajouté !');
 }
@@ -563,14 +592,14 @@ async function addTestimonial() {
 window.toggleTestimonial = async (id, approve) => {
   await updateData('testimonials', id, { is_approved: approve });
   await loadTestimonials();
-  showToast(approve ? 'Témoignage publié' : 'Témoignage masqué');
+  showToast(approve ? '✅ Témoignage publié' : '📁 Témoignage masqué');
 };
 
 window.deleteTestimonial = async (id) => {
   if (!confirm('Supprimer ce témoignage ?')) return;
   await deleteData('testimonials', id);
   await loadTestimonials();
-  showToast('Témoignage supprimé');
+  showToast('🗑️ Témoignage supprimé');
 };
 
 // Vendeurs
@@ -583,7 +612,8 @@ async function loadSellers() {
       <td style="color:#94a3b8">${s.city || '-'}</td>
       <td style="color:#f59e0b">${'★'.repeat(Math.round(s.rating || 5))}</td>
       <td><span class="badge ${s.is_approved ? 'badge-green' : 'badge-orange'}">${s.is_approved ? 'Approuvé' : 'En attente'}</span></td>
-      <td><button onclick="toggleSeller(${s.id},${!s.is_approved})" style="background:${s.is_approved ? '#ef4444' : '#10b981'};color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer">${s.is_approved ? 'Désactiver' : 'Approuver'}</button></td>
+      <td><div style="display:flex;gap:5px"><button onclick="toggleSeller(${s.id},${!s.is_approved})" style="background:${s.is_approved ? '#ef4444' : '#10b981'};color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer">${s.is_approved ? 'Désactiver' : 'Approuver'}</button>
+      <button onclick="deleteSeller(${s.id})" style="background:#ef4444;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer">Supprimer</button></div></td>
     </tr>
   `).join('');
 }
@@ -591,7 +621,14 @@ async function loadSellers() {
 window.toggleSeller = async (id, approve) => {
   await updateData('sellers', id, { is_approved: approve });
   await loadSellers();
-  showToast(approve ? 'Vendeur approuvé' : 'Vendeur désactivé');
+  showToast(approve ? '✅ Vendeur approuvé' : '🚫 Vendeur désactivé');
+};
+
+window.deleteSeller = async (id) => {
+  if (!confirm('Supprimer ce vendeur ?')) return;
+  await deleteData('sellers', id);
+  await loadSellers();
+  showToast('🗑️ Vendeur supprimé');
 };
 
 // Commandes
@@ -617,14 +654,14 @@ async function loadOrders() {
 
 window.updateOrderStatus = async (id, status) => {
   await updateData('orders', id, { status });
-  showToast('Statut mis à jour');
+  showToast('✅ Statut mis à jour');
 };
 
 window.deleteOrder = async (id) => {
   if (!confirm('Supprimer cette commande ?')) return;
   await deleteData('orders', id);
   await loadOrders();
-  showToast('Commande supprimée');
+  showToast('🗑️ Commande supprimée');
 };
 
 // Paramètres
